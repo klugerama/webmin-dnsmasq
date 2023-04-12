@@ -1,0 +1,21 @@
+<header>DNSmasq Configuration</header>
+
+<h3>Introduction to DNSmasq</h3>
+DNSmasq is an integrated DNS caching proxy server and DHCP server designed 
+to run on a host that is masquerading a local private network to the rest
+of the internet. <p>
+<h3>Configuring DNSmasq</h3>
+In most cases, all you'll need to change will be the local domain name. Under
+some circumstances, you may want to change how DNSmasq resolves names to
+allow for other local nameservers (if for example you are using a VPN
+tunnel to another location).<p>
+All the functionality of DNSmasq is beyond the scope of this help file - 
+please read the man pages!
+<h3>Limitations</h3>
+Please read the README file.<br>
+In Short, this is a quick and dirty implementation with virtually <em>
+	no error checking</em>. Therefore, it assumes <em>you
+	know what you are doing!</em> <br>
+<h3>Use with care!</h3> If you enter a name where a IP address 
+should be (for example) then you may need to edit the config file
+manually to remove or edit the offending line. YOU HAVE BEEN WARNED!

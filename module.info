@@ -1,0 +1,5 @@
+name=DNSMasq
+desc=DNSMasq integrated DNS & DHCP servers
+os_support=
+depends=0.77
+category=servers
