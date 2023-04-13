@@ -79,7 +79,7 @@ if( $in{leasefile} !~ /^$FILE$/ ) {
 #
 # read /etc/ethers
 #
-&update( $config{dhcp_ethers}{line}, "read-ethers", 
+&update( $config{read_ethers}{line}, "read-ethers", 
 	$config_file, ($in{ethers} == 1) );
 
 #

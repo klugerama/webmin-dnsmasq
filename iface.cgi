@@ -76,7 +76,7 @@ print $text{'listen_addr'};
 print "</h2>";
 $count=0;
 print &ui_columns_start( [ $text{listen_addr}, $text{in_use} ], 100 );
-foreach my $iface ( @{$config{listen_on}} ) {
+foreach my $iface ( @{$config{listen_address}} ) {
 	my $edit = "<a href=listen_edit.cgi?idx=$count>".$$iface{address}."</a>";
 	print &ui_columns_row( [ $edit, ($$iface{used})?$text{used}:$text{not_used} ],
        		[ "width=30%", "width=30%", "width=30%" ]	);

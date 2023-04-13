@@ -143,7 +143,7 @@ print "<br><a href=add.cgi?what=dhcp-option=27&where=dhcp.cgi>".
 print &ui_form_start( 'dhcp_apply.cgi', "get" );
 print "<h2>".$text{misc}."</h2><br>";
 print $text{read_ethers}.&ui_yesno_radio( "ethers", 
-			($config{dhcp_ethers}{used})?1:0 );
+			($config{read_ethers}{used})?1:0 );
 print "<br><br>".$text{use_bootp}.&ui_yesno_radio ( "bootp",
 			($config{dhcp_boot}{used})?1:0 );
 print "<br>".$text{bootp_host}.&ui_textbox( "bootp_host",

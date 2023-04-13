@@ -8,47 +8,76 @@
 # 
 my %config = {
     errors => 0,
-    mx_host => { used => 0, line => 0, file => "", host => "" },
-    mx_target => { used => 0, line => 0, file => "", host => "" },
-    selfmx => { used => 0, line => 0, file => "" },
-    localmx => { used => 0, line => 0, file => "" },	
+    port => { used => 0, line => 0, file => "", port = 53 },
     domain_needed => { line => 0, used => 0, file => "" },
     bogus_priv => { line =>0, used => 0, file => "" },
+    conf_file => { used => 0, line => 0, file => "", filename => "" },
+    conf_dir => { used => 0, line => 0, file => "", dirname => "", filter => "", exceptions => "" },
+    dnssec => { line =>0, used => 0, file => "" },
+    dnssec_check_unsigned => { line =>0, used => 0, file => "" },
     filterwin2k => { line => 0, used => 0, file => "" },
     resolv_file => { line => 0, used => 0, file => "",				
             filename => "/etc/hosts" },
     strict_order => { line => 0, used => 0, file => "" },
     no_resolv => { line => 0, used => 0, file => "" },
     no_poll => { line => 0, used => 0, file => "" },
-    servers => [],
     locals => [],
-    forced => [],
-    bogus => [],
+    forced => [], # address
+    ip_set => [],
+    servers => [],
     user => { used => 0, file => "", user =>"" },
     group => { used => 0, file => "", group => "" },
     interface =>  [],
     ex_interface =>  [],
-    listen_on => 	[],
-    alias => [],
+    listen_address => 	[],
+    no_dhcp_interface =>  [],
     bind_interfaces => { used => 0, line => 0, file => "" },
     no_hosts => { used => 0, line => 0, file => "" },
     addn_hosts => { used => 0, line => 0, file => "" },
     expand_hosts => { used => 0, line => 0, file => "" },
     domain => { used => 0, line => 0, file => "", domain => "" },
+    dhcp_range => [],
+    dhcp_host => [],
+    enable_ra => { used => 0, line => 0, file => "" },
+    dhcp_ignore => [],
+    vendor_class => [],
+    user_class => [],
+    dhcp_mac => [],
+    read_ethers => { used => 0, line => 0, file => "" },
+    dhcp_option => [],
+    dhcp_option_force => [],
+    dhcp_boot => { used => 0, line => 0, file => "",
+            host => "", address => "" },
+    dhcp_match => [],
+    pxe_prompt => { used => 0, line => 0, file => "" },
+    pxe_service => [],
+    enable_tftp => { used => 0, line => 0, file => "" },
+    tftp_root => { used => 0, line => 0, file => "" },
+    tftp_no_fail => { used => 0, line => 0, file => "" },
+    tftp_secure => { used => 0, line => 0, file => "" },
+    tftp_no_blocksize => { used => 0, line => 0, file => "" },
+    dhcp_leasemax => { used => 0, line => 0, file => "", max => 0 },
+    dhcp_leasefile => { used => 0, line => 0, file => "", filename => "" },
+    dhcp_authoritative => { used => 0, line => 0, file => "" },
+    dhcp_script => { used => 0, line => 0, file => "", filename => "" },
     cache_size => { used => 0, line =>0, file => "", size => 0 },
     neg_cache => { used => 0, line => 0, file => "" },
     local_ttl => { used => 0, line => 0, file => "", ttl => 0 },
+    bogus_nxdomain => [],
+    alias => [],
+    mx_host => { used => 0, line => 0, file => "", host => "" },
+    mx_target => { used => 0, line => 0, file => "", host => "" },
+    localmx => { used => 0, line => 0, file => "" },	
+    selfmx => { used => 0, line => 0, file => "" },
+    srv_host => [],
+    ptr_record => [],
+    txt_record => [],
+    cname => { used => 0, line => 0, file => "" },
     log_queries => { used => 0, line => 0, file => "" },	
-    dhcp_range => [],
-    dhcp_host => [],
-    vendor_class => [],
-    user_class => [],
-    dhcp_option => [],
-    dhcp_boot => { used => 0, line => 0, file => "",
-            host => "", address => "" },
-    dhcp_leasemax => { used => 0, line => 0, file => "", max => 0 },
-    dhcp_leasefile => { used => 0, line => 0, file => "", file => "" },
-    dhcp_ethers => { used => 0, line => 0, file => "" }
+    log_dhcp => { used => 0, line => 0, file => "" },	
+    log_facility => { used => 0, line => 0, file => "", filename => "" },	
+    dhcp_name_match => { used => 0, line => 0, file => "" },
+    dhcp_ignore_names => { used => 0, line => 0, file => "" }
 };
 #
 # parse the configuration file and populate the %config structure
@@ -67,7 +96,7 @@ sub parse_config_file {
     $IPV6PROP = "ra-only|ra-names|ra-stateless|slaac";
 
     $lineno=0;
-    foreach my $line (@$$config_file) { # this appears to skip empty lines?
+    foreach my $line (@$$config_file) {
         my $subline;
         my %temp;
         
@@ -83,7 +112,13 @@ sub parse_config_file {
             # reject lines blank at start!
             next if ($line !~ /^[0-9a-zA-Z\_\-\#]/);
             # MX records server?
-            if ( $line =~ /(^[\#]*[\s]*mx-host)\=([0-9a-zA-Z\.\-]*)/ ) {
+            if ( $line =~ /(^[\#]*[\s]*port)\=([0-9]{1,5})/ ) {
+                $$config{port}{port}=$2;
+                $$config{port}{line}=$lineno;
+                $$config{port}{used}=($line!~/^\#/);
+                # $$config{port}{file}=$config_file;
+            }
+            elsif ( $line =~ /(^[\#]*[\s]*mx-host)\=([0-9a-zA-Z\.\-]*)/ ) {
             }
             elsif ($line =~ /(^[\#]*[\s]*mx-target)\=([0-9a-zA-Z\.\-]*)/ ) {
             }
@@ -218,19 +253,19 @@ sub parse_config_file {
                     $temp{line}=$lineno;
                     $temp{address}=$1;
                     $temp{used}= ($line !~ /^\#/);
-                    push @{ $$config{listen_on} }, { %temp };
+                    push @{ $$config{listen_address} }, { %temp };
                 }
                 elsif ( $subline =~ /($IPV6ADDR)/ ) {
                     $temp{line}=$lineno;
                     $temp{address}=$1;
                     $temp{used}= ($line !~ /^\#/);
-                    push @{ $$config{listen_on} }, { %temp };
+                    push @{ $$config{listen_address} }, { %temp };
                 }
                 elsif ( $subline eq "" ) {
                     $temp{line}=$lineno;
                     $temp{address}="";
                     $temp{used}= ($line !~ /^\#/);
-                    push @{ $$config{listen_on} }, { %temp };
+                    push @{ $$config{listen_address} }, { %temp };
                 }
                 else
                 {
@@ -301,7 +336,7 @@ sub parse_config_file {
                     $temp{line}=$lineno;
                     $temp{addr}=$1;
                     $temp{used}= ($line !~ /^\#/);
-                    push @{ $$config{bogus} }, { %temp };
+                    push @{ $$config{bogus_nxdomain} }, { %temp };
                 }
                 else
                 {
@@ -493,8 +528,8 @@ sub parse_config_file {
             }
             # /etc/ethers?
             elsif ($line =~ /(^[\#]*[\s]*read-ethers)/ ) {
-                $$config{dhcp_ethers}{line}=$lineno;
-                $$config{dhcp_ethers}{used}=($line !~/^\#/);
+                $$config{read_ethers}{line}=$lineno;
+                $$config{read_ethers}{used}=($line !~/^\#/);
             }
             # dchp options
             elsif ($line =~ /(^[\#]*[\s]*dhcp-option\=)([0-9a-zA-Z\,\_\.]*)/ ) {

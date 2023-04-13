@@ -97,7 +97,7 @@ print "<h2>".$text{nx}."</h2>";
 print "<br><br>\n";
 $count=0;
 print &ui_columns_start( [ $text{forced_from}, $text{in_use} ], 100 );
-foreach my $frcd ( @{$config{bogus}} ) {
+foreach my $frcd ( @{$config{bogus_nxdomain}} ) {
 	my $edit = "<a href=nx_edit.cgi?idx=$count>".$$frcd{addr}."</a>";
 	print &ui_columns_row( [ 
 			$edit, 

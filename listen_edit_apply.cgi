@@ -53,7 +53,7 @@ if( $in{addr} !~ /^$IPADDR$/ ) {
 # adjust everything to what we got
 #
 my $line="listen-address=".$in{addr};
-&update( $config{listen_on}[$in{idx}]{line}, $line,
+&update( $config{listen_address}[$in{idx}]{line}, $line,
 	$config_file, ( $in{used} == 1 ) );
 #
 # write file!!

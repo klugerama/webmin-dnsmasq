@@ -53,7 +53,7 @@ if( $in{from} !~ /^$IPADDR$/ ) {
 # adjust everything to what we got
 #
 my $line="bogus-nxdomain=".$in{from};
-&update( $config{bogus}[$in{idx}]{line}, $line,
+&update( $config{bogus_nxdomain}[$in{idx}]{line}, $line,
 	$config_file, ( $in{used} == 1 ) );
 #
 # write file!!

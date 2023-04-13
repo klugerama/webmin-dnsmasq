@@ -51,16 +51,16 @@ if( $config{errors} > 0 ) {
 # adjust everything to what we got
 #
 &header( "DNSMasq settings", "" );
-print "<h2>".$text{bogus}."</h2>";
+print "<h2>".$text{bogus_nxdomain}."</h2>";
 print &ui_form_start( "nx_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
 print $text{forced_from}. &ui_textbox( "from", 
-					$config{bogus}[$in{idx}]{addr}, 15 );
+					$config{bogus_nxdomain}[$in{idx}]{addr}, 15 );
 print "<br>".$text{in_use}.&ui_yesno_radio( "used",
-				($config{bogus}[$in{idx}]{used})?1:0 );
+				($config{bogus_nxdomain}[$in{idx}]{used})?1:0 );
 print "<br><br>" . &ui_submit( $text{'save_button'} )."<br>";
 print &ui_form_end();
-print "<a href=delete.cgi?idx=".$in{idx}."&what=bogus&where=alias.cgi".
+print "<a href=delete.cgi?idx=".$in{idx}."&what=bogus_nxdomain&where=alias.cgi".
 	">".$text{delet}."</a>";
 print "<br><a href=alias.cgi>".$text{alias_config}."</a>";
 &footer( "/", $text{'index'});

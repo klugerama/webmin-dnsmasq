@@ -17,7 +17,7 @@
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
-do 'dnsmasq-lib.pl';
+do './dnsmasq-lib.pl';
 
 $|=1;
 &init_config("DNSMasq");
