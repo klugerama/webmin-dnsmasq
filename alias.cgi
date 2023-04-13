@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - alias.cgi; aliasing and redirection
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -40,8 +40,7 @@ $config_file = &read_file_lines( $config{config_file} );
 
 
 &parse_config_file( \%config, \$config_file );
-if( $config{errors} > 0 )
-{
+if( $config{errors} > 0 ) {
 	my $line="error.cgi?line=xx&type=".$text{err_configbad};
 	&redirect( $line );
 	exit;
@@ -56,8 +55,7 @@ print "<br><br>\n";
 my $count=0;
 print &ui_columns_start( [ $text{forced_domain}, $text{forced_ip},
 			$text{in_use} ], 100 );
-foreach my $frcd ( @{$config{forced}} )
-{
+foreach my $frcd ( @{$config{forced}} ) {
 	my $edit = "<a href=forced_edit.cgi?idx=$count>".$$frcd{domain}."</a>";
 	print &ui_columns_row( [ $edit, $$frcd{addr}, ($$frcd{used}) ?
 			$text{used} : $text{not_used} ],
@@ -77,8 +75,7 @@ print "<br><br>\n";
 $count=0;
 print &ui_columns_start( [ $text{forced_from}, $text{forced_ip},
 			$text{forced_mask}, $text{in_use} ], 100 );
-foreach my $frcd ( @{$config{alias}} )
-{
+foreach my $frcd ( @{$config{alias}} ) {
 	my $edit = "<a href=alias_edit.cgi?idx=$count>".$$frcd{from}."</a>";
 	print &ui_columns_row( [ 
 			$edit, $$frcd{to}, 
@@ -100,8 +97,7 @@ print "<h2>".$text{nx}."</h2>";
 print "<br><br>\n";
 $count=0;
 print &ui_columns_start( [ $text{forced_from}, $text{in_use} ], 100 );
-foreach my $frcd ( @{$config{bogus}} )
-{
+foreach my $frcd ( @{$config{bogus}} ) {
 	my $edit = "<a href=nx_edit.cgi?idx=$count>".$$frcd{addr}."</a>";
 	print &ui_columns_row( [ 
 			$edit, 

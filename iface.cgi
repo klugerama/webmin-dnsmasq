@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - iface.cgi; network interfaces
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -48,8 +48,7 @@ print "<h2>";
 print $text{'iface_listen'};
 print "</h2>";
 print &ui_columns_start( [ $text{iface}, $text{in_use} ], 100 );
-foreach my $iface ( @{$config{interface}} )
-{
+foreach my $iface ( @{$config{interface}} ) {
 	my $edit = "<a href=iface_edit.cgi?idx=$count>".$$iface{iface}."</a>";
 	print &ui_columns_row( [ $edit, ($$iface{used})?$text{used}:$text{not_used} ],
        		[ "width=30%", "width=30%", "width=30%" ]	);
@@ -63,8 +62,7 @@ print $text{'xiface_listen'};
 print "</h2>";
 $count=0;
 print &ui_columns_start( [ $text{xiface}, $text{in_use} ], 100 );
-foreach my $iface ( @{$config{ex_interface}} )
-{
+foreach my $iface ( @{$config{ex_interface}} ) {
 	my $edit = "<a href=xiface_edit.cgi?idx=$count>".$$iface{iface}."</a>";
 	print &ui_columns_row( [ $edit, ($$iface{used})?$text{used}:$text{not_used} ],
        		[ "width=30%", "width=30%", "width=30%" ]	);
@@ -78,8 +76,7 @@ print $text{'listen_addr'};
 print "</h2>";
 $count=0;
 print &ui_columns_start( [ $text{listen_addr}, $text{in_use} ], 100 );
-foreach my $iface ( @{$config{listen_on}} )
-{
+foreach my $iface ( @{$config{listen_on}} ) {
 	my $edit = "<a href=listen_edit.cgi?idx=$count>".$$iface{address}."</a>";
 	print &ui_columns_row( [ $edit, ($$iface{used})?$text{used}:$text{not_used} ],
        		[ "width=30%", "width=30%", "width=30%" ]	);

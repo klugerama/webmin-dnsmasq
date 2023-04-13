@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - index.cgi; basic DNS config     
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -29,8 +29,10 @@ $|=1;
 
 ## sanity checks
 
+# &header($text{'index_title'}, "", "intro", 1, 1, undef,
+#         "Written by Neil Fisher<BR><A HREF=mailto:neil\@magnecor.com.au>Author</A><BR><A HREF=http://www.authorpage.invalid>Home://page</A>");
 &header($text{'index_title'}, "", "intro", 1, 1, undef,
-        "Written by Neil Fisher<BR><A HREF=mailto:neil\@magnecor.com.au>Author</A><BR><A HREF=http://www.authorpage.invalid>Home://page</A>");
+        "Written by Loren Cress<BR><A HREF=mailto:lcress\@gmail.com>Author</A><BR><A HREF=http://www.authorpage.invalid>Home://page</A>");
 # uses the index_title entry from ./lang/en or appropriate
 
 ## Insert Output code here
@@ -45,8 +47,7 @@ $config_file = &read_file_lines( $config{config_file} );
 &header( "DNSMasq settings", "" );
 &parse_config_file( \%config, \$config_file );
 print "<hr>\n";
-if( $config{errors} > 0 )
-{
+if( $config{errors} > 0 ) {
 	print "<h3>WARNING: found ";
 	print $config{errors};
 	print "errors in config file!</h3><br>\n";

@@ -1,12 +1,12 @@
 
 lang=en
-author=Neil Fisher
-module_author=Neil Fisher
+author=Loren Cress (originally Neil Fisher)
+module_author=Loren Cress (originally Neil Fisher)
 homepage=www.nonexistent.invalid
-copyright=(C) 2006 by Neil Fisher <neil@magnecor.com.au>
-license=GPL
+copyright=(C) 2023 by Loren Cress <lcress@gmail.com>
+license=GPLv3
 
-index_title=DNSMasq - integrated DNS and DHCP servers
+index_title=DNSMasq - A lightweight DHCP and caching DNS server
 DNS_settings=Basic DNS settings
 DHCP_settings=DHCP settings
 DNS_servers=DNS Upstream Servers Configuration

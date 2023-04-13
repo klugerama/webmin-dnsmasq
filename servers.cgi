@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - server.cgi; Upstream Servers config
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -62,11 +62,9 @@ print &ui_yesno_radio( "strict", ($config{strict_order}{used}?1:0) );
 print "<br><br><h3>".$text{in_file}."</h3>";
 print &ui_columns_start( [ $text{domain}, $text{address}, 
 			   $text{in_use}, "" ], 100 );
-foreach my $server ( @{$config{servers}} )
-{
+foreach my $server ( @{$config{servers}} ) {
 	local ( $mover, $edit );
-	if( $count == @{$config{servers}}-1 )
-	{
+	if( $count == @{$config{servers}}-1 ) {
 		$mover="<img src=images/gap.gif>";
 	}
 	else
@@ -75,8 +73,7 @@ foreach my $server ( @{$config{servers}} )
 		"dir=down'><img src=".
 		"images/down.gif border=0></a>";
 	}
-        if( $count == 0 )
-	{
+        if( $count == 0 ) {
 		$mover.="<img src=images/gap.gif>";
 	}
 	else

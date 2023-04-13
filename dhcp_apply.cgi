@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - dhcp_apply.cgi; update misc DHCP info     
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -38,43 +38,37 @@ $config_file = &read_file_lines( $config{config_file} );
 # read posted data
 &ReadParse();
 # check for errors in read config
-if( $config{errors} > 0 )
-{
+if( $config{errors} > 0 ) {
 	my $line="error.cgi?line=xx&type=".$text{err_configbad};
 	&redirect( $line );
 	exit;
 }
 # check for input data errors
-if( $in{bootp_addr} !~ /^$IPADDR$/ )
-{
+if( $in{bootp_addr} !~ /^$IPADDR$/ ) {
 	my $line="error.cgi?line=".$text{bootp_address};
 	$line .= "&type=".$text{err_notip};
 	&redirect( $line );
 	exit;
 }	
-if( $in{bootp_file} !~ /^$FILE$/ )
-{
+if( $in{bootp_file} !~ /^$FILE$/ ) {
 	my $line="error.cgi?line=".$text{bootp_file};
 	$line .= "&type=".$text{err_filebad};
 	&redirect( $line );
 	exit;
 }	
-if( $in{bootp_host} !~ /^$NAME$/ )
-{
+if( $in{bootp_host} !~ /^$NAME$/ ) {
 	my $line="error.cgi?line=".$text{bootp_host};
 	$line .= "&type=".$text{err_hostbad};
 	&redirect( $line );
 	exit;
 }	
-if( $in{max_leases} !~ /^$NUMBER$/ )
-{
+if( $in{max_leases} !~ /^$NUMBER$/ ) {
 	my $line="error.cgi?line=".$text{max_leases};
 	$line .= "&type=".$text{err_numbbad};
 	&redirect( $line );
 	exit;
 }	
-if( $in{leasefile} !~ /^$FILE$/ )
-{
+if( $in{leasefile} !~ /^$FILE$/ ) {
 	my $line="error.cgi?line=".$text{leasefile};
 	$line .= "&type=".$text{err_filebad};
 	&redirect( $line );

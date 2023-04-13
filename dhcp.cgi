@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - dhcp.cgi; DHCP config
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -45,8 +45,7 @@ $config_file = &read_file_lines( $config{config_file} );
 &header( "DNSMasq settings", "" );
 &parse_config_file( \%config, \$config_file );
 print "<hr>\n";
-if( $config{errors} > 0 )
-{
+if( $config{errors} > 0 ) {
 	print "<h3>WARNING: found ";
 	print $config{errors};
 	print "errors in config file!</h3><br>\n";
@@ -61,8 +60,7 @@ $width="width=33%";
 print "<h2>".$text{vendor_classes}."</h2>";
 print &ui_columns_start( [ $text{class},
 				$text{vendor}, $text{in_use} ], 100 );
-foreach my $range ( @{$config{vendor_class}} )
-{
+foreach my $range ( @{$config{vendor_class}} ) {
 	my $edit = "<a href=vend_edit.cgi?idx=$count>".$$range{class}."</a>";
 	print &ui_columns_row( [
 			$edit, $$range{vendor},
@@ -79,8 +77,7 @@ $width="width=33%";
 print "<h2>".$text{user_classes}."</h2>";
 print &ui_columns_start( [ $text{class},
 				$text{user}, $text{in_use} ], 100 );
-foreach my $range ( @{$config{user_class}} )
-{
+foreach my $range ( @{$config{user_class}} ) {
 	my $edit = "<a href=user_edit.cgi?idx=$count>".$$range{class}."</a>";
 	print &ui_columns_row( [
 			$edit, $$range{user},
@@ -98,8 +95,7 @@ print "<h2>".$text{dhcp_range}."</h2>";
 print &ui_columns_start( [ $text{net_id}, $text{forced_from}, $text{forced_ip},
 				$text{forced_mask}, $text{leasetime},
 			        $text{in_use}	], 100 );
-foreach my $range ( @{$config{dhcp_range}} )
-{
+foreach my $range ( @{$config{dhcp_range}} ) {
 	my $edit = "<a href=range_edit.cgi?idx=$count>".$$range{start}."</a>";
 	print &ui_columns_row( [
 			$$range{id}, $edit, $$range{end}, $$range{mask},
@@ -116,8 +112,7 @@ $count=0;
 $width="width=50%";
 print "<h2>".$text{hosts}."</h2>";
 print &ui_columns_start( [ $text{hosts}, $text{in_use} ], 100 );
-foreach my $range ( @{$config{dhcp_host}} )
-{
+foreach my $range ( @{$config{dhcp_host}} ) {
 	my $edit = "<a href=host_edit.cgi?idx=$count>".$$range{option}."</a>";
 	print &ui_columns_row( [
 			$edit,
@@ -133,8 +128,7 @@ $count=0;
 $width="width=50%";
 print "<h2>".$text{dhcp_options}."</h2>";
 print &ui_columns_start( [ $text{dhcp_option}, $text{in_use} ], 100 );
-foreach my $range ( @{$config{dhcp_option}} )
-{
+foreach my $range ( @{$config{dhcp_option}} ) {
 	my $edit = "<a href=option_edit.cgi?idx=$count>".$$range{option}."</a>";
 	print &ui_columns_row( [
 			$edit,

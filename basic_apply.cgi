@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - dns_apply.cgi; update basic DNS info     
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -38,36 +38,31 @@ $config_file = &read_file_lines( $config{config_file} );
 # read posted data
 &ReadParse();
 # check for errors in read config
-if( $config{errors} > 0 )
-{
+if( $config{errors} > 0 ) {
 	my $line = "error.cgi?line=xx&type=".$text{err_configbad};
 	&redirect( $line );
 	exit;
 }
 # check user input for obvious errors
-if( $in{local_domain} !~ /^$FILE$/ )
-{
+if( $in{local_domain} !~ /^$FILE$/ ) {
 	my $line = "error.cgi?line=".$text{local_domain};
 	$line .= "&type=".$text{err_domainbad};
 	&redirect( $line );
 	exit;
 }
-if( ($in{xhosts}) && ($in{addn_hosts} !~ /^$FILE$/) )
-{
+if( ($in{xhosts}) && ($in{addn_hosts} !~ /^$FILE$/) ) {
 	my $line = "error.cgi?line=".$text{xhostsfile};
 	$line .= "&type=".$text{err_filebad};
 	&redirect( $line );
 	exit;
 }
-if( ($in{cache_size}) && ($in{cust_cache_size} !~ /^$NUMBER/) )
-{
+if( ($in{cache_size}) && ($in{cust_cache_size} !~ /^$NUMBER/) ) {
 	my $line = "error.cgi?line=".$text{cust_cache_size};
 	$line .= "&type=".$text{err_numbbad};
 	&redirect( $line );
 	exit;
 }
-if( ($in{local_ttl}) && ($in{ttl} !~ /^$NUMBER/) )
-{
+if( ($in{local_ttl}) && ($in{ttl} !~ /^$NUMBER/) ) {
 	my $line = "error.cgi?line=".$text{ttl};
 	$line .= "&type=".$text{err_numbbad};
 	&redirect( $line );
@@ -78,7 +73,7 @@ if( ($in{local_ttl}) && ($in{ttl} !~ /^$NUMBER/) )
 #
 #our local domain
 #
-&update( $config{domain}{line}, "domain=".$in{local_domain}, 
+&update( $config{domain}{line}, "local=".$in{local_domain}, 
 	$config_file, 1 );
 #
 # need domains for forwarded lookups?

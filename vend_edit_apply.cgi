@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #    DNSMasq Webmin Module - vend_edit_apply.cgi; do the update      
-#    Copyright (C) 2006 by Neil Fisher
+#    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    This module inherited from the Webmin Module Template 0.79.1 by tn
+#    This module inherited from the DNSMasq Webmin module by Neil Fisher
 
 do '../web-lib.pl';
 do '../ui-lib.pl';
@@ -38,22 +38,19 @@ $config_file = &read_file_lines( $config{config_file} );
 # read posted data
 &ReadParse();
 # check for errors in read config
-if( $config{errors} > 0 )
-{
+if( $config{errors} > 0 ) {
 	my $line = "error.cgi?line=xx&type=".$text{err_configbad};
 	&redirect( $line );
 	exit;
 }
 # check for input data errors
-if( $in{class} !~ /^$NAME$/  )
-{
+if( $in{class} !~ /^$NAME$/  ) {
 	my $line = "error.cgi?line=".$text{class};
 	$line .= "&type=".$text{err_namebad};
 	&redirect( $line );
 	exit;
 }
-if( $in{vendor} !~ /^$NAME$/  )
-{
+if( $in{vendor} !~ /^$NAME$/  ) {
 	my $line = "error.cgi?line=".$text{vendor};
 	$line .= "&type=".$text{err_namebad};
 	&redirect( $line );
