@@ -1,0 +1,3 @@
+config_file=Full path to DNSmasq config file,0
+restart=Shell script to re-start DNSmasq,0
+pid_filename=PID full path and filename,0

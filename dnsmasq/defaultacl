@@ -1,0 +1,4 @@
+root=/
+logging=1
+start=1
+restart=1

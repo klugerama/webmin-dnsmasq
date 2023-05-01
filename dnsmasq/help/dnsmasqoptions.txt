@@ -1,0 +1,160 @@
+--no-hosts
+--addn-hosts=<file>
+--hostsdir=<path>
+--expand-hosts
+--local-ttl=<time>
+--dhcp-ttl=<time>
+--neg-ttl=<time>
+--max-ttl=<time>
+--max-cache-ttl=<time>
+--min-cache-ttl=<time>
+--auth-ttl=<time>
+--log-queries
+--log-facility=<facility>
+--log-debug
+--log-async[=<lines>]
+--pid-file=<path>
+--user=<username>
+--group=<groupname>
+--port=<port>
+--edns-packet-max=<size>
+--query-port=<query_port>
+--min-port=<port>
+--max-port=<port>
+--interface=<interface name>
+--except-interface=<interface name>
+--auth-server=<domain>,[<interface>|<ip-address>...]
+--local-service
+--no-dhcp-interface=<interface name>
+--listen-address=<ipaddr>
+--bind-interfaces
+--bind-dynamic
+--localise-queries
+--bogus-priv
+--alias=[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>]
+--bogus-nxdomain=<ipaddr>[/prefix]
+--ignore-address=<ipaddr>[/prefix]
+--filterwin2k
+--resolv-file=<file>
+--no-resolv
+--enable-dbus[=<service-name>]
+--enable-ubus[=<service-name>]
+--strict-order
+--all-servers
+--dns-loop-detect
+--stop-dns-rebind
+--rebind-localhost-ok
+--rebind-domain-ok=[<domain>]|[[/<domain>/[<domain>/]
+--no-poll
+--clear-on-reload
+--domain-needed
+--local=[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+--server=[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+--rev-server=<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
+--address=/<domain>[/<domain>...]/[<ipaddr>]
+--ipset=/<domain>[/<domain>...]/<ipset>[,<ipset>...]
+--mx-host=<mx name>[[,<hostname>],<preference>]
+--mx-target=<hostname>
+--selfmx
+--localmx
+--srv-host=<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
+--host-record=<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
+--dynamic-host=<name>,[IPv4-address],[IPv6-address],<interface>
+--txt-record=<name>[[,<text>],<text>]
+--ptr-record=<name>[,<target>]
+--naptr-record=<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
+--caa-record=<name>,<flags>,<tag>,<value>
+--cname=<cname>,[<cname>,]<target>[,<TTL>]
+--dns-rr=<name>,<RR-number>,[<hex data>]
+--interface-name=<name>,<interface>[/4|/6]
+--synth-domain=<domain>,<address range>[,<prefix>[*]]
+--dumpfile=<path/to/file>
+--dumpmask=<mask>
+--add-mac[=base64|text]
+--add-cpe-id=<string>
+--add-subnet[[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
+--cache-size=<cachesize>
+--no-negcache
+--dns-forward-max=<queries>
+--dnssec
+--trust-anchor=[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
+--dnssec-check-unsigned[=no]
+--dnssec-no-timecheck
+--dnssec-timestamp=<path>
+--proxy-dnssec
+--dnssec-debug
+--auth-zone=<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>].....][,exclude:<subnet>[/<prefix length>]].....]
+--auth-soa=<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
+--auth-sec-servers=<domain>[,<domain>[,<domain>...]]
+--auth-peer=<ip-address>[,<ip-address>[,<ip-address>...]]
+--conntrack
+--dhcp-range=[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>]
+--dhcp-range=[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
+--dhcp-host=[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
+--dhcp-hostsfile=<path>
+--dhcp-optsfile=<path>
+--dhcp-hostsdir=<path>
+--dhcp-optsdir=<path>
+--read-ethers
+--dhcp-option=[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+--dhcp-option-force=[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],]<opt>,[<value>[,<value>]]
+--dhcp-no-override
+--dhcp-relay=<local address>,<server address>[,<interface]
+--dhcp-vendorclass=set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
+--dhcp-userclass=set:<tag>,<user-class>
+--dhcp-mac=set:<tag>,<MAC address>
+--dhcp-circuitid=set:<tag>,<circuit-id>, --dhcp-remoteid=set:<tag>,<remote-id>
+--dhcp-subscrid=set:<tag>,<subscriber-id>
+--dhcp-proxy[=<ip addr>]......
+--dhcp-match=set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
+--dhcp-name-match=set:<tag>,<name>[*]
+--tag-if=set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
+--dhcp-ignore=tag:<tag>[,tag:<tag>]
+--dhcp-ignore-names[=tag:<tag>[,tag:<tag>]]
+--dhcp-generate-names=tag:<tag>[,tag:<tag>]
+--dhcp-broadcast[=tag:<tag>[,tag:<tag>]]
+--dhcp-boot=[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
+--dhcp-sequential-ip
+--dhcp-ignore-clid
+--pxe-service=[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
+--pxe-prompt=[tag:<tag>,]<prompt>[,<timeout>]
+--dhcp-pxe-vendor=<vendor>[,...]
+--dhcp-lease-max=<number>
+--dhcp-authoritative
+--dhcp-rapid-commit
+--dhcp-alternate-port[=<server port>[,<client port>]]
+--bootp-dynamic[=<network-id>[,<network-id>]]
+--no-ping
+--log-dhcp
+--quiet-dhcp, --quiet-dhcp6, --quiet-ra
+--dhcp-leasefile=<path>
+--dhcp-duid=<enterprise-id>,<uid>
+--dhcp-script=<path>
+--dhcp-luascript=<path>
+--dhcp-scriptuser
+--script-arp
+--leasefile-ro
+--script-on-renewal
+--bridge-interface=<interface>,<alias>[,<alias>]
+--shared-network=<interface>,<addr>
+--shared-network=<addr>,<addr>
+--domain=<domain>[,<address range>[,local]]
+--dhcp-fqdn
+--dhcp-client-update
+--enable-ra
+--ra-param=<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
+--dhcp-reply-delay=[tag:<tag>,]<integer>
+--enable-tftp[=<interface>[,<interface>]]
+--tftp-root=<directory>[,<interface>]
+--tftp-no-fail
+--tftp-unique-root[=ip|mac]
+--tftp-secure
+--tftp-lowercase
+--tftp-max=<connections>
+--tftp-mtu=<mtu size>
+--tftp-no-blocksize
+--tftp-port-range=<start>,<end>
+--tftp-single-port
+--conf-file=<file>
+--conf-dir=<directory>[,<file-extension>......],
+--servers-file=<file>
