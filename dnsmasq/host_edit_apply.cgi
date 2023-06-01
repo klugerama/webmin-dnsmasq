@@ -35,20 +35,20 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-    my $line="error.cgi?line=xx&type=".$text{"err_configbad"};
+    my $line="error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
     &redirect( $line );
     exit;
 }
 # adjust everything to what we got
 #
 my $line="dhcp-host=".$in{host};
-&update( $dnsmconfig{"dhcp-host"}[$in{idx}]{line}, $line,
-    $config_file, ( $in{used} == 1 ) );
+&update( $dnsmconfig{"dhcp-host"}[$in{idx}]{"line"}, $line,
+    $config_file, ( $in{"used"} == 1 ) );
 #
 # write file!!
 &flush_file_lines();

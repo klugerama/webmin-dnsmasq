@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - xiface_edit_apply.cgi; do the update      
+#    DNSMasq Webmin Module - # TODO xiface_edit_apply.cgi; do the update      
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,20 +35,20 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-	my $line = "error.cgi?line=xx&type=".$text{"err_configbad"};
+	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
 	&redirect( $line );
 	exit;
 }
 # adjust everything to what we got
 #
-my $line="except-interface=".$in{iface};
-&update( $dnsmconfig{"ex-interface"}[$in{idx}]{line}, $line,
-	$config_file, ( $in{used} == 1 ) );
+my $line="except-interface=".$in{"interface"};
+&update( $dnsmconfig{"except-interface"}[$in{idx}]{"line"}, $line,
+	$config_file, ( $in{"enabled"} == 1 ) );
 #
 # write file!!
 &flush_file_lines();

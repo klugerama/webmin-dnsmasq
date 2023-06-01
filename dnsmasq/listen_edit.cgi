@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - listen_edit.cgi;  edit listen on
+#    DNSMasq Webmin Module - # TODO listen_edit.cgi;  edit listen on
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
@@ -52,18 +52,18 @@ if( $dnsmconfig{"errors"} > 0 ) {
 # adjust everything to what we got
 #
 &header( "DNSMasq settings", "" );
-print "<h2>".$text{"edit_"}." ".$text{"_listen"}."</h2>";
+print "<h2>".&text("edit_", $text{"_listen"})."</h2>";
 print &ui_form_start( "listen_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
 print "<br>".$text{"enabled"}.&ui_yesno_radio( "used",
-				($dnsmconfig{"listen-address"}[$in{idx}]{used})?1:0 );
-print "<br>".$text{"listen_name"};
-print &ui_textbox( "addr", $dnsmconfig{"listen-address"}[$in{idx}]{address}, 50 );
+				($dnsmconfig{"listen-address"}[$in{"idx"}]{"enabled"})?1:0 );
+print "<br>".$text{"p_label_listen_address"};
+print &ui_textbox( "listen_address", $dnsmconfig{"listen-address"}[$in{"idx"}]{"val"}, 50 );
 print "<br><br>" . &ui_submit( $text{"save_button"} )."<br>";
 print &ui_form_end();
 print "<a href=delete.cgi?idx=".$in{idx}."&what=listen_address&where=dns_iface.cgi".
 		">".$text{"delet"}."</a>";
-print "<br><a href=dns_iface.cgi>".$text{"dns_iface_config"}."</a>";
+print "<br><a href=dns_iface.cgi>".$text{"index_dns_iface_settings"}."</a>";
 &footer( "/", $text{"index"});
 #
 

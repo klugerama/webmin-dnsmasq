@@ -35,37 +35,37 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-	my $line = "error.cgi?line=xx&type=".$text{"err_configbad"};
+	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
 	&redirect( $line );
 	exit;
 }
 # check for input data errors
-if( $in{from} !~ /^$IPADDR$/ ) {
+if( $in{from} !~ /^($IPADDR)$/ ) {
 	my $line = "error.cgi?line=".$text{"forced_from"};
-	$line .= "&type=".$text{"err_notip"};
+	$line .= "&type=" . &urlize($text{"err_notip"});
 	&redirect( $line );
 	exit;
 }
-if( $in{to} !~ /^$IPADDR$/ ) {
+if( $in{to} !~ /^($IPADDR)$/ ) {
 	my $line = "error.cgi?line=".$text{"forced_ip"};
-	$line .= "&type=".$text{"err_notip"};
+	$line .= "&type=" . &urlize($text{"err_notip"});
 	&redirect( $line );
 	exit;
 }
-if( ($in{masked}) && ($in{mask} !~ /^$IPADDR$/) ) {
+if( ($in{masked}) && ($in{mask} !~ /^($IPADDR)$/) ) {
 	my $line = "error.cgi?line=".$text{"netmask"};
-	$line .= "&type=".$text{"err_notmask"};
+	$line .= "&type=" . &urlize($text{"err_notmask"});
 	&redirect( $line );
 	exit;
 }
 if( ($in{timed}) && ($in{'time'} !~ /^$TIME$/) ) {
 	my $line = "error.cgi?line=".$text{"leasetime"};
-	$line .= "&type=".$text{"err_nottime"};
+	$line .= "&type=" . &urlize($text{"err_nottime"});
 	&redirect( $line );
 	exit;
 }
@@ -76,8 +76,8 @@ $line .= $in{id}."," if $in{ided};
 $line .= $in{from}.",".$in{to};
 $line .= $in{mask} if $in{masked};
 $line .= $in{'time'} if $in{timed};
-&update( $dnsmconfig{"dhcp-range"}[$in{idx}]{line}, $line,
-	$config_file, ( $in{used} == 1 ) );
+&update( $dnsmconfig{"dhcp-range"}[$in{idx}]{"line"}, $line,
+	$config_file, ( $in{"used"} == 1 ) );
 #
 # write file!!
 &flush_file_lines();
@@ -96,8 +96,8 @@ $line .= $in{id}."," if $in{ided};
 $line .= $in{from}.",".$in{to};
 $line .= $in{mask} if $in{masked};
 $line .= $in{'time'} if $in{timed};
-&update( $dnsmconfig{"dhcp-range"}[$in{idx}]{line}, $line,
-	$config_file, ( $in{used} == 1 ) );
+&update( $dnsmconfig{"dhcp-range"}[$in{idx}]{"line"}, $line,
+	$config_file, ( $in{"used"} == 1 ) );
 #
 # write file!!
 &flush_file_lines();

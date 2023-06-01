@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - xiface_edit.cgi;  edit except interface
+#    DNSMasq Webmin Module - # TODO xiface_edit.cgi;  edit except interface
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
@@ -52,18 +52,18 @@ if( $dnsmconfig{"errors"} > 0 ) {
 # adjust everything to what we got
 #
 &header( "DNSMasq settings", "" );
-print "<h2>".$text{"edit_"}." ".$text{"_xiface"}."</h2>";
+print "<h2>".&text("edit_", $text{"_xiface"})."</h2>";
 print &ui_form_start( "xiface_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
-print "<br>".$text{"enabled"}.&ui_yesno_radio( "used",
-				($dnsmconfig{"ex-interface"}[$in{idx}]{used})?1:0 );
-print "<br>".$text{"xiface_name"};
-print &ui_textbox( "iface", $dnsmconfig{"ex-interface"}[$in{idx}]{iface}, 50 );
+print "<br>".$text{"enabled"}.&ui_yesno_radio( "enabled",
+				($dnsmconfig{"except-interface"}[$in{idx}]{"used"})?1:0 );
+print "<br>".$text{"except_interface"};
+print &ui_textbox( "interface", $dnsmconfig{"except-interface"}[$in{idx}]{"val"}, 50 );
 print "<br><br>" . &ui_submit( $text{"save_button"} )."<br>";
 print &ui_form_end();
-print "<a href=delete.cgi?idx=".$in{idx}."&what=ex_interface&where=dhcp.cgi>".
+print "<a href=delete.cgi?idx=".$in{idx}."&what=except_interface&where=dhcp.cgi>".
 		$text{"delet"}."</a>";
-print "<br>< a href=dns_iface.cgi>".$text{"dns_iface_config"}."</a>";
+print "<br>< a href=dns_iface.cgi>".$text{"index_dns_iface_settings"}."</a>";
 &footer( "/", $text{"index"});
 #
 

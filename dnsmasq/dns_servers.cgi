@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - dns_servers.cgi; Upstream Servers config
+#    DNSMasq Webmin Module - # TODO dns_servers.cgi; Upstream Servers config
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -26,58 +26,69 @@ my %access=&get_module_acl;
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+
+&header( "DNSMasq settings", "" );
+
+print "<h2>";
+print $text{"index_dns_servers"};
+print "</h2>";
+
+my $formid = "dns_servers_form";
+my $context = "server";
+my @newfields = ("domain", "ip", "source");
+my @editfields = ( "idx", @newfields );
+my @list_link_buttons = &list_links( "sel", 0 );
+my ($button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_srv"}), $context, $text{"index_dns_servers"}, 700, 505, $formid, \@newfields );
+# my @list_link_buttons = &list_links( "sel", 0, "dns_servers_apply.cgi", "server=0.0.0.0", "dns_servers.cgi", &text("add_", $text{"_dns_serv"}) );
+push(@list_link_buttons, $button);
 
 my $count=0;
-&header( "DNSMasq settings", "" );
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
-print "<h2>";
-print $text{"dns_servers"};
-print "</h2>";
-print &ui_form_start( "srv_apply.cgi", "post" );
-print "<h3>".$text{"dynamic"}."</h3>";
-print $text{"resolv"};
-print &ui_yesno_radio( "resolv", ($dnsmconfig{"no-resolv"}->{used}?0:1) );
-print "<br>".$text{"resolv_file_explicit"};
-print &ui_yesno_radio( "resolv_std", ($dnsmconfig{"resolv-file"}->{used}?1:0) );
-print "<br>".$text{"resolv_file"};
-print &ui_textbox( "resolv_file", $dnsmconfig{"resolv-file"}->{filename}, 50 );
-print "<br><br>".$text{"poll"}."<br>";
-print &ui_yesno_radio( "poll", ($dnsmconfig{"no-poll"}->{used}?0:1) );
-print "<br><br>".$text{"strict_order"};
-print &ui_yesno_radio( "strict", ($dnsmconfig{"strict-order"}->{used}?1:0) );
-print "<br><br><h3>".$text{"in_file"}."</h3>";
-print &ui_columns_start( [ $text{"domain"}, $text{"address"}, $text{"enabled"}, "" ], 100 );
-foreach my $server ( @{$dnsmconfig{"servers"}} ) {
+print &ui_form_start( "dns_servers_apply.cgi", "post", undef, "id='$formid'" );
+print &ui_links_row(\@list_link_buttons);
+my $edit_link_domain;
+my $edit_link_ip;
+my $edit_link_source;
+my $hidden_edit_input_fields;
+my $edit_script;
+my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
+print &ui_columns_start( [
+    "",
+    $text{"enabled"},
+    $text{"domain"},
+    $text{"ip_address"},
+    $text{"source"},
+    ""
+    ], 100, undef, undef, &ui_columns_header( [ $text{"index_dns_servers"} . &ui_help($text{"p_man_desc_server"}) ], [ 'class="table-title" colspan=5' ] ), 1 );
+foreach my $server ( @{$dnsmconfig{"server"}} ) {
+    local %val = %{ $server->{"val"} };
+    local @cols;
     local ( $mover, $edit );
-    if( $count == @{$dnsmconfig{"servers"}}-1 ) {
-        $mover="<img src=images/gap.gif>";
-    }
-    else
-    {	
-        $mover = "<a href='srv_move.cgi?idx=$count&".
-        "dir=down'><img src=".
-        "images/down.gif border=0></a>";
-    }
-        if( $count == 0 ) {
-        $mover.="<img src=images/gap.gif>";
-    }
-    else
-    {
-        $mover .= "<a href='srv_move.cgi?idx=$count&".
-        "dir=up'><img src=images/up.gif ".
-        "border=0></a>";
-    }
-    $edit = "<a href=srv_edit.cgi?idx=$count>".$$server{address}."</a>";
-    print &ui_columns_row( [ $$server{domain}, $edit,
-        ($$server{used})?$text{"enabled"}:$text{"disabled"}, $mover ],
-               [ "width=30%", "width=30%", "width=30%", "width=10%" ]	);
+    $mover = &get_mover_buttons("srv_move.cgi", $count, int(@{$dnsmconfig{"server"}}) );
+    # $edit = "<a href=dns_servers_edit.cgi?idx=$count>".$val{"ip"}."</a>";
+    ($edit_link_domain, $hidden_edit_input_fields, $edit_script) = &edit_item_link(join(",", @{$val{"domain"}}), $context, $text{"index_dns_servers"}, $count, $formid, 700, 505, \@editfields);
+    ($edit_link_ip) = &edit_item_link($val{"ip"}, $context, $text{"index_dns_servers"}, $count, $formid, 700, 505, \@editfields);
+    ($edit_link_source) = &edit_item_link($val{"source"}, $context, $text{"index_dns_servers"}, $count, $formid, 700, 505, \@editfields);
+    push ( @cols, &ui_checkbox("enabled", "1", "", $server->{"used"}?1:0, undef, 1) );
+    push ( @cols, $edit_link_domain );
+    push ( @cols, $edit_link_ip );
+    push ( @cols, $edit_link_source );
+    push ( @cols, $mover );
+    print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
     $count++;
 }
 print &ui_columns_end();
-print "<br><a href=add.cgi?what=server=0.0.0.0&where=dns_servers.cgi>".
-        $text{"add_"}." ".$text{"_dns_serv"}."</a><hr>";
-print "<br>" . &ui_submit( $text{"save_button"} );
+print &ui_links_row(\@list_link_buttons);
+print "<p>" . $text{"with_selected"} . "</p>";
+print &ui_submit($text{"enable_sel"}, "enable_sel");
+print &ui_submit($text{"disable_sel"}, "disable_sel");
+print &ui_submit($text{"delete_sel"}, "delete_sel");
+# print $button;
+print $hidden_add_input_fields;
+print $add_new_script;
+print &add_js(1,1,0);
+print &ui_hr();
+print $hidden_edit_input_fields . $edit_script;
 print &ui_form_end();
 ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});
 

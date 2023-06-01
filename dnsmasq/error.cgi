@@ -15,41 +15,32 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-do '../web-lib.pl';
-do '../ui-lib.pl';
-do 'dnsmasq-lib.pl';
+require 'dnsmasq-lib.pl';
 
-$|=1;
-&init_config("DNSMasq");
-
-%access=&get_module_acl;
+my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
-
-## sanity checks
-
-&header($text{"index_title"}, "", "intro", 1, 1, undef,
-        "Written by Neil Fisher<BR><A HREF=mailto:neil\@magnecor.com.au>Author</A><BR><A HREF=http://www.authorpage.invalid>Home://page</A>");
-# uses the index_title entry from ./lang/en or appropriate
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 
 ## Insert Output code here
 
 # output as web page
 &ReadParse();
-print "<h2>".$text{"error_heading"}."</h2>";
+
+print "<h3>".$text{"error_heading"}."</h3>";
 print "<br><br>";
-print $text{"err_line"};
-print $in{line};
+print $text{"err_line"} . " " . $in{"line"};
 print "<br>\n";
-print $text{"err_type"};
-print $in{type};
+print $text{"err_type"} . " " . $in{"type"};
 print "<br><br>\n";
 print $text{"err_help"};
-&footer("/", $text{"index"});
+# &footer("/", $text{"index"});
+my $returnto = $in{"returnto"} || "index.cgi?mode=dns";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings"};
+&ui_print_footer($returnto, $returnlabel);
+
 # uses the index entry in /lang/en
-
-
 
 ## if subroutines are not in an extra file put them here
 

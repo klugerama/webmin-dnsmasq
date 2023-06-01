@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - vend_edit.cgi;  edit vendor class
+#    DNSMasq Webmin Module - # TODO vend_edit.cgi;  edit vendor class
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
@@ -56,7 +56,7 @@ print "<h2>".$text{dhcp-vendorclass}."</h2>";
 print &ui_form_start( "vend_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
 print $text{"enabled"}.&ui_yesno_radio( "used",
-			($dnsmconfig{"vendor-class"}[$in{idx}]{used})?1:0 );
+			($dnsmconfig{"vendor-class"}[$in{idx}]{"used"})?1:0 );
 print $text{"class"}. &ui_textbox( "class", 
 			$dnsmconfig{"vendor-class"}[$in{idx}]{class}, 60 );
 print "<br>".$text{"vendor"}. &ui_textbox( "vendor", 
@@ -65,7 +65,7 @@ print "<br><br>" . &ui_submit( $text{"save_button"} )."<br>";
 print &ui_form_end();
 print "<a href=delete.cgi?idx=".$in{idx}."&what=vendor_class&where=dhcp.cgi>".
 	$text{"delet"}."</a>";
-print "<br><a href=dhcp.cgi>".$text{"dhcp_config"}."</a>";
+print "<br><a href=dhcp.cgi>".$text{"index_dhcp_config"}."</a>";
 &footer( "/", $text{"index"});
 #
 

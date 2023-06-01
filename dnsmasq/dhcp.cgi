@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - dhcp.cgi; DHCP config
+#    DNSMasq Webmin Module - # TODO dhcp.cgi; DHCP config
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -16,18 +16,57 @@
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
 sub show_dhcp_settings {
-    my @links = ["dhcp_basic.cgi", "dhcp_vendorclass.cgi","dhcp_userclass.cgi","dhcp_ranges.cgi","dhcp_reservations.cgi"];
-    my @titles = [$text{"dhcp_settings"},$text{"dhcp_vendorclass"},$text{"dhcp_userclass"},$text{"dhcp_range"},$text{"spec_hosts"}];
-    my @icons = ["images/icon.gif","images/icon.gif","images/icon.gif","images/icon.gif","images/icon.gif"];
-    print icons_table(@links, @titles, @icons);
-    # print "<br><hr><br><a href=\"dhcp_basic.cgi\">" . $text{"index_dns_settings"} . "</a><br/>";
-    # print "<a href=\"dhcp_vendorclass.cgi\">" . $text{"dhcp_vendorclass"} . "</a><br/>";
-    # print "<a href=\"dhcp_userclass.cgi\">" . $text{"dhcp_userclass"} . "</a><br/>";
-    # print "<a href=\"dhcp_ranges.cgi\">" . $text{"dhcp_range"} . "</a><br/>";
-    # print "<a href=\"dhcp_reservations.cgi\">" . $text{"spec_hosts"} . "</a><br/>";
-    # print "<hr />\n";
-    # print "<a href=\"index.cgi\">" . $text{"index_dns_settings"} . "</a></>";
-    # # &footer("/", $text{"index"});
+    my @links = ();
+    my @titles = ();
+    my @icons = ();
+
+    my @buttons = (
+        {
+            "link" => "dhcp_basic.cgi",
+            "title" => $text{"index_dhcp_settings_basic"},
+            "icon" => "basic.gif"
+        },
+        {
+            "link" => "dhcp_domain_name.cgi",
+            "title" => $text{"index_dhcp_domain_name"},
+            "icon" => "hostnames.gif"
+        },
+        {
+            "link" => "dhcp_client_options.cgi",
+            "title" => $text{"index_dhcp_client_options"},
+            "icon" => "clients.gif"
+        },
+        {
+            "link" => "dhcp_vendorclass.cgi",
+            "title" => $text{"index_dhcp_vendorclass"},
+            "icon" => "vendorclass.gif"
+        },
+        {
+            "link" => "dhcp_userclass.cgi",
+            "title" => $text{"index_dhcp_userclass"},
+            "icon" => "userclass.gif"
+        },
+        {
+            "link" => "dhcp_ranges.cgi",
+            "title" => $text{"index_dhcp_range"},
+            "icon" => "ranges.gif"
+        },
+        {
+            "link" => "dhcp_reservations.cgi",
+            "title" => $text{"index_dhcp_host_reservations"},
+            "icon" => "reservations.gif"
+        },
+    );
+    local $i;
+    for ($i = 0; $i < @buttons; $i++ ) {
+        push(@links, $buttons[$i]->{"link"} );
+        push(@titles, $buttons[$i]->{"title"} );
+        push(@icons, "images/" . ($current_theme ? "theme/" : "") . $buttons[$i]->{"icon"} );
+    }
+
+    print &icons_table(\@links, \@titles, \@icons);
+
+    # print &icons_table(@links, @titles);
 }
 1;
 # uses the index entry in /lang/en

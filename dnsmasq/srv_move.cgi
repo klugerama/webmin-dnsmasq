@@ -35,7 +35,7 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
@@ -51,22 +51,22 @@ if( $dnsmconfig{"errors"} > 0 ) {
 }
 # adjust everything to what we got
 #
-my $selected=$dnsmconfig{"servers"}[$in{idx}]{line};
+my $selected=$dnsmconfig{"servers"}[$in{idx}]{"line"};
 if( $in{dir} eq "up" ) {
-	$dnsmconfig{"servers"}[$in{idx}]{line}=$dnsmconfig{"servers"}[$in{idx}-1]{line};
-	$dnsmconfig{"servers"}[$in{idx}-1]{line}=$selected;
+	$dnsmconfig{"servers"}[$in{idx}]{"line"}=$dnsmconfig{"servers"}[$in{idx}-1]{"line"};
+	$dnsmconfig{"servers"}[$in{idx}-1]{"line"}=$selected;
 }
 else
 {
-	$dnsmconfig{"servers"}[$in{idx}]{line}=$dnsmconfig{"servers"}[$in{idx}+1]{line};
-	$dnsmconfig{"servers"}[$in{idx}+1]{line}=$selected;
+	$dnsmconfig{"servers"}[$in{idx}]{"line"}=$dnsmconfig{"servers"}[$in{idx}+1]{"line"};
+	$dnsmconfig{"servers"}[$in{idx}+1]{"line"}=$selected;
 }
 foreach my $server (@{$dnsmconfig{"servers"}}) {
 	$line= ($$server{domain_used}) ?
 		"server=/".$$server{domain}."/".$$server{address} :
 		"server=".$$server{address};
-	&update( $$server{line}, $line, 
-		$config_file, ($$server{used}) );
+	&update( $$server{"line"}, $line, 
+		$config_file, ($$server{"used"}) );
 }
 #
 # write file!!

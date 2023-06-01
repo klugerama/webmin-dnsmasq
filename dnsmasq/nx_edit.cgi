@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - nx_edit.cgi;  edit forced NXDOMAIN
+#    DNSMasq Webmin Module - # TODO nx_edit.cgi;  edit forced NXDOMAIN
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
@@ -58,12 +58,12 @@ print &ui_hidden( "idx", $in{idx} );
 print $text{"forced_from"}. &ui_textbox( "from", 
 					$dnsmconfig{"bogus-nxdomain"}[$in{idx}]{addr}, 15 );
 print "<br>".$text{"enabled"}.&ui_yesno_radio( "used",
-				($dnsmconfig{"bogus-nxdomain"}[$in{idx}]{used})?1:0 );
+				($dnsmconfig{"bogus-nxdomain"}[$in{idx}]{"used"})?1:0 );
 print "<br><br>" . &ui_submit( $text{"save_button"} )."<br>";
 print &ui_form_end();
 print "<a href=delete.cgi?idx=".$in{idx}."&what=bogus_nxdomain&where=dns_alias.cgi".
 	">".$text{"delet"}."</a>";
-print "<br><a href=dns_alias.cgi>".$text{"dns_alias_config"}."</a>";
+print "<br><a href=dns_alias.cgi>".$text{"index_dns_alias_settings"}."</a>";
 &footer( "/", $text{"index"});
 #
 

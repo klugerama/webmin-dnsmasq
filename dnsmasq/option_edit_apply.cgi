@@ -15,46 +15,84 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-do '../web-lib.pl';
-do '../ui-lib.pl';
-do 'dnsmasq-lib.pl';
+require 'dnsmasq-lib.pl';
 
-$|=1;
-&init_config("DNSMasq");
-
-%access=&get_module_acl;
+my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
+my $config_filename = $config{config_file};
+my $config_file = &read_file_lines( $config_filename );
 
-## sanity checks
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-
-## Insert Output code here
-# read config file
-$config_filename = $config{config_file};
-$config_file = &read_file_lines( $config_filename );
-# pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
 # read posted data
 &ReadParse();
+
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-	my $line= "error.cgi?line=x&type=".$text{"listen_addr"};
+	my $line= "error.cgi?line=x&type=".$text{"p_label_dhcp_option"};
 	&redirect( $line );
 	exit;
 }
+
 # adjust everything to what we got
 #
-my $line="dhcp-option=".$in{host};
-&update( $dnsmconfig{"dhcp-option"}[$in{idx}]{line}, $line,
-	$config_file, ( $in{used} == 1 ) );
+if ($in{"delete"}) {
+    my $file_arr = &read_file_lines($dnsmconfig{"dhcp-option"}[$in{"idx"}]->{"file"});
+
+    &update( $dnsmconfig{"dhcp-option"}[$in{"idx"}]->{"line"}, "",
+        \@$file_arr, 2 );
+    #
+    # write file!!
+    &flush_file_lines();
+}
+elsif ($in{"submit"}) {
+    # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+    my $line;
+    if ($in{"forced"} == 1) {
+        $line = "dhcp-option-force=";
+    }
+    else {
+        $line = "dhcp-option=";
+    }
+    my @tags = split(/\0/, $in{"tag"});
+    foreach my $tag ( @tags ) {
+        # print "found tag: $tag<br/>";
+        $line .= "tag:$tag,";
+    }
+    if ($in{"encap"}) {
+        $line .= "encap:" . $in{"encap"} . ",";
+    }
+    if ($in{"vi_encap"}) {
+        $line .= "vi-encap:" . $in{"vi_encap"} . ",";
+    }
+    if ($in{"vendor"}) {
+        $line .= "vendor:" . $in{"vendor"} . ",";
+    }
+    my $option;
+    if ( $in{"option"} =~ /^[0-9]+$/ ) {
+        $option = $in{"option"};
+    }
+    else {
+        $option = "option:" . $in{"option"};
+    }
+    $line .= $option;
+    if ($in{"value"}) {
+        $line .= "," . $in{"value"};
+    }
+
+    my $file_arr = &read_file_lines($dnsmconfig{"dhcp-option"}[$in{"idx"}]->{"file"});
+
+    &update( $dnsmconfig{"dhcp-option"}[$in{"idx"}]->{"line"}, $line,
+        \@$file_arr, ( $in{"enabled"} == 1 ? 0 : 1 ) );
+    #
+    # write file!!
+    &flush_file_lines();
+}
 #
-# write file!!
-&flush_file_lines();
-#
-# re-load basic page
-&redirect( "dhcp.cgi" );
+# re-load client_options page
+&redirect( "dhcp_client_options.cgi" );
 
 # 
 # sub-routines

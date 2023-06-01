@@ -50,7 +50,8 @@ OPTIONS
          under some circumstances.
 
        --dhcp-ttl=<time>
-         As for --local-ttl, but affects only replies with information from DHCP leases. If both are given, --dhcp-ttl applies for DHCP information, and --local-ttl for others. Setting this to zero eliminates the effect of
+         As for --local-ttl, but affects only replies with information from DHCP leases. If both are given, --dhcp-ttl applies for DHCP information, and --local-ttl for 
+         others. Setting this to zero eliminates the effect of
          --local-ttl for DHCP.
 
        --neg-ttl=<time>
@@ -269,7 +270,8 @@ OPTIONS
          --server=/3.2.1.in-addr.arpa/192.168.0.1
 
        -A, --address=/<domain>[/<domain>...]/[<ipaddr>]
-         Specify an IP address to return for any host in the given domains. Queries in the domains are never forwarded and always replied to with the specified IP address which may be IPv4 or IPv6. To give both IPv4 and IPv6
+         Specify an IP address to return for any host in the given domains. Queries in the domains are never forwarded and always replied to with the specified IP addres
+         s which may be IPv4 or IPv6. To give both IPv4 and IPv6
          addresses for a domain, use repeated --address flags. To include multiple IP addresses for a single query, use --addn-hosts=<path> instead. Note that /etc/hosts and DHCP leases override this for individual names. A
          common use of this is to redirect the entire doubleclick.net domain to some friendly local web server to avoid banner ads. The domain specification works in the same was as for --server, with the additional facility
          that /#/ matches any domain. Thus --address=/#/1.2.3.4 will always return 1.2.3.4 for any query not answered from /etc/hosts or DHCP and not sent to an upstream nameserver by a more specific  --server directive. As

@@ -16,26 +16,46 @@
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
 sub show_dns_settings {
-    my @links = ["dns_basic.cgi", "dns_servers.cgi","dns_iface.cgi","dns_alias.cgi"];
-    my @titles = [$text{"index_dns_settings_basic"},$text{"dns_servers_config"},$text{"dns_iface_config"},$text{"dns_alias_config"}];
-    my @icons = ["images/icon.gif","images/icon.gif","images/icon.gif","images/icon.gif"];
-    print icons_table(@links, @titles, @icons);
+    my @links = ();
+    my @titles = ();
+    my @icons = ();
 
+    my @buttons = (
+        {
+            "link" => "dns_basic.cgi",
+            "title" => $text{"index_dns_settings_basic"},
+            "icon" => "basic.gif"
+        },
+        {
+            "link" => "dns_servers.cgi",
+            "title" => $text{"index_dns_servers"},
+            "icon" => "servers.gif"
+        },
+        {
+            "link" => "dns_iface.cgi",
+            "title" => $text{"index_dns_iface_settings"},
+            "icon" => "network.gif"
+        },
+        {
+            "link" => "dns_alias.cgi",
+            "title" => $text{"index_dns_alias_settings"},
+            "icon" => "alias.gif"
+        },
+        {
+            "link" => "dns_addn_config.cgi",
+            "title" => $text{"index_dns_addn_config"},
+            "icon" => "files.gif"
+        },
+    );
+    local $i;
+    for ($i = 0; $i < @buttons; $i++ ) {
+        push(@links, $buttons[$i]->{"link"} );
+        push(@titles, $buttons[$i]->{"title"} );
+        push(@icons, "images/" . ($current_theme ? "theme/" : "") . $buttons[$i]->{"icon"} );
+    }
 
-    # print "<hr>";
-    # print "<a href=\"dns_servers.cgi\">";
-    # print $text{"dns_servers_config"};
-    # print "</a><br>";
-    # print "<a href=\"dns_iface.cgi\">";
-    # print $text{"dns_iface_config"};
-    # print "</a><br>";
-    # print "<a href=\"dns_alias.cgi\">";
-    # print $text{"dns_alias_config"};
-    # print "</a><br>";
-    # print "<hr>";
-    # print "<a href=\"restart.cgi\">";
-    # print $text{"restart"};
-    # print "</a><br>";
+    print &icons_table(\@links, \@titles, \@icons);
+    # print icons_table(@links, @titles);
     # &footer("/", $text{"index"});
 }
 1;

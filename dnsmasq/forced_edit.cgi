@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - forced_edit.cgi;  forced domain response edit
+#    DNSMasq Webmin Module - # TODO forced_edit.cgi;  forced domain response edit
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
@@ -55,18 +55,18 @@ if( $dnsmconfig{"errors"} > 0 ) {
 print "<h2>".$text{"alias"}."</h2>";
 print &ui_form_start( "forced_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
-print $text{"forced_domain"}. &ui_textbox( "domain", 
+print $text{"domain_name"}. &ui_textbox( "domain", 
                     $dnsmconfig{"alias"}[$in{idx}]{domain}, 50 );
 print "<br>";
 print $text{"forced_ip"}. &ui_textbox( "to", 
                     $dnsmconfig{"alias"}[$in{idx}]{addr}, 15 );
 print "<br>".$text{"enabled"}.&ui_yesno_radio( "used",
-                ($dnsmconfig{"alias"}[$in{idx}]{used})?1:0 );
+                ($dnsmconfig{"alias"}[$in{idx}]{"used"})?1:0 );
 print "<br><br>" . &ui_submit( $text{"save_button"} )."<br>";
 print &ui_form_end();
 print "<a href=delete.cgi?idx=".$in{idx}."&what="alias"&where=dns_alias.cgi".
     ">".$text{"delet"}."</a>";
-print "<br><a href=dns_alias.cgi>".$text{"dns_alias_config"}."</a>";
+print "<br><a href=dns_alias.cgi>".$text{"index_dns_alias_settings"}."</a>";
 &footer( "/", $text{"index"});
 #
 

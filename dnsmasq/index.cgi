@@ -28,9 +28,6 @@ my %access=&get_module_acl;
 
 ## sanity checks
 
-# &header($text{"index_title"}, "", "intro", 1, 0, 0,
-#         "<a href=\"mailto:lcress\@gmail.com\">Author</a><div>--</div><a href=\"". $text{"homepage"} . "\">Project GitHub</a>");
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 # uses the index_title entry from ./lang/en or appropriate
 
 ## Insert Output code here
@@ -38,9 +35,11 @@ my %access=&get_module_acl;
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &ReadParse();
+
+&ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 
 my $mode = "dns";
 if ( defined ($in{mode}) ) {

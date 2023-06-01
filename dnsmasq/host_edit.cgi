@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - host_edit.cgi;  edit DHCP host
+#    DNSMasq Webmin Module - # TODO host_edit.cgi;  edit DHCP host
 #        Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
 # check for errors in read config
@@ -52,18 +52,18 @@ if( $dnsmconfig{"errors"} > 0 ) {
 # adjust everything to what we got
 #
 &header( "DNSMasq settings", "" );
-print "<h2>".$text{"edit_"}." ".$text{"_host"}."</h2>";
+print "<h2>".&text("edit_", $text{"_host"})."</h2>";
 print &ui_form_start( "host_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
 print "<br>".$text{"enabled"}.&ui_yesno_radio( "used",
-                ($dnsmconfig{"dhcp-host"}[$in{idx}]{used})?1:0 );
+                ($dnsmconfig{"dhcp-host"}[$in{idx}]{"used"})?1:0 );
 print "<br>".$text{"host_spec"};
 print &ui_textbox( "host", $dnsmconfig{"dhcp-host"}[$in{idx}]{option}, 80 );
 print "<br><br>" . &ui_submit( $text{"save_button"} )."<br>";
 print &ui_form_end();
 print "<a href=delete.cgi?idx=".$in{idx}."&what=dhcp_host&where=dhcp.cgi".
     ">".$text{"delet"}."</a>";
-print "<br><a href=dhcp.cgi>".$text{"dhcp_settings"}."</a>";
+print "<br><a href=dhcp.cgi>".$text{"index_dhcp_settings"}."</a>";
 &footer( "/", $text{"index"});
 #
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - alias_edit_apply.cgi; do the update      
+#    DNSMasq Webmin Module - # TODO tftp_apply.cgi; do the update      
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,47 +35,27 @@ $|=1;
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );# read posted data
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+# read posted data
 &ReadParse();
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-    my $line="error.cgi?line=xx&type=".$text{"err_configbad"};
-    &redirect( $line );
-    exit;
-}
-# check user input for obvious errors
-if( $in{from} !~ /^$IPADDR$/ ) {
-    my $line="error.cgi?line=".$text{"forced_from"};
-    $line .= "&type=".$text{"err_notip"};
-    &redirect( $line );
-    exit;
-}
-if( $in{to} !~ /^$IPADDR$/ ) {
-    my $line="error.cgi?line=".$text{"forced_ip"};
-    $line .= "&type=".$text{"err_notip"};
-    &redirect( $line );
-    exit;
-}
-if( ($in{mask}) && ($in{netmask} !~ /^$IPADDR$/) ) {
-    my $line="error.cgi?line=".$text{"netmask"};
-    $line .= "&type=".$text{"err_notip"};
-    &redirect( $line );
-    exit;
+	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
+	&redirect( $line );
+	exit;
 }
 # adjust everything to what we got
 #
-my $line="alias=".$in{from}.",".$in{to};
-$line .= ",".$in{netmask} if $in{mask};
-&update( $dnsmconfig{"alias"}[$in{idx}]{line}, $line,
-    $dnsmconfig{"alias"}[$in{idx}]{file}, ( $in{used} == 1 ) );
+# &update( $dnsmconfig{"bind-interfaces"}->{"line"}, "bind-interfaces",
+# 	$config_file, ( $in{"bind_interfaces"} == 1 ) );
 #
 # write file!!
 &flush_file_lines();
 #
 # re-load basic page
-&redirect( "dns_alias.cgi" );
+&redirect( "tftp.cgi" );
 
 # 
 # sub-routines
 #
-### END of alias_edit_apply.cgi ###.
+### END of tftp_apply.cgi ###.

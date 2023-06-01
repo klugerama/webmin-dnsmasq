@@ -21,145 +21,168 @@ my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
+my %dnsmconfig = ();
 
-&parse_config_file( \%dnsmconfig, \$config_file, \$config_filename );
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-print &ui_form_start( 'basic_apply.cgi', "post" );
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 
-my @radiodefaultno = ( 0, "Default" );
-my @radioyes = ( 1, "Yes" );
-my @defaultoryes = ( \@radiodefaultno, \@radioyes );
-# my @radiodefaultyes = ( 1, "Default" );
-# my @radiono = ( 0, "No" );
-# my @defaultorno = ( \@radiodefaultyes, \@radiono );
-my @radioval = ( 1, " " );
-my @defaultorval = ( \@radiodefaultno, \@radioval );
-my $count;
-my $subcount;
-my $desccolumnprops;
-my $valcolumnprops;
-$desccolumnprops='width="auto" style="text-align:right;"';
-# $desccolumnprops='class="col_label vertical-align-top"';
-$valcolumnprops='width="auto" style="text-align:left;"';
-# $valcolumnprops='class="col_value"';
+my @basic_fields = ();
+foreach my $configfield ( @confdns ) {
+    next if ( grep { /^$configfield$/ } ( @confarrs ) );
+    next if ( %dnsmconfigvals{"$configfield"}->{"mult"} ne "" );
+    next if ( ( ! grep { /^$configfield$/ } ( @confbools ) ) && ( ! grep { /^$configfield$/ } ( @confsingles ) ) );
+    push @basic_fields, $configfield;
+}
+my $l = int(@basic_fields / 2);
 
+print &ui_form_start( 'dns_basic_apply.cgi', "post" );
 # print "<h2>$text{"index_dns_settings_basic"}</h2>";
-$count=0;
-print &ui_table_start( $text{"index_dns_settings_basic"}, "", 4 );
-print &ui_table_row($text{"domain_needed"}, &ui_radio( "domain_needed", ($dnsmconfig{"domain-needed"}->{"used"})?1:0, \@defaultoryes ));
-$count++;
-print &ui_table_row($text{"expand_hosts"}, &ui_radio( "expand_hosts", ($dnsmconfig{"expand-hosts"}->{"used"})?1:0, \@defaultoryes ));
-$count++;
-print &ui_table_row($text{"dns_port"}, &ui_radio( "dns_port", ($dnsmconfig{"port"}->{"used"})?1:0, \@defaultorval ) . &ui_textbox( "dns_portval", $dnsmconfig{"port"}->{"val"}, 5 ));
-$count++;
-print &ui_table_row($text{"bogus_priv"}, &ui_radio( "bogus_priv", ($dnsmconfig{"bogus-priv"}->{"used"})?1:0, \@defaultoryes ));
-$count++;
-print &ui_table_row($text{"filterwin2k"}, &ui_radio( "filterwin2k", ($dnsmconfig{"filterwin2k"}->{"used"})?1:0, \@defaultoryes ));
-$count++;
-print &ui_table_row($text{"no_read_hosts"}, &ui_radio( "no_read_hosts", ($dnsmconfig{"no-hosts"}->{"used"})?1:0, \@defaultoryes ));
-$count++;
-print &ui_table_row($text{"no_negcache"}, &ui_radio( "no_negcache", ($dnsmconfig{"no-negcache"}->{"used"})?1:0, \@defaultoryes ));
-$count++;
-print &ui_table_row($text{"cache_size"}, &ui_radio( "cache_size", ($dnsmconfig{"cache-size"}->{"used"})?1:0, \@defaultorval ) . &ui_textbox( "cache_sizeval", $dnsmconfig{"cache-size"}->{"val"}, 5 ));
-$count++;
-print &ui_table_row($text{"log_queries"}, &ui_radio( "log_queries", ($dnsmconfig{"log-queries"}->{"used"})?1:0, \@defaultoryes ));
-$count++;
-print &ui_table_row($text{"local_ttl"}, &ui_radio( "local_ttl", ($dnsmconfig{"local-ttl"}->{"used"})?1:0, \@defaultorval ) . &ui_textbox( "local_ttlval", $dnsmconfig{"local-ttl"}->{"val"}, 5 ));
-$count++;
-print &ui_table_end();
+# print &ui_table_start( $text{"index_dns_settings_basic"}, "", 4 );
+my $cbtd = 'style="width: 15px; height: 31px;"';
+my $customcbtd = 'class="ui_checked_checkbox flexed" style="width: 15px; height: 31px;"';
+my $td = 'style="height: 31px; white-space: normal !important; word-break: normal;"';
+my $bigtd = 'style="height: 31px; white-space: normal !important; word-break: normal;" colspan=2';
+my @grid = ();
+my @booltds = ( $cbtd, $bigtd );
+my @tds = ( $cbtd, $td, $td );
+my @cbtds = ( $customcbtd, $td, $td );
+foreach my $column_array ([ @basic_fields[0..$l-1] ], [ @basic_fields[$l..$#basic_fields] ]) {
+	my $g = &ui_columns_start( [
+            "",
+            $text{'column_option'},
+            $text{'column_value'}
+        ], undef, 0, \@tds);
 
-
-$subcount=0;
-# print "<h2>$text{"local_domain"}</h2>";
-print &ui_columns_start( [ 
-    # "line", 
-    # $text{""}, 
-    "Domain name",
-    "Subnet",
-    "Range",
-    $text{"enabled"}, 
-    # "full" 
-], 100, 0, undef, &ui_columns_header( [ $text{"local_domain"} ], [ 'class="table-title" colspan=4' ] ) );
-
-foreach my $domain ( @{$dnsmconfig{"domain"}} ) {
-    my $edit = "<a href=host_edit.cgi?idx=$subcount>".$domain->{"val"}->{"domain"}."</a>";
-    my $enabled_cb = ui_checkbox("used", "1", "", $domain->{"used"});
-    print &ui_columns_row( [
-        # $$host{line},
-        $edit,
-        $domain->{"val"}->{"subnet"},
-        $domain->{"val"}->{"range"},
-        $enabled_cb,
-        ],
-        [ $valcolumnprops, $valcolumnprops, $valcolumnprops, $desccolumnprops ] );
-    $subcount++;
-
+    foreach my $configfield ( @$column_array ) {
+        my $inputfield = &config_to_input("$configfield");
+        my $help = &ui_help($configfield . ": " . $text{"p_man_desc_$inputfield"});
+        if ( grep { /^$configfield$/ } ( @confbools ) ) {
+            $g .= &ui_checked_columns_row( [
+                    $text{"p_label_$inputfield"} . $help,
+                ], \@booltds, "sel", $configfield, ($dnsmconfig{"$configfield"}->{"used"})?1:0
+            );
+        }
+        elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
+            if ( $configfield eq "user" ) {
+                $g .= &ui_columns_row( [
+                        '<div class="wh-100p flex-wrapper flex-centered flex-start">' . &ui_checkbox("sel", $configfield, undef, ($dnsmconfig{"$configfield"}->{"used"})?1:0, ) . '</div>',
+                        $text{"p_label_$inputfield"} . $help,
+                        &ui_user_textbox( $inputfield . "val", $dnsmconfig{"$configfield"}->{"val"} )
+                    ], \@cbtds
+                );
+            }
+            elsif ( $configfield eq "group" ) {
+                $g .= &ui_columns_row( [
+                        '<div class="wh-100p flex-wrapper flex-centered flex-start">' . &ui_checkbox("sel", $configfield, undef, ($dnsmconfig{"$configfield"}->{"used"})?1:0, ) . '</div>',
+                        $text{"p_label_$inputfield"} . $help,
+                        &ui_group_textbox( $inputfield . "val", $dnsmconfig{"$configfield"}->{"val"} )
+                    ], \@cbtds
+                );
+            }
+            else {
+                $g .= &ui_checked_columns_row( [
+                        $text{"p_label_$inputfield"} . $help,
+                        &ui_textbox( $inputfield . "val", $dnsmconfig{"$configfield"}->{"val"}, 25 )
+                    ], \@tds, "sel", $configfield, ($dnsmconfig{"$configfield"}->{"used"})?1:0
+                );
+            }
+        }
+    }
+	$g .= &ui_columns_end();
+	push(@grid, $g);
 }
-print &ui_columns_end();
+print &ui_grid_table(\@grid, 2, 100, undef, undef, $text{"index_dns_settings_basic"});
 
-$subcount=0;
-# print "<h2>$text{"p_desc_sh_conf_file"}</h2>";
-print &ui_columns_start( [ 
-    # "line", 
-    # $text{""}, 
-    "Filename",
-    $text{"enabled"}, 
-    # "full" 
-], 100, 0, undef, &ui_columns_header( [ $text{"p_desc_lg_conf_file"} ], [ 'class="table-title" colspan=4' ] ) );
-
-foreach my $conffile ( @{$dnsmconfig{"conf-file"}} ) {
-    my $edit = "<a href=host_edit.cgi?idx=$subcount>".$conffile->{"val"}."</a>";
-    my $enabled_cb = ui_checkbox("used", "1", "", $conffile->{"used"});
-    print &ui_columns_row( [
-        # $$host{line},
-        $edit,
-        $enabled_cb,
-        ],
-        [ $valcolumnprops, $desccolumnprops ] );
-    $subcount++;
-
-}
-print &ui_columns_end();
-
-$subcount=0;
-# print "<h2>$text{"p_desc_sh_conf_dir"}</h2>";
-print &ui_columns_start( [ 
-    # "line", 
-    # $text{""}, 
-    $text{"p_desc_sh_conf_dir"},
-    $text{"p_desc_sh_conf_dir_filter"},
-    $text{"p_desc_sh_conf_dir_exceptions"},
-    $text{"enabled"}, 
-    # "full" 
-], 100, 0, undef, &ui_columns_header( [ $text{"p_desc_lg_conf_dir"} ], [ 'class="table-title" colspan=4' ] ) );
-
-foreach my $confdir ( @{$dnsmconfig{"conf-dir"}} ) {
-    my $edit = "<a href=host_edit.cgi?idx=$subcount>".$confdir->{"val"}->{"dirname"}."</a>";
-    my $enabled_cb = ui_checkbox("used", "1", "", $confdir->{"used"});
-    print &ui_columns_row( [
-        # $$host{line},
-        $edit,
-        $confdir->{"val"}->{"filter"},
-        $confdir->{"val"}->{"exceptions"},
-        $enabled_cb,
-        ],
-        [ $valcolumnprops, $valcolumnprops, $valcolumnprops, $desccolumnprops ] );
-    $subcount++;
-
-}
-print &ui_columns_end();
-
-print "<br><br>\n";
-print &ui_submit( $text{"save_button"} );
+print &ui_submit( $text{"save_button"}, "submit" );
 print &ui_form_end( );
-print "<hr>";
-print "<a href=\"restart.cgi\">";
-print $text{"restart"};
-print "</a><br>";
+print &ui_hr();
+
+my $formid = "addn_hosts_form";
+$count=0;
+@grid = ();
+my $g = &ui_form_start( 'dns_basic_apply.cgi', "post", undef, "id='$formid'" );
+my @list_link_buttons = &list_links( "sel", 2);
+my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"_hostsfile"}), "new_addn_hosts_file", 0, $formid );
+$g .= &ui_links_row(\@list_link_buttons);
+$g .= $hidden_input_fields;
+$g .= $file_chooser_button;
+$g.= &ui_columns_start( [ 
+    # "line", 
+    # $text{""}, 
+    "",
+    $text{"enabled"}, 
+    $text{"filename"}, 
+    # "full" 
+], 100, undef, undef, &ui_columns_header( [ $text{"p_desc_addn_hosts"} . &ui_help($text{"p_man_desc_addn_hosts"}) ], [ 'class="table-title" colspan=3' ] ), 1 );
+
+foreach my $hosts ( @{$dnsmconfig{"addn-hosts"}} ) {
+    local @cols;
+    # my $edit = "<a href=host_edit.cgi?idx=$count>".$hosts->{"val"}."</a>"; # TODO edit
+    push ( @cols, &ui_checkbox("enabled", "1", "", $hosts->{"used"}?1:0, undef, 1) );
+    # push ( @cols, $edit );
+    push ( @cols, $hosts->{"val"} );
+    $g .= &ui_checked_columns_row( \@cols, undef, "sel", $count );
+    $count++;
+}
+$g .= &ui_columns_end();
+$g .= &ui_links_row(\@list_link_buttons);
+$g .= $hidden_input_fields;
+$g .= $file_chooser_button;
+$g .= "<p>" . $text{"with_selected"} . "</p>";
+$g .= &ui_submit($text{"enable_sel"}, "enable_sel_addn_hosts");
+$g .= &ui_submit($text{"disable_sel"}, "disable_sel_addn_hosts");
+$g .= &ui_submit($text{"delete_sel"}, "delete_sel_addn_hosts");
+$g .= $submit_script;
+$g .= &ui_form_end( );
+push(@grid, $g);
+
+$formid = "add_resolv_file_form";
+$count=0;
+$g = &ui_form_start( 'dns_basic_apply.cgi', "post", undef, "id='$formid'" );
+@list_link_buttons = &list_links( "sel", 3 );
+my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"_resolvfile"}), "new_resolv_file", 0, $formid );
+$g .= &ui_links_row(\@list_link_buttons);
+# $g .= $file_chooser_button;
+$g .= $hidden_input_fields;
+$g .= $file_chooser_button;
+$g.= &ui_columns_start( [ 
+    # "line", 
+    # $text{""}, 
+    "",
+    $text{"enabled"}, 
+    $text{"filename"}, 
+    # "full" 
+], 100, undef, undef, &ui_columns_header( [ $text{"p_desc_resolv_file"} . &ui_help($text{"p_man_desc_resolv_file"}) ], [ 'class="table-title" colspan=3' ] ), 1 );
+
+foreach my $rfile ( @{$dnsmconfig{"resolv-file"}} ) {
+    local @cols;
+    # my $edit = "<a href=host_edit.cgi?idx=$count>".$rfile->{"val"}."</a>"; # TODO edit
+    push ( @cols, &ui_checkbox("enabled", "1", "", $rfile->{"used"}?1:0, undef, 1) );
+    # push ( @cols, $edit );
+    push ( @cols, $rfile->{"val"} );
+    $g .= &ui_checked_columns_row( \@cols, undef, "sel", $count );
+    $count++;
+}
+$g .= &ui_columns_end();
+$g .= &ui_links_row(\@list_link_buttons);
+$g .= $hidden_input_fields;
+$g .= $file_chooser_button;
+$g .= "<p>" . $text{"with_selected"} . "</p>";
+$g .= &ui_submit($text{"enable_sel"}, "enable_sel_resolv_file");
+$g .= &ui_submit($text{"disable_sel"}, "disable_sel_resolv_file");
+$g .= &ui_submit($text{"delete_sel"}, "delete_sel_resolv_file");
+$g .= $submit_script;
+$g .= &ui_form_end( );
+push(@grid, $g);
+print &ui_grid_table(\@grid, 2, 100);
+
+print &ui_hr();
+
+print &add_js(1, 0, 1);
+
 ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});
 
 ### END of dns_basic.cgi ###.
