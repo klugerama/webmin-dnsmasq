@@ -40,7 +40,7 @@ sub show_alias {
     my $h = 505;
     # my @list_link_buttons = &list_links( "sel", 0, "dns_alias_apply.cgi", "alias=0.0.0.0,0.0.0.0", "dns_alias.cgi", &text("add_", $text{"_alias"}) );
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_alias"}), $context, $text{"alias"}, 500, 505, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_alias"}), $context, $text{"alias"}, $w, $h, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
     my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
 
@@ -124,9 +124,58 @@ sub show_nx {
     print &ui_form_end();
 }
 
+sub show_address {
+    my @edit_link = ( "", "", "" );
+    my $hidden_edit_input_fields;
+    my $edit_script;
+    my $formid = "address_form";
+    my $context = "address";
+    my @newfields = ( "domain", "addr" );
+    my @editfields = ( "idx", @newfields );
+    my $w = 500;
+    my $h = 565;
+    my @list_link_buttons = &list_links( "sel", 0 );
+    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_addr"}), $context, $text{"address"}, $w, $h, $formid, \@newfields );
+    push(@list_link_buttons, $add_new_button);
+    my @tds = ( $td_left, $td_left, $td_left, $td_left );
+
+    # uses the index_title entry from ./lang/en or appropriate
+    my $count=0;
+    print &ui_form_start( "dns_alias_apply.cgi", "post", undef, "id=\"$formid\"" );
+    print &ui_links_row(\@list_link_buttons);
+    print $hidden_add_input_fields . $add_new_script;
+    print &ui_columns_start( [ 
+        "",
+        $text{"enabled"},
+        $text{"domain"},
+        $text{"ip_address"},
+        ], 100, undef, undef, &ui_columns_header( [ $text{"address"} . &ui_help($text{"p_man_desc_address"}) ], [ 'class="table-title" colspan=4' ] ), 1 );
+    foreach my $address ( @{$dnsmconfig{"address"}} ) {
+        local %val = %{ $address->{"val"} };
+        local @cols;
+        ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"domain"}, $context, $text{"address"}, $count, $formid, $w, $h, \@editfields);
+        ($edit_link[1]) = &edit_item_link($val{"addr"}, $context, $text{"address"}, $count, $formid, $w, $h, \@editfields);
+        push ( @cols, &ui_checkbox("enabled", "1", "", $address->{"used"}?1:0, undef, 1) );
+        push ( @cols, $edit_link[0] );
+        push ( @cols, $edit_link[1] );
+        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        $count++;
+    }
+    print &ui_columns_end();
+    print &ui_links_row(\@list_link_buttons);
+    print "<p>" . $text{"with_selected"} . "</p>";
+    print &ui_submit($text{"enable_sel"}, "enable_sel_address");
+    print &ui_submit($text{"disable_sel"}, "disable_sel_address");
+    print &ui_submit($text{"delete_sel"}, "delete_sel_address");
+    print $hidden_edit_input_fields . $edit_script;
+    print &ui_form_end();
+}
+
 &show_alias();
 print "<hr>";
 &show_nx();
+print "<hr>";
+&show_address();
 print &add_js(1, 1, 0);
 
 ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});

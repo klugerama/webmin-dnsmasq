@@ -88,19 +88,21 @@ elsif ($context eq "listen_address") {
     print &ui_columns_row( [ $text{"p_label_listen_address"}, &ui_textbox("$fieldname_prefix . listen_address_val", $item->{"val"}, 10) ], \@tds );
 }
 elsif ($context eq "alias") {
-    # print &ui_hidden("alias_idx", $idx);
     print &ui_columns_row( [ $text{"from_ip"}, &ui_textbox($fieldname_prefix . "from", $val{"from"}, 15) ], \@tds );
     print &ui_columns_row( [ $text{"to_ip"}, &ui_textbox($fieldname_prefix . "to", $val{"to"}, 10) ], \@tds );
     print &ui_columns_row( [ $text{"netmask"}, &ui_textbox($fieldname_prefix . "netmask", $val{"netmask"}, 10) ], \@tds );
 }
 elsif ($context eq "bogus_nxdomain") {
-    # print &ui_hidden("bogus_nxdomain_idx", $idx);
     print &ui_columns_row( [ $text{"ip_address"}, &ui_textbox($fieldname_prefix . "ip", $val{"addr"}, 10) ], \@tds );
 }
 elsif ($context eq "domain") {
     print &ui_columns_row( [ $text{"domain_name"}, &ui_textbox($fieldname_prefix . "domain", $val{"domain"}, 10) ], \@tds );
     print &ui_columns_row( [ $text{"subnet"}, &ui_textbox($fieldname_prefix . "subnet", $val{"subnet"}, 10) ], \@tds );
     print &ui_columns_row( [ $text{"range"}, &ui_textbox($fieldname_prefix . "range", $val{"range"}, 10) ], \@tds );
+}
+elsif ($context eq "address") {
+    print &ui_columns_row( [ $text{"domain"}, &ui_textbox($fieldname_prefix . "domain", $val{"domain"}, 10) ], \@tds );
+    print &ui_columns_row( [ $text{"ip_address"}, &ui_textbox($fieldname_prefix . "addr", $val{"addr"}, 10) ], \@tds );
 }
 # elsif ($context eq "") {
 #     print &ui_columns_row( [ $text{""}, &ui_textbox($fieldname_prefix . "fieldname", $val{""}, 10) ], \@tds );

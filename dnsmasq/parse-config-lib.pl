@@ -249,7 +249,7 @@ our %dnsmconfigvals = (
     "local"                     => { "idx" => 50,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 1 }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
     "server"                    => { "idx" => 51,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 1 }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
     "rev-server"                => { "idx" => 52,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
-    "address"                   => { "idx" => 53,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =/<domain>[/<domain>...]/[<ipaddr>]
+    "address"                   => { "idx" => 53,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =/<domain>[/<domain>...]/[<ipaddr>]
     "ipset"                     => { "idx" => 54,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 1 }, # TODO edit # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
     "connmark-allowlist-enable" => { "idx" => 55,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 1, "val_optional" => 1 }, # [=<mask>]
     "connmark-allowlist"        => { "idx" => 56,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 1 }, # TODO edit # =<connmark>[/<mask>][,<pattern>[/<pattern>...]] 
@@ -407,7 +407,7 @@ our $MAC = "(?:[0-9a-fA-F]{2})(?:[:-](?:[0-9a-fA-F]{2}|\\*)){5}";
 our $TIME = "[0-9]{1,3}[mh]";
 our $FILE = "[0-9a-zA-Z\_\.\/\-]+";
 our $NUMBER="[0-9]+";
-my $TAG = "(set|tag):([0-9a-zA-Z\_\.\-!]*)";
+my $TAG = "(set|tag):([!0-9a-zA-Z\_\.\-]*)";
 my $IPV6PROP = "ra-only|ra-names|ra-stateless|slaac";
 my $OPTION = "option6?:([0-9a-zA-Z\-]*)|[0-9]{1,3}";
 my $NAME = "[a-zA-Z\_\.][0-9a-zA-Z\_\.\-]*";
@@ -577,13 +577,17 @@ sub parse_config_file {
                             }
                         }
                         when ("address") { # =/<domain>[/<domain>...]/[<ipaddr>]
-                            if( $remainder =~ /\/($NAME)\/($IPADDR)/ ) {
+                            if ( $remainder =~ /^\/(.*)\/($IPADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
-                                $valtemp{"addr"}=$2;
+                                if ( defined ($2) ) {
+                                    $valtemp{"addr"}=$2;
+                                }
                             }
-                            elsif ( $remainder =~ /\/($NAME)\/($IPV6ADDR)/ ) {
+                            elsif ( $remainder =~ /^\/(.*)\/($IPV6ADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
-                                $valtemp{"addr"}=$2;
+                                if ( defined ($2) ) {
+                                    $valtemp{"addr"}=$2;
+                                }
                             }
                             else
                             {
@@ -734,7 +738,15 @@ sub parse_config_file {
                                 $valtemp{"value"} = $3;
                             }
                         }
-                        when ("cname") { # TODO read/parse # =<cname>,[<cname>,]<target>[,<TTL>]
+                        when ("cname") { # =<cname>,[<cname>,]<target>[,<TTL>]
+                            if ( $remainder =~ /^(.*)((?:,)([0-9]{1,5}))$/ ) {
+                                $valtemp{"ttl"} = $3;
+                                $remainder = $1;
+                            }
+                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                                $valtemp{"target"} = $3;
+                                $valtemp{"cname"} = $3;
+                            }
                         }
                         when ("dns-rr") { # =<name>,<RR-number>,[<hex data>]
                             if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
@@ -807,7 +819,23 @@ sub parse_config_file {
                                 }
                             }
                         }
-                        when ("auth-zone") { # TODO read/parse # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>].....][,exclude:<subnet>[/<prefix length>]].....]
+                        when ("auth-zone") { # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>].....][,exclude:<subnet>[/<prefix length>]].....]
+                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                                $valtemp{"domain"} = $1;
+                                $remainder = $3;
+                                if ( $remainder =~ /((?:exclude:)(.*))*$/ ) {
+                                    while ( $remainder =~ /^(.*)((?:,exclude:)(.*))$/ ) {
+                                        push( @{ $valtemp{"exclude"} }, $3 );
+                                        $remainder = $1;
+                                    }
+                                }
+                                if ( $remainder ne "" ) {
+                                    while ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                                        push( @{ $valtemp{"include"} }, $3 );
+                                        $remainder = $1;
+                                    }
+                                }
+                            }
                         }
                         when ("auth-soa") { # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
                             if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
@@ -1298,14 +1326,33 @@ sub parse_config_file {
                                     }
                                 }
                                 else {
-                                    $valtemp{"range"}=$remainder;
+                                    $valtemp{"range"} = $remainder;
                                 }
                             }
                             else {
-                                $valtemp{"domain"}=$remainder;
+                                $valtemp{"domain"} = $remainder;
                             }
                         }
-                        when ("ra-param") { # TODO read/parse # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
+                        when ("ra-param") { # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
+                            if ( $remainder =~ /^(.*)\,(.*)$/ ) {
+                                $valtemp{"interface"} = $1;
+                                $remainder = $2;
+                                if ( $remainder =~ /^((?:mtu:)(.*))((?:,)(.*))$/ ) {
+                                    $valtemp{"mtu"} = $2;
+                                    $remainder = $4;
+                                }
+                                if ( $remainder =~ /^(high|low)((?:,)(.*))$/ ) {
+                                    $valtemp{"priority"} = $1;
+                                    $remainder = $3;
+                                }
+                                if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                                    $valtemp{"interval"} = $1;
+                                    $valtemp{"lifetime"} = $3;
+                                }
+                                else {
+                                    $valtemp{"interval"} = $remainder;
+                                }
+                            }
                         }
                         when ("dhcp-reply-delay") { # =[tag:<tag>,]<integer>
                             if ( $remainder =~ /^($TAG),(.*)$/ ) {

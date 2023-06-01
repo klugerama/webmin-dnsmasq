@@ -62,6 +62,11 @@ elsif ($in{'new_bogus_nxdomain_ip'} ne "") {
     my $val = $in{"new_bogus_nxdomain_ip"};
     &add_to_list( "bogus-nxdomain", $val );
 }
+elsif ($in{'new_address_domain'} ne "") {
+    my $val = "/" . $in{"new_address_domain"};
+    $val .= "/" . $in{"new_address_addr"};
+    &add_to_list( "address", $val );
+}
 elsif ($in{"alias_idx"} ne "" && $in{"alias_from"} ne "") {
     my $item = $dnsmconfig{"alias"}[$in{"alias_idx"}];
     my $file_arr = &read_file_lines($item->{"file"});
@@ -80,6 +85,14 @@ elsif ($in{"bogus_nxdomain_idx"} ne "" && $in{"bogus_nxdomain_ip"} ne "") {
     &update($item->{"line"}, $val, \@$file_arr, 0);
     &flush_file_lines();
 }
+elsif ($in{"address_idx"} ne "" && $in{"address_domain"} ne "") {
+    my $item = $dnsmconfig{"address"}[$in{"address_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "address=" . "/" . $in{"address_domain"};
+    $val .= "/" . $in{"address_addr"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
+}
 else {
     my $action = $in{"enable_sel_alias"} ? "enable" : $in{"disable_sel_alias"} ? "disable" : $in{"delete_sel_alias"} ? "delete" : "";
     if ($action ne "") {
@@ -93,6 +106,14 @@ else {
             @sel || &error($text{'selected_none'});
 
             &update_selected("bogus-nxdomain", $action, \@sel, \%$dnsmconfig);
+        }
+        else {
+            $action = $in{"enable_sel_address"} ? "enable" : $in{"disable_sel_address"} ? "disable" : $in{"delete_sel_address"} ? "delete" : "";
+            if ($action ne "") {
+                @sel || &error($text{'selected_none'});
+
+                &update_selected("address", $action, \@sel, \%$dnsmconfig);
+            }
         }
     }
 }
