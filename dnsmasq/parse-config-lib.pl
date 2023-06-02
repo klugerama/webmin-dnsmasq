@@ -319,7 +319,7 @@ our %dnsmconfigvals = (
     "dhcp-ignore-clid"          => { "idx" => 120, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "pxe-service"               => { "idx" => 121, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
     "pxe-prompt"                => { "idx" => 122, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<prompt>[,<timeout>]
-    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<vendor>[,...]
+    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # =<vendor>[,...]
     "dhcp-lease-max"            => { "idx" => 124, "valtype" => "int",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 1000 }, # =<number>
     "dhcp-authoritative"        => { "idx" => 125, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "dhcp-rapid-commit"         => { "idx" => 126, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
@@ -346,17 +346,17 @@ our %dnsmconfigvals = (
     "enable-ra"                 => { "idx" => 147, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "ra-param"                  => { "idx" => 148, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
     "dhcp-reply-delay"          => { "idx" => 149, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<integer>
-    "enable-tftp"               => { "idx" => 150, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [=<interface>[,<interface>]]
+    "enable-tftp"               => { "idx" => 150, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # [=<interface>[,<interface>]]
     "tftp-root"                 => { "idx" => 151, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<directory>[,<interface>]
-    "tftp-no-fail"              => { "idx" => 152, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # TODO edit
+    "tftp-no-fail"              => { "idx" => 152, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "tftp-unique-root"          => { "idx" => 153, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [=ip|mac]
-    "tftp-secure"               => { "idx" => 154, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # TODO edit
-    "tftp-lowercase"            => { "idx" => 155, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # TODO edit
-    "tftp-max"                  => { "idx" => 156, "valtype" => "int",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<connections>
-    "tftp-mtu"                  => { "idx" => 157, "valtype" => "int",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<mtu size>
-    "tftp-no-blocksize"         => { "idx" => 158, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # TODO edit
+    "tftp-secure"               => { "idx" => 154, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "tftp-lowercase"            => { "idx" => 155, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "tftp-max"                  => { "idx" => 156, "valtype" => "int",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # =<connections>
+    "tftp-mtu"                  => { "idx" => 157, "valtype" => "int",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # =<mtu size>
+    "tftp-no-blocksize"         => { "idx" => 158, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "tftp-port-range"           => { "idx" => 159, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<start>,<end>
-    "tftp-single-port"          => { "idx" => 160, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # TODO edit
+    "tftp-single-port"          => { "idx" => 160, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "conf-file"                 => { "idx" => 161, "valtype" => "path",    "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<file>
     "conf-dir"                  => { "idx" => 162, "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<directory>[,<file-extension>......],
     "servers-file"              => { "idx" => 163, "valtype" => "file",    "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<file>
