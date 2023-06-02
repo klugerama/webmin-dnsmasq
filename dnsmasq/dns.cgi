@@ -46,6 +46,11 @@ sub show_dns_settings {
             "title" => $text{"index_dns_addn_config"},
             "icon" => "files.gif"
         },
+        {
+            "link" => "manual_edit.cgi",
+            "title" => $text{"index_dns_manual_edit"},
+            "icon" => "manual.gif"
+        },
     );
     local $i;
     for ($i = 0; $i < @buttons; $i++ ) {
@@ -55,7 +60,6 @@ sub show_dns_settings {
     }
 
     print &icons_table(\@links, \@titles, \@icons);
-    # print icons_table(@links, @titles);
     # &footer("/", $text{"index"});
 }
 1;

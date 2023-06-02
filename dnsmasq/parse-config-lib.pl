@@ -306,7 +306,7 @@ our %dnsmconfigvals = (
     "dhcp-circuitid"            => { "idx" => 107, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<circuit-id>
     "dhcp-remoteid"             => { "idx" => 108, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<remote-id>
     "dhcp-subscrid"             => { "idx" => 109, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<subscriber-id>
-    "dhcp-proxy"                => { "idx" => 110, "valtype" => "ip",      "section" => "dhcp",  "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO # [=<ip addr>]......
+    "dhcp-proxy"                => { "idx" => 110, "valtype" => "ip",      "section" => "dhcp",  "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=<ip addr>]......
     "dhcp-match"                => { "idx" => 111, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
     "dhcp-name-match"           => { "idx" => 112, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<name>[*]
     "tag-if"                    => { "idx" => 113, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
@@ -319,7 +319,7 @@ our %dnsmconfigvals = (
     "dhcp-ignore-clid"          => { "idx" => 120, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "pxe-service"               => { "idx" => 121, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
     "pxe-prompt"                => { "idx" => 122, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<prompt>[,<timeout>]
-    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO # =<vendor>[,...]
+    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<vendor>[,...]
     "dhcp-lease-max"            => { "idx" => 124, "valtype" => "int",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 1000 }, # =<number>
     "dhcp-authoritative"        => { "idx" => 125, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
     "dhcp-rapid-commit"         => { "idx" => 126, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
@@ -426,6 +426,7 @@ sub parse_config_file {
 
     if ($is_not_main_config != 1) { # initialize the config with all known options 
                                     # (except those that can be specified multiple times)
+        push ( @{ $$dnsmconfig_ref{"configfiles"} }, $config_filename);
         while ( ($key, $vals) = each %dnsmconfigvals ) {
             if ( ! grep { /^$key$/ } ( @confarrs ) ) {
                 $$dnsmconfig_ref{$key}{"used"} = 0;
@@ -433,6 +434,9 @@ sub parse_config_file {
                 $$dnsmconfig_ref{$key}{"file"} = $config_filename;
             }
         }
+    }
+    else {
+        push ( @{ $$dnsmconfig_ref{"configfiles"} }, $$config_filename);
     }
 
     $lineno=0;
@@ -495,6 +499,7 @@ sub parse_config_file {
                 }
                 else {
                     my %valtemp = ();
+                    $valtemp{"full"} = $remainder;
                     if ($option eq "local") {
                         $option = "server";
                     }
@@ -959,7 +964,6 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-host") { # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
-                            $valtemp{"full"} = $remainder; # TODO - remove after debugging
                             if ($remainder =~ /^(([0-9a-zA-Z\,\.\-\_: ]*)(\,))(($TIME)|infinite)$/ && defined ($4)) {
                                 # time (optional)
                                 $remainder = $2;

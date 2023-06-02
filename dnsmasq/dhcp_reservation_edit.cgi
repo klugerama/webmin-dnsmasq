@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO host_edit.cgi;  edit DHCP host
+#    DNSMasq Webmin Module - # TODO dhcp_reservation_edit.cgi;  edit DHCP host
 #        Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -53,7 +53,7 @@ if( $dnsmconfig{"errors"} > 0 ) {
 #
 &header( "DNSMasq settings", "" );
 print "<h2>".&text("edit_", $text{"_host"})."</h2>";
-print &ui_form_start( "host_edit_apply.cgi", "post" );
+print &ui_form_start( "dhcp_reservation_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
 print "<br>".$text{"enabled"}.&ui_yesno_radio( "used",
                 ($dnsmconfig{"dhcp-host"}[$in{idx}]{"used"})?1:0 );
@@ -70,4 +70,4 @@ print "<br><a href=dhcp.cgi>".$text{"index_dhcp_settings"}."</a>";
 # 
 # sub-routines
 #
-### END of host_edit.cgi ###.
+### END of dhcp_reservation_edit.cgi ###.

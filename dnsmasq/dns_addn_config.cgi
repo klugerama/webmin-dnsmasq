@@ -44,7 +44,7 @@ print &ui_columns_start( [
 
 foreach my $conffile ( @{$dnsmconfig{"conf-file"}} ) {
     local @cols;
-    my $edit = "<a href=host_edit.cgi?idx=$count>".$conffile->{"val"}."</a>";
+    my $edit = "<a href=dhcp_reservation_edit.cgi?idx=$count>".$conffile->{"val"}."</a>";
     push ( @cols, &ui_checkbox("enabled", "1", "", $conffile->{"used"}?1:0, undef, 1) );
     push ( @cols, $edit );
     print &ui_checked_columns_row( \@cols, undef, "sel", $count );
@@ -62,7 +62,7 @@ print &ui_hr();
 
 $count=0;
 print &ui_form_start( 'dns_addn_config_apply.cgi', "post" );
-@list_link_buttons = &list_links( "sel", 1, "dns_addn_config_apply.cgi", "conf-dir=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_conf_dir"}) );
+@list_link_buttons = &list_links( "sel", 1, "dns_addn_config_edit.cgi", "conf-dir=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_conf_dir"}) );
 print &ui_links_row(\@list_link_buttons);
 print &ui_columns_start( [ 
     # "line", 
@@ -77,7 +77,7 @@ print &ui_columns_start( [
 
 foreach my $confdir ( @{$dnsmconfig{"conf-dir"}} ) {
     local @cols;
-    my $edit = "<a href=host_edit.cgi?idx=$count>".$confdir->{"val"}->{"dirname"}."</a>";
+    my $edit = "<a href=dns_addn_config_edit.cgi?idx=$count>".$confdir->{"val"}->{"dirname"}."</a>";
     push ( @cols, &ui_checkbox("enabled", "1", "", $confdir->{"used"}?1:0, undef, 1) );
     push ( @cols, $edit );
     push ( @cols, $confdir->{"val"}->{"filter"} );

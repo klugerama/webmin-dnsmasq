@@ -17,6 +17,7 @@ filename=Filename
 enabled=Enabled
 disabled=Disabled
 default=Default
+description=Description
 value=Value
 forced=Forced
 in_file=Defined in config file
@@ -70,6 +71,7 @@ index_dns_servers=DNS Upstream Servers
 index_dns_iface_settings=Network Interface Settings
 index_dns_alias_settings=Alias / Redirect Settings
 index_dns_addn_config=Additional Configuration Files
+index_dns_manual_edit=Edit config files
 
 server_name=Specific domain
 server_address=Server address
@@ -90,6 +92,7 @@ dynamic=Defined in resolv.conf file
 domain=For domain
 ip_address=IP address
 source=Source
+manual_file=Edit File:
 _dns_serv=upstream server
 _addr=address
 _iface=interface
@@ -369,7 +372,6 @@ p_man_desc_dhcp_lease_max=Limits dnsmasq to the specified maximum number of DHCP
 p_man_desc_dhcp_authoritative=Should be set when dnsmasq is definitely the only DHCP server on a network. For DHCPv4, it changes the behaviour from strict RFC compliance so that DHCP requests on unknown leases from unknown hosts are not ignored. This allows new hosts to get a lease without a tedious timeout under all circumstances. It also allows dnsmasq to rebuild its lease database without each client needing to reacquire a lease, if the database is lost. For DHCPv6 it sets the priority in replies to 255 (the maximum) instead of 0 (the minimum).
 p_man_desc_dhcp_rapid_commit=Enable DHCPv4 Rapid Commit Option specified in RFC 4039. When enabled, dnsmasq will respond to a DHCPDISCOVER message including a Rapid Commit option with a DHCPACK including a Rapid Commit option and fully committed address and configuration information. Should only be enabled if either the server is the only server for the subnet, or multiple servers are present and they each commit a binding for all clients.
 p_man_desc_dhcp_alternate_port=(IPv4 only) Change the ports used for DHCP from the default. If this option is given alone, without arguments, it changes the ports used for DHCP from 67 and 68 to 1067 and 1068. If a single argument is given, that port number is used for the server and the port number plus one used for the client. Finally, two port numbers allows arbitrary specification of both server and client ports for DHCP.
-p_man_desc_bootp_dynamic=(IPv4 only) Enable dynamic allocation of IP addresses to BOOTP clients. Use this with care, since each address allocated to a BOOTP client is leased forever, and therefore becomes permanently unavailable for re-use by other hosts. if this is given without tags, then it unconditionally enables dynamic allocation. With tags, only when the tags are all set. It may be repeated with different tag sets.
 p_man_desc_no_ping=(IPv4 only) By default, the DHCP server will attempt to ensure that an address is not in use before allocating it to a host. It does this by sending an ICMP echo request (aka &quot;ping&quot;) to the address in question. If it gets a reply, then the address must already be in use, and another is tried. This flag disables this check. Use with caution.
 p_man_desc_log_dhcp=Extra logging for DHCP: log all the options sent to DHCP clients and the tags used to determine them.
 p_man_desc_quiet_dhcp=Suppress logging of the routine operation of these protocols. Errors and problems will still be logged. 'quiet-tftp' does not consider file not found to be an error. 'quiet-dhcp' and quiet-dhcp6 are over-ridden by 'log-dhcp'.
@@ -488,51 +490,43 @@ lfikletouse=Nonstandard leasefile to use
 flags=Flags
 
 # TFTP settings
+index_tftp_settings=TFTP settings
+index_tftp_settings_basic=Basic TFTP settings
+
 # Property labels/descriptions
-# Unused
-p_man_desc_pxe_service=Most uses of PXE boot-ROMS simply allow the PXE system to obtain an IP address and then download the file specified by 'dhcp-boot' and execute it. However the PXE system is capable of more complex functions when supported by a suitable DHCP server.
-p_man_desc_pxe_prompt=Setting this provides a prompt to be displayed after PXE boot. If the timeout is given then after the timeout has elapsed with no keyboard input, the first available menu option will be automatically executed. If the timeout is zero then the first available menu item will be executed immediately. If 'pxe-prompt' is omitted the system will wait for user input if there are multiple items in the menu, but boot immediately if there is only one. See 'pxe-service' for details of menu items.
-p_man_desc_dhcp_pxe_vendor=According to UEFI and PXE specifications, DHCP packets between PXE clients and proxy PXE servers should have PXEClient in their vendor-class field. However, the firmware of computers from a few vendors is customized to carry a different identifier in that field. This option is used to consider such identifiers valid for identifying PXE clients. For instance
+p_man_desc_dhcp_pxe_vendor=According to UEFI and PXE specifications, DHCP packets between PXE clients and proxy PXE servers should have PXEClient in their vendor-class field. However, the firmware of computers from a few vendors is customized to carry a different identifier in that field. This option is used to consider such identifiers valid for identifying PXE clients. For instance &quot;dhcp-pxe-vendor=PXEClient,HW-Client&quot; will enable dnsmasq to also provide proxy PXE service to those PXE clients with HW-Client in as their identifier.
 p_man_desc_enable_tftp=Enable the TFTP server function. This is deliberately limited to that needed to net-boot a client. Only reading is allowed; the tsize and blk‐ size extensions are supported (tsize is only supported in octet mode). Without an argument, the TFTP service is provided to the same set of interfaces as DHCP service. If the list of interfaces is provided, that defines which interfaces receive TFTP service.
-p_man_desc_tftp_root=Look for files to transfer using TFTP relative to the given directory. When this is set, TFTP paths which include &quot;..&quot; are rejected, to stop clients getting outside the specified root. Absolute paths (starting with /) are allowed, but they must be within the tftp-root. If the optional interface argument is given, the directory is only used for TFTP requests via that interface.
 p_man_desc_tftp_no_fail=Do not abort startup if specified tftp root directories are inaccessible.
-p_man_desc_tftp_unique_root=Add the IP or hardware address of the TFTP client as a path component on the end of the TFTP-root. Only valid if a 'tftp-root' is set and the directory exists. Defaults to adding IP address (in standard dotted-quad format). For instance, if 'tftp-root' is &quot;/tftp&quot; and client 1.2.3.4 requests file &quot;myfile&quot; then the effective path will be &quot;/tftp/1.2.3.4/myfile&quot; if /tftp/1.2.3.4 exists or /tftp/myfile otherwise. When &quot;=mac&quot; is specified it will append the MAC address instead, using lowercase zero padded digits separated by dashes, e.g.: 01-02-03-04-aa-bb Note that resolving MAC addresses is only possible if the client is in the local network or obtained a DHCP lease from us.
 p_man_desc_tftp_secure=Enable TFTP secure mode: without this, any file which is readable by the dnsmasq process under normal unix access-control rules is available via TFTP. When the 'tftp-secure' flag is given, only files owned by the user running the dnsmasq process are accessible. If dnsmasq is being run as root, different rules apply: 'tftp-secure' has no effect, but only files which have the world-readable bit set are accessible. It is not recommended to run dnsmasq as root with TFTP enabled, and certainly not without specifying 'tftp-root'. Doing so can expose any world-readable file on the server to any host on the net.
 p_man_desc_tftp_lowercase=Convert filenames in TFTP requests to all lowercase. This is useful for requests from Windows machines, which have case-insensitive filesystems and tend to play fast-and-loose with case in filenames. Note that dnsmasq&#39;s tftp server always converts &quot;\&quot; to &quot;/&quot; in filenames.
 p_man_desc_tftp_max=Set the maximum number of concurrent TFTP connections allowed. This defaults to 50. When serving a large number of TFTP connections, per-process file descriptor limits may be encountered. Dnsmasq needs one file descriptor for each concurrent TFTP connection and one file descriptor per unique file (plus a few others). So serving the same file simultaneously to n clients will use require about n + 10 file descriptors, serving different files simultaneously to n clients will require about (2*n) + 10 descriptors. If 'tftp-port-range' is given, that can affect the number of concurrent connections.
 p_man_desc_tftp_mtu=Use size as the ceiling of the MTU supported by the intervening network when negotiating TFTP blocksize, overriding the MTU setting of the local interface if it is larger.
 p_man_desc_tftp_no_blocksize=Stop the TFTP server from negotiating the &quot;blocksize&quot; option with a client. Some buggy clients request this option but then behave badly when it is granted.
-p_man_desc_tftp_port_range=A TFTP server listens on a well-known port (69) for connection initiation, but it also uses a dynamically-allocated port for each connection. Normally these are allocated by the OS, but this option specifies a range of ports for use by TFTP transfers. This can be useful when TFTP has to traverse a firewall. The start of the range cannot be lower than 1025 unless dnsmasq is running as root. The number of concurrent TFTP connections is limited by the size of the port range.
 p_man_desc_tftp_single_port=Run in a mode where the TFTP server uses ONLY the well-known port (69) for its end of the TFTP transfer. This allows TFTP to work when there in NAT is the path between client and server. Note that this is not strictly compliant with the RFCs specifying the TFTP protocol: use at your own risk.
 
-p_label_pxe_service=Most uses of PXE boot-ROMS simply allow the PXE system to obtain an IP address and then download the file specified by 'dhcp-boot' and execute it. However the PXE system is capable of more complex functions when supported by a suitable DHCP server.
-p_label_pxe_prompt=Setting this provides a prompt to be displayed after PXE boot. If the timeout is given then after the timeout has elapsed with no keyboard input, the first available menu option will be automatically executed. If the timeout is zero then the first available menu item will be executed immediately. If 'pxe-prompt' is omitted the system will wait for user input if there are multiple items in the menu, but boot immediately if there is only one. See 'pxe-service' for details of menu items.
-p_label_dhcp_pxe_vendor=According to UEFI and PXE specifications, DHCP packets between PXE clients and proxy PXE servers should have PXEClient in their vendor-class field. However, the firmware of computers from a few vendors is customized to carry a different identifier in that field. This option is used to consider such identifiers valid for identifying PXE clients. For instance
+p_label_dhcp_pxe_vendor=Used to consider customized vendor identifiers valid for identifying PXE clients
+p_label_enable_tftp=Enable the TFTP server function
+p_label_tftp_no_fail=Do not abort startup if specified tftp root directories are inaccessible
+p_label_tftp_secure=Enable TFTP secure mode
+p_label_tftp_lowercase=Convert filenames in TFTP requests to all lowercase
+p_label_tftp_max=Set the maximum number of concurrent TFTP connections allowed
+p_label_tftp_mtu=Use size as the ceiling of the MTU supported by the intervening network when negotiating TFTP blocksize
+p_label_tftp_no_blocksize=Stop the TFTP server from negotiating the &quot;blocksize&quot; option with a client
+p_label_tftp_single_port=Run in a mode where the TFTP server uses ONLY the well-known port (69) for its end of the TFTP transfer
+
+# Unused
+p_man_desc_pxe_service=Most uses of PXE boot-ROMS simply allow the PXE system to obtain an IP address and then download the file specified by 'dhcp-boot' and execute it. However the PXE system is capable of more complex functions when supported by a suitable DHCP server. This specifies a boot option which may appear in a PXE boot menu. &quot;CSA&quot; is client system type, only services of the correct type will appear in a menu. The known types are x86PC, PC98, IA64_EFI, Alpha, Arc_x86, Intel_Lean_Client, IA32_EFI, x86-64_EFI, Xscale_EFI, BC_EFI, ARM32_EFI and ARM64_EFI; an integer may be used for other types. The parameter after the menu text may be a file name, in which case dnsmasq acts as a boot server and directs the PXE client to download the file by TFTP, either from itself ('enable-tftp' must be set for this to work) or another TFTP server if the final server address/name is given. Note that the &quot;layer&quot; suffix (normally &quot;.0&quot;) is supplied by PXE, and need not be added to the basename. Alternatively, the basename may be a filename, complete with suffix, in which case no layer suffix is added. If an integer boot service type, rather than a basename is given, then the PXE client will search for a suitable boot service for that type on the network. This search may be done by broadcast, or direct to a server if its IP address/name is provided. If no boot service type or filename is provided (or a boot service type of 0 is specified) then the menu entry will abort the net boot procedure and continue booting from local media. The server address can be given as a domain name which is looked up in /etc/hosts. This name can be associated in /etc/hosts with multiple IP addresses, which are used round-robin.
+p_man_desc_pxe_prompt=Setting this provides a prompt to be displayed after PXE boot. If the timeout is given then after the timeout has elapsed with no keyboard input, the first available menu option will be automatically executed. If the timeout is zero then the first available menu item will be executed immediately. If 'pxe-prompt' is omitted the system will wait for user input if there are multiple items in the menu, but boot immediately if there is only one. See 'pxe-service' for details of menu items.
+p_man_desc_bootp_dynamic=(IPv4 only) Enable dynamic allocation of IP addresses to BOOTP clients. Use this with care, since each address allocated to a BOOTP client is leased forever, and therefore becomes permanently unavailable for re-use by other hosts. if this is given without tags, then it unconditionally enables dynamic allocation. With tags, only when the tags are all set. It may be repeated with different tag sets.
+p_man_desc_tftp_root=Look for files to transfer using TFTP relative to the given directory. When this is set, TFTP paths which include &quot;..&quot; are rejected, to stop clients getting outside the specified root. Absolute paths (starting with /) are allowed, but they must be within the tftp-root. If the optional interface argument is given, the directory is only used for TFTP requests via that interface.
+p_man_desc_tftp_unique_root=Add the IP or hardware address of the TFTP client as a path component on the end of the TFTP-root. Only valid if a 'tftp-root' is set and the directory exists. Defaults to adding IP address (in standard dotted-quad format). For instance, if 'tftp-root' is &quot;/tftp&quot; and client 1.2.3.4 requests file &quot;myfile&quot; then the effective path will be &quot;/tftp/1.2.3.4/myfile&quot; if /tftp/1.2.3.4 exists or /tftp/myfile otherwise. When &quot;=mac&quot; is specified it will append the MAC address instead, using lowercase zero padded digits separated by dashes, e.g.: 01-02-03-04-aa-bb Note that resolving MAC addresses is only possible if the client is in the local network or obtained a DHCP lease from us.
+p_man_desc_tftp_port_range=A TFTP server listens on a well-known port (69) for connection initiation, but it also uses a dynamically-allocated port for each connection. Normally these are allocated by the OS, but this option specifies a range of ports for use by TFTP transfers. This can be useful when TFTP has to traverse a firewall. The start of the range cannot be lower than 1025 unless dnsmasq is running as root. The number of concurrent TFTP connections is limited by the size of the port range.
+
+p_label_pxe_service=Specifies a boot option which may appear in a PXE boot menu
+p_label_pxe_prompt=Provides a prompt to be displayed after PXE boot
 p_label_bootp_dynamic=Enable dynamic allocation of IP addresses to BOOTP clients (IPv4 only)
-p_label_enable_tftp=Enable the TFTP server function. This is deliberately limited to that needed to net-boot a client. Only reading is allowed; the tsize and blk‐ size extensions are supported (tsize is only supported in octet mode). Without an argument, the TFTP service is provided to the same set of interfaces as DHCP service. If the list of interfaces is provided, that defines which interfaces receive TFTP service.
-p_label_tftp_root=Look for files to transfer using TFTP relative to the given directory. When this is set, TFTP paths which include &quot;..&quot; are rejected, to stop clients getting outside the specified root. Absolute paths (starting with /) are allowed, but they must be within the tftp-root. If the optional interface argument is given, the directory is only used for TFTP requests via that interface.
-p_label_tftp_no_fail=Do not abort startup if specified tftp root directories are inaccessible.
-p_label_tftp_unique_root=Add the IP or hardware address of the TFTP client as a path component on the end of the TFTP-root. Only valid if a 'tftp-root' is set and the directory exists. Defaults to adding IP address (in standard dotted-quad format). For instance, if 'tftp-root' is &quot;/tftp&quot; and client 1.2.3.4 requests file &quot;myfile&quot; then the effective path will be &quot;/tftp/1.2.3.4/myfile&quot; if /tftp/1.2.3.4 exists or /tftp/myfile otherwise. When &quot;=mac&quot; is specified it will append the MAC address instead, using lowercase zero padded digits separated by dashes, e.g.: 01-02-03-04-aa-bb Note that resolving MAC addresses is only possible if the client is in the local network or obtained a DHCP lease from us.
-p_label_tftp_secure=Enable TFTP secure mode: without this, any file which is readable by the dnsmasq process under normal unix access-control rules is available via TFTP. When the 'tftp-secure' flag is given, only files owned by the user running the dnsmasq process are accessible. If dnsmasq is being run as root, different rules apply: 'tftp-secure' has no effect, but only files which have the world-readable bit set are accessible. It is not recommended to run dnsmasq as root with TFTP enabled, and certainly not without specifying 'tftp-root'. Doing so can expose any world-readable file on the server to any host on the net.
-p_label_tftp_lowercase=Convert filenames in TFTP requests to all lowercase. This is useful for requests from Windows machines, which have case-insensitive filesystems and tend to play fast-and-loose with case in filenames. Note that dnsmasq&#39;s tftp server always converts &quot;\&quot; to &quot;/&quot; in filenames.
-p_label_tftp_max=Set the maximum number of concurrent TFTP connections allowed. This defaults to 50. When serving a large number of TFTP connections, per-process file descriptor limits may be encountered. Dnsmasq needs one file descriptor for each concurrent TFTP connection and one file descriptor per unique file (plus a few others). So serving the same file simultaneously to n clients will use require about n + 10 file descriptors, serving different files simultaneously to n clients will require about (2*n) + 10 descriptors. If 'tftp-port-range' is given, that can affect the number of concurrent connections.
-p_label_tftp_mtu=Use size as the ceiling of the MTU supported by the intervening network when negotiating TFTP blocksize, overriding the MTU setting of the local interface if it is larger.
-p_label_tftp_no_blocksize=Stop the TFTP server from negotiating the &quot;blocksize&quot; option with a client. Some buggy clients request this option but then behave badly when it is granted.
-p_label_tftp_port_range=A TFTP server listens on a well-known port (69) for connection initiation, but it also uses a dynamically-allocated port for each connection. Normally these are allocated by the OS, but this option specifies a range of ports for use by TFTP transfers. This can be useful when TFTP has to traverse a firewall. The start of the range cannot be lower than 1025 unless dnsmasq is running as root. The number of concurrent TFTP connections is limited by the size of the port range.
-p_label_tftp_single_port=Run in a mode where the TFTP server uses ONLY the well-known port (69) for its end of the TFTP transfer. This allows TFTP to work when there in NAT is the path between client and server. Note that this is not strictly compliant with the RFCs specifying the TFTP protocol: use at your own risk.
+p_label_tftp_root=Look for files to transfer using TFTP relative to the given directory
+p_label_tftp_unique_root=Add the IP or hardware address of the TFTP client as a path component on the end of the TFTP-root
+p_label_tftp_port_range=Specifies a range of ports for use by TFTP transfers
 
 p_label_dhcp_boot=Use BOOTP (network boot)
-p_label_pxe_service=
-p_label_pxe_prompt=
-p_label_enable_tftp=
-p_label_tftp_root=
-p_label_tftp_no_fail=
-p_label_tftp_unique_root=
-p_label_tftp_secure=
-p_label_tftp_lowercase=
-p_label_tftp_max=
-p_label_tftp_mtu=
-p_label_tftp_no_blocksize=
-p_label_tftp_port_range=
-p_label_tftp_single_port=
-p_label_dhcp_pxe_vendor=

@@ -38,6 +38,11 @@ my $idx = $in{"idx"};
 # my $headstuff = $base_headstuff;
 my $headstuff = "";
 $headstuff .= "<script type='text/javascript'>\n";
+$headstuff .= "  document.addEventListener(\"DOMContentLoaded\", function(event) { \n";
+$headstuff .= "    setTimeout(function() {\n";
+$headstuff .= "      \$( \".opener_table_cell_style_small\" ).removeClass(\"opener_table_cell_style_small\");\n";
+$headstuff .= "    },10);\n";
+$headstuff .= "  });\n";
 $headstuff .= "  function save() {\n";
 $headstuff .= "    let vals=[];\n";
 $headstuff .= "    \$(\"#".$context."_input_form\").find(\":input\").each(function(){\n";
@@ -69,7 +74,10 @@ if ($action eq "edit") {
     %val = %{ $item->{"val"} };
     print &ui_hidden($fieldname_prefix . "idx", $idx);
 }
-print &ui_columns_row( [ $text{"p_man_desc_" . $context} ], \@doctd );
+my $desc = &ui_hidden_start($text{"description"}, "mandesc", 0, "list_item_edit_popup.cgi");
+$desc .= $text{"p_man_desc_" . $context};
+$desc .= &ui_hidden_end("mandesc");
+print &ui_columns_row( [ $desc ], \@doctd );
 
 if ($context eq "dhcp_vendorclass") {
     print &ui_columns_row( [ $text{"dhcp_set_tag"} . "  ", &ui_textbox($fieldname_prefix . "tag", $val{"tag"}, 5) ], \@tds );

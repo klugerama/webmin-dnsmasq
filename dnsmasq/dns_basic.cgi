@@ -120,9 +120,7 @@ $g.= &ui_columns_start( [
 
 foreach my $hosts ( @{$dnsmconfig{"addn-hosts"}} ) {
     local @cols;
-    # my $edit = "<a href=host_edit.cgi?idx=$count>".$hosts->{"val"}."</a>"; # TODO edit
     push ( @cols, &ui_checkbox("enabled", "1", "", $hosts->{"used"}?1:0, undef, 1) );
-    # push ( @cols, $edit );
     push ( @cols, $hosts->{"val"} );
     $g .= &ui_checked_columns_row( \@cols, undef, "sel", $count );
     $count++;
@@ -159,9 +157,7 @@ $g.= &ui_columns_start( [
 
 foreach my $rfile ( @{$dnsmconfig{"resolv-file"}} ) {
     local @cols;
-    # my $edit = "<a href=host_edit.cgi?idx=$count>".$rfile->{"val"}."</a>"; # TODO edit
     push ( @cols, &ui_checkbox("enabled", "1", "", $rfile->{"used"}?1:0, undef, 1) );
-    # push ( @cols, $edit );
     push ( @cols, $rfile->{"val"} );
     $g .= &ui_checked_columns_row( \@cols, undef, "sel", $count );
     $count++;

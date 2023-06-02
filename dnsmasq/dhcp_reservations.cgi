@@ -51,7 +51,7 @@ print &ui_columns_start( [
 foreach my $host ( @{$dnsmconfig{"dhcp-host"}} ) {
     local @cols;
     if ($host->{"val"}->{"ipversion"} == 4) {
-        my $edit = "<a href=host_edit.cgi?idx=$count>".$host->{"val"}->{"id"}."</a>";
+        my $edit = "<a href=dhcp_reservation_edit.cgi?idx=$count>".$host->{"val"}->{"id"}."</a>";
         push ( @cols, &ui_checkbox("enabled", "1", "", $host->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit );
         push ( @cols, $host->{"val"}->{"ip"} );
@@ -90,7 +90,7 @@ print &ui_columns_start( [
 ], 100, undef, undef, &ui_columns_header( [ $text{"dhcp6_res_title"} ], [ 'class="table-title" colspan=4' ] ), 1 );
 foreach my $host ( @{$dnsmconfig{"dhcp-host"}} ) {
     if ($host->{"val"}->{"ipversion"} == 6) {
-        my $edit = "<a href=host_edit.cgi?idx=$count>".$host->{"val"}->{"id"}."</a>";
+        my $edit = "<a href=dhcp_reservation_edit.cgi?idx=$count>".$host->{"val"}->{"id"}."</a>";
         push ( @cols, &ui_checkbox("enabled", "1", "", $host->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit );
         push ( @cols, $host->{"val"}->{"ip"} );
