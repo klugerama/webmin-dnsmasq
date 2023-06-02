@@ -116,7 +116,7 @@ elsif ($context eq "address") {
 #     print &ui_columns_row( [ $text{""}, &ui_textbox($fieldname_prefix . "fieldname", $val{""}, 10) ], \@tds );
 # }
 my @form_buttons = ();
-push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel", undef, "style='display:inline; float:right;' onClick='top.close(); return false;'") );
+push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel", undef, "style='display:inline; float:right;' onClick='top.close(); return false;'" ) );
 push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='display:inline !important; float:right;' onClick='\$(\"#".$context."_input_form\").submit(); return false;'" ) );
 print &ui_table_end();
 print &ui_form_end( \@form_buttons );

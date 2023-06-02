@@ -507,10 +507,10 @@ sub parse_config_file {
                         when ("auth-server") { # =<domain>,[<interface>[/4|/6]|<ip-address>...]
                             if( $remainder =~ /^($NAME),(.*)$/ ) {
                                 $valtemp{"domain"} = $1;
-                                $remainder = $2;
+                                $valtemp{"for"} = $2;
                             }
-                            if( $remainder =~ /^(.*)$/ ) {
-                                $valtemp{"for"} = $1;
+                            else {
+                                $valtemp{"domain"} = $remainder;
                             }
                         }
                         when ("alias") { # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>]
