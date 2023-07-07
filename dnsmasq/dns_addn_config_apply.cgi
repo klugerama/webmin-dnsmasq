@@ -31,8 +31,8 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $returnto = $in{"returnto"} || "dhcp_addn_config.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+my $returnto = $in{"returnto"} || "dns_addn_config.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
     my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
@@ -40,46 +40,68 @@ if( $dnsmconfig{"errors"} > 0 ) {
     exit;
 }
 # check user input for obvious errors
-if( $in{"domain"} !~ /^$FILE$/ ) {
-    my $line = "error.cgi?line=".$text{"p_label_domain"};
-    $line .= "&type=" . &urlize($text{"err_domainbad"});
-    &redirect( $line );
-    exit;
-}
-if( ($in{"addn_hosts"}) && ($in{"addn_hostsval"} !~ /^$FILE$/) ) {
-    my $line = "error.cgi?line=".$text{"p_label_addn_hosts"};
-    $line .= "&type=" . &urlize($text{"err_filebad"});
-    &redirect( $line );
-    exit;
-}
-if( ($in{"cache_size"}) && ($in{"cache_sizeval"} !~ /^$NUMBER/) ) {
-    my $line = "error.cgi?line=".$text{"p_label_cache_size"};
-    $line .= "&type=" . &urlize($text{"err_numbbad"});
-    &redirect( $line );
-    exit;
-}
-if( ($in{"local_ttl"}) && ($in{"local_ttlval"} !~ /^$NUMBER/) ) {
-    my $line = "error.cgi?line=".$text{"p_label_local_ttl"};
-    $line .= "&type=" . &urlize($text{"err_numbbad"});
-    &redirect( $line );
-    exit;
-}
+
 # adjust everything to what we got
 
 my $result = "";
 my @sel = split(/\0/, $in{'sel'});
+my @conf_file_adds = split(/\0/, $in{'new_conf_file'});
+my @servers_file_adds = split(/\0/, $in{'new_servers_file'});
+my @conf_dir_adds = split(/\0/, $in{'new_conf_dir'});
 
-
-$action = $in{"enable_sel_conf_file"} ? "enable" : $in{"disable_sel_conf_file"} ? "disable" : $in{"delete_sel_conf_file"} ? "delete" : "";
-if ($action ne "") {
-    @sel || &error($text{'selected_none'});
-    &update_selected("conf-file", $action, \@sel, \%$dnsmconfig);
+if ($in{"conf_dir_idx"} ne "" && ($in{"conf_dir_filter"} ne "" || $in{"conf_dir_exceptions"} ne "")) {
+    my $item = $dnsmconfig{"conf_dir"}[$in{"conf_dir_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "conf-dir=" . $in{"conf_dir_dirname"};
+    if ($in{"conf_dir_filter"} ne "") {
+        $val .= "," . $in{"conf_dir_filter"};
+    }
+    elsif ($in{"conf_dir_exceptions"} ne "") {
+        $val .= "," . $in{"conf_dir_exceptions"};
+    }
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
+}
+elsif (@conf_file_adds) {
+    foreach my $conf_file_add (@conf_file_adds) {
+        if ($conf_file_add ne "") {
+            &add_to_list( "conf-file", $conf_file_add );
+        }
+    }
+}
+elsif (@servers_file_adds) {
+    foreach my $servers_file_add (@servers_file_adds) {
+        if ($servers_file_add ne "") {
+            &add_to_list( "servers-file", $servers_file_add );
+        }
+    }
+}
+elsif (@conf_dir_adds) {
+    foreach my $conf_dir_add (@conf_dir_adds) {
+        if ($conf_dir_add ne "") {
+            &add_to_list( "conf-dir", $conf_dir_add );
+        }
+    }
 }
 else {
-    $action = $in{"enable_sel_conf_dir"} ? "enable" : $in{"disable_sel_conf_dir"} ? "disable" : $in{"delete_sel_conf_dir"} ? "delete" : "";
+    $action = $in{"enable_sel_conf_file"} ? "enable" : $in{"disable_sel_conf_file"} ? "disable" : $in{"delete_sel_conf_file"} ? "delete" : "";
     if ($action ne "") {
         @sel || &error($text{'selected_none'});
-        &update_selected("conf-dir", $action, \@sel, \%$dnsmconfig);
+        &update_selected("conf-file", $action, \@sel, \%$dnsmconfig);
+    }
+    else {
+        $action = $in{"enable_sel_servers_file"} ? "enable" : $in{"disable_sel_servers_file"} ? "disable" : $in{"delete_sel_servers_file"} ? "delete" : "";
+        if ($action ne "") {
+            @sel || &error($text{'selected_none'});
+            &update_selected("servers-file", $action, \@sel, \%$dnsmconfig);
+        }
+        else {
+            $action = $in{"enable_sel_conf_dir"} ? "enable" : $in{"disable_sel_conf_dir"} ? "disable" : $in{"delete_sel_conf_dir"} ? "delete" : "";
+            if ($action ne "") {
+                @sel || &error($text{'selected_none'});
+                &update_selected("conf-dir", $action, \@sel, \%$dnsmconfig);
+            }
+        }
     }
 }
 #

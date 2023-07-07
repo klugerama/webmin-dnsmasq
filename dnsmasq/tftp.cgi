@@ -24,27 +24,20 @@ sub show_tftp_settings {
         {
             "link" => "tftp_basic.cgi",
             "title" => $text{"index_tftp_settings_basic"},
-            "icon" => "basic.gif"
+            "icon" => "basic.gif",
+            "page" => 1
         },
-        # {
-        #     "link" => "dns_servers.cgi",
-        #     "title" => $text{"index_dns_servers"},
-        #     "icon" => "servers.gif"
-        # },
-        # {
-        #     "link" => "dns_iface.cgi",
-        #     "title" => $text{"index_dns_iface_settings"},
-        #     "icon" => "network.gif"
-        # },
-        # {
-        #     "link" => "dns_alias.cgi",
-        #     "title" => $text{"index_dns_alias_settings"},
-        #     "icon" => "alias.gif"
-        # },
+        {
+            "link" => "tftp_bootp.cgi",
+            "title" => $text{"index_tftp_boot_pxe_settings"},
+            "icon" => "boot.gif",
+            "page" => 
+        },
         # {
         #     "link" => "dns_addn_config.cgi",
         #     "title" => $text{"index_dns_addn_config"},
-        #     "icon" => "files.gif"
+        #     "icon" => "files.gif",
+        #     "page" => 
         # },
     );
     local $i;

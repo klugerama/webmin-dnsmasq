@@ -40,7 +40,7 @@ $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-	&header( "DNSMasq settings", "" );
+	&header( $text{"index_title"}, "" );
 	print "<hr><h2>";
 	print $text{"warn_errors"};
 	print $dnsmconfig{"errors"};
@@ -51,7 +51,7 @@ if( $dnsmconfig{"errors"} > 0 ) {
 }
 # adjust everything to what we got
 #
-&header( "DNSMasq settings", "" );
+&header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button() );
 print "<h2>".$text{dhcp-userclass}."</h2>";
 print &ui_form_start( "user_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );

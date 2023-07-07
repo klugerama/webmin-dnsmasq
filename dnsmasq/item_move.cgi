@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - dns_move.cgi; move server     
+#    DNSMasq Webmin Module - item_move.cgi; move array items up or down     
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -15,14 +15,9 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-do '../web-lib.pl';
-do '../ui-lib.pl';
-do 'dnsmasq-lib.pl';
+require 'dnsmasq-lib.pl';
 
-$|=1;
-&init_config("DNSMasq");
-
-%access=&get_module_acl;
+my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
@@ -32,15 +27,18 @@ $|=1;
 
 ## Insert Output code here
 # read config file
-$config_filename = $config{config_file};
-$config_file = &read_file_lines( $config_filename );
+my $config_filename = $config{config_file};
+my $config_file = &read_file_lines( $config_filename );
 # pass into data structure
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();
+
+my $returnto = $in{"returnto"};
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-	&header( "DNSMasq settings", "" );
+	&header( $text{"index_title"}, "" );
 	print "<hr><h2>";
 	print $text{"warn_errors"};
 	print $dnsmconfig{"errors"};
@@ -51,31 +49,29 @@ if( $dnsmconfig{"errors"} > 0 ) {
 }
 # adjust everything to what we got
 #
-my $selected=$dnsmconfig{"servers"}[$in{idx}]{"line"};
+my $internalfield = $in{"internalfield"};
+my $selected=$dnsmconfig{$internalfield}[$in{idx}]{"line"};
 if( $in{dir} eq "up" ) {
-	$dnsmconfig{"servers"}[$in{idx}]{"line"}=$dnsmconfig{"servers"}[$in{idx}-1]{"line"};
-	$dnsmconfig{"servers"}[$in{idx}-1]{"line"}=$selected;
+	$dnsmconfig{$internalfield}[$in{idx}]{"line"}=$dnsmconfig{$internalfield}[$in{idx}-1]{"line"};
+	$dnsmconfig{$internalfield}[$in{idx}-1]{"line"}=$selected;
 }
-else
-{
-	$dnsmconfig{"servers"}[$in{idx}]{"line"}=$dnsmconfig{"servers"}[$in{idx}+1]{"line"};
-	$dnsmconfig{"servers"}[$in{idx}+1]{"line"}=$selected;
+else {
+	$dnsmconfig{$internalfield}[$in{idx}]{"line"}=$dnsmconfig{$internalfield}[$in{idx}+1]{"line"};
+	$dnsmconfig{$internalfield}[$in{idx}+1]{"line"}=$selected;
 }
-foreach my $server (@{$dnsmconfig{"servers"}}) {
-	$line= ($$server{domain_used}) ?
-		"server=/".$$server{domain}."/".$$server{address} :
-		"server=".$$server{address};
-	&update( $$server{"line"}, $line, 
-		$config_file, ($$server{"used"}) );
+foreach my $item (@{$dnsmconfig{$internalfield}}) {
+	$line = $item->{"full"};
+	&update( $item->{"line"}, $line, 
+		$config_file, ($item->{"used"}?0:1) );
 }
 #
 # write file!!
 &flush_file_lines();
 #
 # re-load basic page
-&redirect( "dns_servers.cgi" );
+&redirect( $returnto );
 
 # 
 # sub-routines
 #
-### END of dns_move.cgi ###.
+### END of item_move.cgi ###.

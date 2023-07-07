@@ -50,7 +50,30 @@ my @sel = split(/\0/, $in{'sel'});
 
 # adjust everything to what we got
 #
-if ($in{'new_alias_from'} ne "") {
+if ($in{"submit"}) {
+    &apply_simple_vals("dns", \@sel, "4");
+
+    &check_other_vals("dns", \@sel);
+
+    if ($in{"rebind_domain_ok_val"}) {
+        my @rebind_domain_ok_val = split(/\0/, $in{'rebind_domain_ok_val'});
+        my $item = $dnsmconfig{"rebind-domain-ok"};
+        my $file_arr = &read_file_lines($item->{"file"});
+        my $val = "rebind-domain-ok=";
+        if (@rebind_domain_ok_val == 1) {
+            $val .= @rebind_domain_ok_val[0];
+        }
+        else {
+            foreach my $dom (@rebind_domain_ok_val) {
+                $val .= "/" . $dom;
+            }
+            $val .= "/";
+        }
+        &update($item->{"line"}, $val, \@$file_arr, 0);
+        &flush_file_lines();
+    }
+}
+elsif ($in{'new_alias_from'} ne "") {
     my $val = $in{"new_alias_from"};
     $val .= "," . $in{"new_alias_to"};
     if ($in{"new_alias_netmask"} ne "") {
@@ -101,7 +124,7 @@ else {
         &update_selected("alias", $action, \@sel, \%$dnsmconfig);
     }
     else {
-        $action = $in{"enable_sel_nx"} ? "enable" : $in{"disable_sel_nx"} ? "disable" : $in{"delete_sel_nx"} ? "delete" : "";
+        $action = $in{"enable_sel_bogus_nxdomain"} ? "enable" : $in{"disable_sel_bogus_nxdomain"} ? "disable" : $in{"delete_sel_bogus_nxdomain"} ? "delete" : "";
         if ($action ne "") {
             @sel || &error($text{'selected_none'});
 
@@ -113,6 +136,14 @@ else {
                 @sel || &error($text{'selected_none'});
 
                 &update_selected("address", $action, \@sel, \%$dnsmconfig);
+            }
+            else {
+                $action = $in{"enable_sel_ignore_address"} ? "enable" : $in{"disable_sel_ignore_address"} ? "disable" : $in{"delete_sel_ignore_address"} ? "delete" : "";
+                if ($action ne "") {
+                    @sel || &error($text{'selected_none'});
+
+                    &update_selected("ignore-address", $action, \@sel, \%$dnsmconfig);
+                }
             }
         }
     }

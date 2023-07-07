@@ -21,13 +21,18 @@ my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_range"});
+
+my $returnto = $in{"returnto"} || "dhcp_ranges.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_range"};
+
+my $internalfield = "dhcp_range";
+my $configfield = &internal_to_config($internalfield);
 my @list_link_buttons = &list_links( "sel", 0, "dhcp_range_apply.cgi", "dhcp-range=0.0.0.0,0.0.0.0", "dhcp_ranges.cgi", &text("add_", $text{"_range"}) );
 
 my $count;
@@ -42,10 +47,10 @@ print &ui_columns_start( [
     $text{"mask"},
     $text{"leasetime"},
     $text{"dhcp_if_tags"}, 
-    $text{"dhcp_set_tags"}, 
+    $text{"p_label_val_set_tags"}, 
     $text{"flags"},
-    ], 100, undef, undef, &ui_columns_header( [ $text{"index_dhcp_range"} . &ui_help($text{"p_man_desc_dhcp_range"}) ], [ 'class="table-title" colspan=4' ] ), 1 );
-foreach my $range ( @{$dnsmconfig{"dhcp-range"}} ) {
+    ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=4' ] ), 1 );
+foreach my $range ( @{$dnsmconfig{$configfield}} ) {
     local @cols;
     my $edit = "<a href=range_edit.cgi?idx=$count>".$range->{"val"}->{"start"}."</a>";
     my $if_tags = "";

@@ -27,7 +27,10 @@ my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_domain_name"});
+
+my $returnto = $in{"returnto"} || "dhcp_domain_name.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_domain_name"};
 
 my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left );
 
@@ -35,7 +38,8 @@ my @edit_link = ( "", "", "" );
 my $hidden_edit_input_fields;
 my $edit_script;
 my $formid = "domain_form";
-my $context = "domain";
+my $internalfield = "domain";
+my $configfield = &internal_to_config($internalfield);
 my @newfields = ( "name", "subnet", "range" );
 my @editfields = ( "idx", @newfields );
 my $w = 500;
@@ -43,7 +47,7 @@ my $h = 375;
 my $count=0;
 # my @list_link_buttons = &list_links( "sel", 0, "dhcp_domain_name_apply.cgi", "domain=new", "dhcp_domain_name.cgi", &text("add_", $text{"_domain"}) );
 my @list_link_buttons = &list_links( "sel", 0 );
-my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_domain"}), $context, $text{"p_label_domain"}, $w, $h, $formid, \@newfields );
+my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_domain"}), $internalfield, $text{"p_label_domain"}, $w, $h, $formid, \@newfields );
 push(@list_link_buttons, $add_new_button);
 
 print &ui_form_start( 'dhcp_domain_name_apply.cgi', "post" );
@@ -58,16 +62,16 @@ print &ui_columns_start( [
     $text{"subnet"}, 
     $text{"range"}, 
     # "full" 
-], 100, undef, undef, &ui_columns_header( [ $text{"p_label_domain"} . &ui_help($text{"p_man_desc_domain"}) ], [ 'class="table-title" colspan=5' ] ), 1 );
+], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=5' ] ), 1 );
 
 foreach my $domain ( @{$dnsmconfig{"domain"}} ) {
     local %val = %{ $domain->{"val"} };
     local @cols;
     # my $edit = "<a href=dhcp_domain_edit.cgi?idx=$count>".$domain->{"val"}->{"domain"}."</a>";
     push ( @cols, &ui_checkbox("enabled", "1", "", $domain->{"used"}?1:0, undef, 1) );
-    ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"domain"}, $context, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
-    ($edit_link[1]) = &edit_item_link($val{"subnet"}, $context, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
-    ($edit_link[2]) = &edit_item_link($val{"range"}, $context, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
+    ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"domain"}, $internalfield, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
+    ($edit_link[1]) = &edit_item_link($val{"subnet"}, $internalfield, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
+    ($edit_link[2]) = &edit_item_link($val{"range"}, $internalfield, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
     # push ( @cols, $edit );
     # push ( @cols, $domain->{"val"}->{"subnet"} );
     # push ( @cols, $domain->{"val"}->{"range"} );
@@ -87,7 +91,7 @@ print &ui_submit($text{"delete_sel"}, "delete_sel_domain");
 print $hidden_edit_input_fields . $edit_script;
 print &ui_form_end( );
 print &ui_hr();
-print &add_js(1, 1, 0);
+print &add_js();
 
 &ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
 

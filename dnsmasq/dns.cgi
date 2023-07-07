@@ -24,32 +24,56 @@ sub show_dns_settings {
         {
             "link" => "dns_basic.cgi",
             "title" => $text{"index_dns_settings_basic"},
-            "icon" => "basic.gif"
+            "icon" => "basic.gif",
+            "page" => 1
         },
         {
             "link" => "dns_servers.cgi",
             "title" => $text{"index_dns_servers"},
-            "icon" => "servers.gif"
+            "icon" => "servers.gif",
+            "page" => 2
         },
         {
             "link" => "dns_iface.cgi",
             "title" => $text{"index_dns_iface_settings"},
-            "icon" => "network.gif"
+            "icon" => "network.gif",
+            "page" => 3
         },
         {
             "link" => "dns_alias.cgi",
             "title" => $text{"index_dns_alias_settings"},
-            "icon" => "alias.gif"
+            "icon" => "alias.gif",
+            "page" => 4
+        },
+        {
+            "link" => "dns_records.cgi",
+            "title" => $text{"index_dns_records_settings"},
+            "icon" => "records.gif",
+            "page" => 5
+        },
+        {
+            "link" => "dns_sec.cgi",
+            "title" => $text{"index_dns_sec_settings"},
+            "icon" => "lock.gif",
+            "page" => 6
+        },
+        {
+            "link" => "dns_auth.cgi",
+            "title" => $text{"index_dns_auth_settings"},
+            "icon" => "forwarding.gif",
+            "page" => 7
         },
         {
             "link" => "dns_addn_config.cgi",
             "title" => $text{"index_dns_addn_config"},
-            "icon" => "files.gif"
+            "icon" => "files.gif",
+            "page" => 8
         },
         {
             "link" => "manual_edit.cgi",
             "title" => $text{"index_dns_manual_edit"},
-            "icon" => "manual.gif"
+            "icon" => "manual.gif",
+            "page" => 9
         },
     );
     local $i;
@@ -65,9 +89,6 @@ sub show_dns_settings {
 1;
 # uses the index entry in /lang/en
 
-
-
 ## if subroutines are not in an extra file put them here
 
-
-### END of index.cgi ###.
+### END of dns.cgi ###.

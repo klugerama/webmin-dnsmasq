@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dhcp_basic.cgi; DHCP config
+#    DNSMasq Webmin Module - # TODO dns_auth.cgi; authoritative DNS settings
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -23,22 +23,30 @@ my %access=&get_module_acl;
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_settings_basic"});
+&header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_auth_settings"} );
 
-my $returnto = $in{"returnto"} || "dhcp_basic.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+# print "<h2>";
+# print $text{"index_dns_auth_settings"};
+# print "</h2>";
+
+my $returnto = $in{"returnto"} || "dns_auth.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
 
 my @page_fields = ();
-foreach my $configfield ( @confdhcp ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "1" );
+foreach my $configfield ( @confdns ) {
+    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "7" );
     push( @page_fields, $configfield );
 }
-&show_basic_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, "dhcp_basic_apply.cgi", $text{"index_dhcp_settings_basic"} );
 
-&ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
+&show_basic_fields( \%dnsmconfig, "dns_auth", \@page_fields, "dns_auth_apply.cgi", $text{"index_basic"} );
 
-### END of dhcp_basic.cgi ###.
+&show_other_fields( \%dnsmconfig, "dns_auth", \@page_fields, "dns_auth_apply.cgi", " " );
+
+print &add_js();
+
+ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});
+
+### END of dns_auth.cgi ###.

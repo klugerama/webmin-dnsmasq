@@ -26,25 +26,38 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_client_options"});
+
+my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_client_options"};
 
 my @list_link_buttons = &list_links( "sel", 0, "option_edit.cgi", "dhcp-option=27", "dhcp_client_options.cgi", &text("add_", $text{"_dhcp_option"}) );
 
+my @edit_link = ( "", "", "" );
+my $hidden_edit_input_fields;
+my $edit_script;
+my $formid = "dhcp_option_form";
+my $internalfield = "dhcp_option";
+my $configfield = &internal_to_config($internalfield);
+my @newfields = ( "option", "value", "tag", "vendor", "encap", "forced" );
+my @editfields = ( "idx", @newfields );
+my $w = 500;
+my $h = 375;
 my $count;
 $count=0;
-print &ui_form_start( 'dhcp_client_options_apply.cgi', "post" );
+print &ui_form_start( 'dhcp_client_options_apply.cgi', "post", undef, "id=\"$formid\"" );
 print &ui_links_row(\@list_link_buttons);
 print &ui_columns_start( [
     "",
     $text{"enabled"},
     $text{"_dhcp_option"},
     $text{"value"},
-    $text{"dhcp_tag_s"},
+    $text{"p_label_val_tags"},
     $text{"vendor"},
     $text{"dhcp_encap"},
     $text{"forced"},
-    ], 100, undef, undef, &ui_columns_header( [ $text{"dhcp_options"} ], [ 'class="table-title" colspan=8' ] ), 1 );
-foreach my $option ( @{$dnsmconfig{"dhcp-option"}} ) {
+    ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=8' ] ), 1 );
+foreach my $option ( @{$dnsmconfig{$configfield}} ) {
     local @cols;
     local %val = %{ $option->{"val"} };
     local $tags = "";
@@ -72,4 +85,4 @@ print &ui_form_end();
 
 &ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
 
-### END of dhcp_basic.cgi ###.
+### END of dhcp_client_options.cgi ###.

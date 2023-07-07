@@ -15,7 +15,7 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-require "dnsmasq-lib.pl";
+require 'dnsmasq-lib.pl';
 
 my %access=&get_module_acl;
 
@@ -25,6 +25,7 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+
 # read posted data
 &ReadParse();
 
@@ -37,13 +38,18 @@ if( $dnsmconfig{"errors"} > 0 ) {
 	exit;
 }
 # check for input data errors
-
+if( ($in{resolv_std}) && ($in{resolv_file} !~ /^$FILE$/) ) {
+	my $line = "error.cgi?line=".$text{"p_label_resolv_file"};
+	$line .= "&type=" . &urlize($text{"err_filebad"});
+	&redirect( $line );
+	exit;
+}
 # adjust everything to what we got
 my $result = "";
 my @sel = split(/\0/, $in{'sel'});
 
 if ($in{"submit"}) {
-    &apply_simple_vals("dns", \@sel, "2");
+    &apply_simple_vals("dns", \@sel, "5");
 }
 elsif ($in{"new_server_domain"} ne "" || $in{"new_server_ip"} ne "") {
     my $newval = "";
@@ -61,7 +67,7 @@ elsif ($in{"new_server_domain"} ne "" || $in{"new_server_ip"} ne "") {
 elsif ($in{"server_idx"} ne "") {
     my $item = $dnsmconfig{"server"}[$in{"server_idx"}];
     my $file_arr = &read_file_lines($item->{"file"});
-    my $newval = $item->{"val"}->{"is_local"} ? "local=" : "server=";
+    my $newval = "server=";
     if ($in{"server_domain"} ne "") {
         $newval .= "/" . $in{"server_domain"} . "/";
     }
@@ -70,34 +76,6 @@ elsif ($in{"server_idx"} ne "") {
     }
     if ($in{"server_source"} ne "") {
         $newval .= "," . $in{"server_source"};
-    }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
-}
-elsif ($in{"new_rev_server_domain"} ne "" || $in{"new_rev_server_ip"} ne "") {
-    my $newval = "";
-    if ($in{"new_rev_server_domain"} ne "") {
-        $newval .= "/" . $in{"new_rev_server_domain"} . "/";
-    }
-    if ($in{"new_rev_server_ip"} ne "") {
-        $newval .= $in{"new_rev_server_ip"};
-    }
-    if ($in{"new_rev_server_source"} ne "") {
-        $newval .= "," . $in{"new_rev_server_source"};
-    }
-    &add_to_list("rev-server", $newval);
-}
-elsif ($in{"rev_server_idx"} ne "") {
-    my $item = $dnsmconfig{"rev-server"}[$in{"rev_server_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
-    if ($in{"rev_server_domain"} ne "") {
-        $newval .= "/" . $in{"rev_server_domain"} . "/";
-    }
-    if ($in{"rev_server_ip"} ne "") {
-        $newval .= $in{"rev_server_ip"};
-    }
-    if ($in{"rev_server_source"} ne "") {
-        $newval .= "," . $in{"rev_server_source"};
     }
     &update($item->{"line"}, $newval, \@$file_arr, 0);
     &flush_file_lines();

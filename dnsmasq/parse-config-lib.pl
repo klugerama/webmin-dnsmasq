@@ -4,175 +4,15 @@
 # dnsmasq webmin module library module
 #
 
+# use strict;
+use warnings;
+use v5.10; # at least for Perl 5.10
+# use Data::Dumper;
+use experimental qw( switch );
+
 #
 # the config hash holds the parsed config file(s)
 # 
-# --no-hosts
-# --addn-hosts=<file>
-# --hostsdir=<path>
-# --expand-hosts
-# --local-ttl=<time>
-# --dhcp-ttl=<time>
-# --neg-ttl=<time>
-# --max-ttl=<time>
-# --max-cache-ttl=<time>
-# --min-cache-ttl=<time>
-# --auth-ttl=<time>
-# --log-queries
-# --log-facility=<facility>
-# --log-debug
-# --log-async[=<lines>]
-# --pid-file=<path>
-# --user=<username>
-# --group=<groupname>
-# --port=<port>
-# --edns-packet-max=<size>
-# --query-port=<query_port>
-# --min-port=<port>
-# --max-port=<port>
-# --interface=<interface name>
-# --except-interface=<interface name>
-# --auth-server=<domain>,[<interface>|<ip-address>...]
-# --local-service
-# --no-dhcp-interface=<interface name>
-# --listen-address=<ipaddr>
-# --bind-interfaces
-# --bind-dynamic
-# --localise-queries
-# --bogus-priv
-# --alias=[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>]
-# --bogus-nxdomain=<ipaddr>[/prefix]
-# --ignore-address=<ipaddr>[/prefix]
-# --filterwin2k
-# --resolv-file=<file>
-# --no-resolv
-# --enable-dbus[=<service-name>]
-# --enable-ubus[=<service-name>]
-# --strict-order
-# --all-servers
-# --dns-loop-detect
-# --stop-dns-rebind
-# --rebind-localhost-ok
-# --rebind-domain-ok=[<domain>]|[[/<domain>/[<domain>/]
-# --no-poll
-# --clear-on-reload
-# --domain-needed
-# --local=[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-# --server=[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-# --rev-server=<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
-# --address=/<domain>[/<domain>...]/[<ipaddr>]
-# --ipset=/<domain>[/<domain>...]/<ipset>[,<ipset>...]
-# --connmark-allowlist-enable[=<mask>]
-# --connmark-allowlist=<connmark>[/<mask>][,<pattern>[/<pattern>...]]
-# --mx-host=<mx name>[[,<hostname>],<preference>]
-# --mx-target=<hostname>
-# --selfmx
-# --localmx
-# --srv-host=<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
-# --host-record=<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
-# --dynamic-host=<name>,[IPv4-address],[IPv6-address],<interface>
-# --txt-record=<name>[[,<text>],<text>]
-# --ptr-record=<name>[,<target>]
-# --naptr-record=<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
-# --caa-record=<name>,<flags>,<tag>,<value>
-# --cname=<cname>,[<cname>,]<target>[,<TTL>]
-# --dns-rr=<name>,<RR-number>,[<hex data>]
-# --interface-name=<name>,<interface>[/4|/6]
-# --synth-domain=<domain>,<address range>[,<prefix>[*]]
-# --dumpfile=<path/to/file>
-# --dumpmask=<mask>
-# --add-mac[=base64|text]
-# --add-cpe-id=<string>
-# --add-subnet[[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
-# --umbrella[=deviceid:<deviceid>[,orgid:<orgid>]]
-# --cache-size=<cachesize>
-# --no-negcache
-# --dns-forward-max=<queries>
-# --dnssec
-# --trust-anchor=[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
-# --dnssec-check-unsigned[=no]
-# --dnssec-no-timecheck
-# --dnssec-timestamp=<path>
-# --proxy-dnssec
-# --dnssec-debug
-# --auth-zone=<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>].....][,exclude:<subnet>[/<prefix length>]].....]
-# --auth-soa=<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
-# --auth-sec-servers=<domain>[,<domain>[,<domain>...]]
-# --auth-peer=<ip-address>[,<ip-address>[,<ip-address>...]]
-# --conntrack
-# --dhcp-range=[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>]
-# --dhcp-range=[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
-# --dhcp-host=[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
-# --dhcp-hostsfile=<path>
-# --dhcp-optsfile=<path>
-# --dhcp-hostsdir=<path>
-# --dhcp-optsdir=<path>
-# --read-ethers
-# --dhcp-option=[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-# --dhcp-option-force=[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],]<opt>,[<value>[,<value>]]
-# --dhcp-no-override
-# --dhcp-relay=<local address>,<server address>[,<interface]
-# --dhcp-vendorclass=set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
-# --dhcp-userclass=set:<tag>,<user-class>
-# --dhcp-mac=set:<tag>,<MAC address>
-# --dhcp-circuitid=set:<tag>,<circuit-id>
-# --dhcp-remoteid=set:<tag>,<remote-id>
-# --dhcp-subscrid=set:<tag>,<subscriber-id>
-# --dhcp-proxy[=<ip addr>]......
-# --dhcp-match=set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
-# --dhcp-name-match=set:<tag>,<name>[*]
-# --tag-if=set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
-# --dhcp-ignore=tag:<tag>[,tag:<tag>]
-# --dhcp-ignore-names[=tag:<tag>[,tag:<tag>]]
-# --dhcp-generate-names=tag:<tag>[,tag:<tag>]
-# --dhcp-broadcast[=tag:<tag>[,tag:<tag>]]
-# --dhcp-boot=[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
-# --dhcp-sequential-ip
-# --dhcp-ignore-clid
-# --pxe-service=[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
-# --pxe-prompt=[tag:<tag>,]<prompt>[,<timeout>]
-# --dhcp-pxe-vendor=<vendor>[,...]
-# --dhcp-lease-max=<number>
-# --dhcp-authoritative
-# --dhcp-rapid-commit
-# --dhcp-alternate-port[=<server port>[,<client port>]]
-# --bootp-dynamic[=<network-id>[,<network-id>]]
-# --no-ping
-# --log-dhcp
-# --quiet-dhcp
-# --quiet-dhcp6
-# --quiet-ra
-# --dhcp-leasefile=<path>
-# --dhcp-duid=<enterprise-id>,<uid>
-# --dhcp-script=<path>
-# --dhcp-luascript=<path>
-# --dhcp-scriptuser=<user>
-# --script-arp
-# --leasefile-ro
-# --script-on-renewal
-# --bridge-interface=<interface>,<alias>[,<alias>]
-# --shared-network=<interface>,<addr>
-# --shared-network=<addr>,<addr>
-# --domain=<domain>[,<address range>[,local]]
-# --dhcp-fqdn
-# --dhcp-client-update
-# --enable-ra
-# --ra-param=<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
-# --dhcp-reply-delay=[tag:<tag>,]<integer>
-# --enable-tftp[=<interface>[,<interface>]]
-# --tftp-root=<directory>[,<interface>]
-# --tftp-no-fail
-# --tftp-unique-root[=ip|mac]
-# --tftp-secure
-# --tftp-lowercase
-# --tftp-max=<connections>
-# --tftp-mtu=<mtu size>
-# --tftp-no-blocksize
-# --tftp-port-range=<start>,<end>
-# --tftp-single-port
-# --conf-file=<file>
-# --conf-dir=<directory>[,<file-extension>......],
-# --servers-file=<file>
 
 # type:
 #   int ------- integer
@@ -188,181 +28,175 @@
 #   value if none is specified
 # mult:
 #   {char} ---- (complete) specified value may be specified multiple times, separated by the specified character
-
-use strict;
-use warnings;
-use v5.10; # at least for Perl 5.10
-# use Data::Dumper;
-use experimental qw( switch );
-
 our %dnsmconfigvals = (
-    "no-hosts"                  => { "idx" => 0,   "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "addn-hosts"                => { "idx" => 1,   "valtype" => "path",    "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =<file>
-    "hostsdir"                  => { "idx" => 2,   "valtype" => "dir",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "expand-hosts"              => { "idx" => 3,   "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "local-ttl"                 => { "idx" => 4,   "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
-    "dhcp-ttl"                  => { "idx" => 5,   "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
-    "neg-ttl"                   => { "idx" => 6,   "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
-    "max-ttl"                   => { "idx" => 7,   "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
-    "max-cache-ttl"             => { "idx" => 8,   "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
-    "min-cache-ttl"             => { "idx" => 9,   "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
-    "auth-ttl"                  => { "idx" => 10,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
-    "log-queries"               => { "idx" => 11,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "log-facility"              => { "idx" => 12,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<facility>
-    "log-debug"                 => { "idx" => 13,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "log-async"                 => { "idx" => 14,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 5, "val_optional" => 1 }, # [=<lines>]
-    "pid-file"                  => { "idx" => 15,  "valtype" => "file",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "user"                      => { "idx" => 16,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => "nobody" }, # =<username>
-    "group"                     => { "idx" => 17,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => "dip" }, # =<groupname>
-    "port"                      => { "idx" => 18,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 53 }, # =<port>
-    "edns-packet-max"           => { "idx" => 19,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 4096 }, # =<size>
-    "query-port"                => { "idx" => 20,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<query_port>
-    "min-port"                  => { "idx" => 21,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 1024 }, # =<port>
-    "max-port"                  => { "idx" => 22,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<port>
-    "interface"                 => { "idx" => 23,  "valtype" => "string",  "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =<interface name>
-    "except-interface"          => { "idx" => 24,  "valtype" => "string",  "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =<interface name>
-    "auth-server"               => { "idx" => 25,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<domain>,[<interface>|<ip-address>...]
-    "local-service"             => { "idx" => 26,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "no-dhcp-interface"         => { "idx" => 27,  "valtype" => "string",  "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =<interface name>
-    "listen-address"            => { "idx" => 28,  "valtype" => "ip",      "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =<ipaddr>
-    "bind-interfaces"           => { "idx" => 29,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "bind-dynamic"              => { "idx" => 30,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "localise-queries"          => { "idx" => 31,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "bogus-priv"                => { "idx" => 32,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "alias"                     => { "idx" => 33,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>] # previously "dns_forced"?
-    "bogus-nxdomain"            => { "idx" => 34,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =<ipaddr>[/prefix]
-    "ignore-address"            => { "idx" => 35,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # =<ipaddr>[/prefix]
-    "filterwin2k"               => { "idx" => 36,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "resolv-file"               => { "idx" => 37,  "valtype" => "file",    "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0, "default" => "/etc/resolv.conf" }, # =<file>
-    "no-resolv"                 => { "idx" => 38,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "enable-dbus"               => { "idx" => 39,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => "uk.org.thekelleys.dnsmasq", "val_optional" => 1 }, # [=<service-name>]
-    "enable-ubus"               => { "idx" => 40,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => "dnsmasq", "val_optional" => 1 }, # [=<service-name>]
-    "strict-order"              => { "idx" => 41,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "all-servers"               => { "idx" => 42,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dns-loop-detect"           => { "idx" => 43,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "stop-dns-rebind"           => { "idx" => 44,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "rebind-localhost-ok"       => { "idx" => 45,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "rebind-domain-ok"          => { "idx" => 46,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "/", "special" => 0 }, # TODO edit # =[<domain>]|[[/<domain>/[<domain>/]
-    "no-poll"                   => { "idx" => 47,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "clear-on-reload"           => { "idx" => 48,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "domain-needed"             => { "idx" => 49,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "local"                     => { "idx" => 50,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 1 }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-    "server"                    => { "idx" => 51,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 1 }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-    "rev-server"                => { "idx" => 52,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
-    "address"                   => { "idx" => 53,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =/<domain>[/<domain>...]/[<ipaddr>]
-    "ipset"                     => { "idx" => 54,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 1 }, # TODO edit # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
-    "connmark-allowlist-enable" => { "idx" => 55,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 1, "val_optional" => 1 }, # [=<mask>]
-    "connmark-allowlist"        => { "idx" => 56,  "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 1 }, # TODO edit # =<connmark>[/<mask>][,<pattern>[/<pattern>...]] 
-    "mx-host"                   => { "idx" => 57,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<mx name>[[,<hostname>],<preference>]
-    "mx-target"                 => { "idx" => 58,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<hostname>
-    "selfmx"                    => { "idx" => 59,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "localmx"                   => { "idx" => 60,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "srv-host"                  => { "idx" => 61,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
-    "host-record"               => { "idx" => 62,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
-    "dynamic-host"              => { "idx" => 63,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,[IPv4-address],[IPv6-address],<interface>
-    "txt-record"                => { "idx" => 64,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>[[,<text>],<text>]
-    "ptr-record"                => { "idx" => 65,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>[,<target>]
-    "naptr-record"              => { "idx" => 66,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
-    "caa-record"                => { "idx" => 67,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<flags>,<tag>,<value>
-    "cname"                     => { "idx" => 68,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<cname>,[<cname>,]<target>[,<TTL>]
-    "dns-rr"                    => { "idx" => 69,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<RR-number>,[<hex data>]
-    "interface-name"            => { "idx" => 70,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<interface>[/4|/6]
-    "synth-domain"              => { "idx" => 71,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<domain>,<address range>[,<prefix>[*]]
-    "dumpfile"                  => { "idx" => 72,  "valtype" => "file",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<path/to/file>
-    "dumpmask"                  => { "idx" => 73,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<mask>
-    "add-mac"                   => { "idx" => 74,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # [=base64|text]
-    "add-cpe-id"                => { "idx" => 75,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<string>
-    "add-subnet"                => { "idx" => 76,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
-    "umbrella"                  => { "idx" => 77,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [=deviceid:<deviceid>[,orgid:<orgid>]]
-    "cache-size"                => { "idx" => 78,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 150 }, # =<cachesize>
-    "no-negcache"               => { "idx" => 79,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dns-forward-max"           => { "idx" => 80,  "valtype" => "int",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 150 }, # =<queries>
-    "dnssec"                    => { "idx" => 81,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "trust-anchor"              => { "idx" => 82,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
-    "dnssec-check-unsigned"     => { "idx" => 83,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => "", "special" => 1, "default" => 1, "val_optional" => 1 }, # [=no]
-    "dnssec-no-timecheck"       => { "idx" => 84,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dnssec-timestamp"          => { "idx" => 85,  "valtype" => "file",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "proxy-dnssec"              => { "idx" => 86,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dnssec-debug"              => { "idx" => 87,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "auth-zone"                 => { "idx" => 88,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>].....][,exclude:<subnet>[/<prefix length>]].....]
-    "auth-soa"                  => { "idx" => 89,  "valtype" => "var",     "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
-    "auth-sec-servers"          => { "idx" => 90,  "valtype" => "string",  "section" => "dns",   "arr" => 0, "mult" => ",", "special" => 0 }, # TODO edit # =<domain>[,<domain>[,<domain>...]]
-    "auth-peer"                 => { "idx" => 91,  "valtype" => "ip",      "section" => "dns",   "arr" => 0, "mult" => ",", "special" => 0 }, # TODO edit # =<ip-address>[,<ip-address>[,<ip-address>...]]
-    "conntrack"                 => { "idx" => 92,  "valtype" => "bool",    "section" => "dns",   "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-range"                => { "idx" => 93,  "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
-    "dhcp-host"                 => { "idx" => 94,  "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
-    "dhcp-hostsfile"            => { "idx" => 95,  "valtype" => "path",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "dhcp-optsfile"             => { "idx" => 96,  "valtype" => "path",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "dhcp-hostsdir"             => { "idx" => 97,  "valtype" => "dir",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "dhcp-optsdir"              => { "idx" => 98,  "valtype" => "dir",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "read-ethers"               => { "idx" => 99,  "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-option"               => { "idx" => 100, "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-    "dhcp-option-force"         => { "idx" => 101, "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-    "dhcp-no-override"          => { "idx" => 102, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-relay"                => { "idx" => 103, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<local address>,<server address>[,<interface]
-    "dhcp-vendorclass"          => { "idx" => 104, "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
-    "dhcp-userclass"            => { "idx" => 105, "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # =set:<tag>,<user-class>
-    "dhcp-mac"                  => { "idx" => 106, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<MAC address>
-    "dhcp-circuitid"            => { "idx" => 107, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<circuit-id>
-    "dhcp-remoteid"             => { "idx" => 108, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<remote-id>
-    "dhcp-subscrid"             => { "idx" => 109, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<subscriber-id>
-    "dhcp-proxy"                => { "idx" => 110, "valtype" => "ip",      "section" => "dhcp",  "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=<ip addr>]......
-    "dhcp-match"                => { "idx" => 111, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
-    "dhcp-name-match"           => { "idx" => 112, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<name>[*]
-    "tag-if"                    => { "idx" => 113, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
-    "dhcp-ignore"               => { "idx" => 114, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => ",", "special" => 0 }, # TODO edit # =tag:<tag>[,tag:<tag>]
-    "dhcp-ignore-names"         => { "idx" => 115, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=tag:<tag>[,tag:<tag>]]
-    "dhcp-generate-names"       => { "idx" => 116, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => ",", "special" => 0 }, # TODO edit # =tag:<tag>[,tag:<tag>]
-    "dhcp-broadcast"            => { "idx" => 117, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=tag:<tag>[,tag:<tag>]]
-    "dhcp-boot"                 => { "idx" => 118, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
-    "dhcp-sequential-ip"        => { "idx" => 119, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-ignore-clid"          => { "idx" => 120, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "pxe-service"               => { "idx" => 121, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
-    "pxe-prompt"                => { "idx" => 122, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<prompt>[,<timeout>]
-    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # =<vendor>[,...]
-    "dhcp-lease-max"            => { "idx" => 124, "valtype" => "int",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 1000 }, # =<number>
-    "dhcp-authoritative"        => { "idx" => 125, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-rapid-commit"         => { "idx" => 126, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-alternate-port"       => { "idx" => 127, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [=<server port>[,<client port>]]
-    "bootp-dynamic"             => { "idx" => 128, "valtype" => "string",  "section" => "t_b_p", "arr" => 1, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=<network-id>[,<network-id>]]
-    "no-ping"                   => { "idx" => 129, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "log-dhcp"                  => { "idx" => 130, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "quiet-dhcp"                => { "idx" => 131, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "quiet-dhcp6"               => { "idx" => 132, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "quiet-ra"                  => { "idx" => 133, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-leasefile"            => { "idx" => 134, "valtype" => "file",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "dhcp-duid"                 => { "idx" => 135, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<enterprise-id>,<uid>
-    "dhcp-script"               => { "idx" => 136, "valtype" => "file",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "dhcp-luascript"            => { "idx" => 137, "valtype" => "file",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
-    "dhcp-scriptuser"           => { "idx" => 138, "valtype" => "string",  "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => "root" }, # =<username>
-    "script-arp"                => { "idx" => 139, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "leasefile-ro"              => { "idx" => 140, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "script-on-renewal"         => { "idx" => 141, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "bridge-interface"          => { "idx" => 142, "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<interface>,<alias>[,<alias>]
-    "shared-network"            => { "idx" => 143, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<interface|addr>,<addr>
-    "domain"                    => { "idx" => 144, "valtype" => "var",     "section" => "dhcp",  "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<domain>[,<address range>[,local]]
-    "dhcp-fqdn"                 => { "idx" => 145, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "dhcp-client-update"        => { "idx" => 146, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "enable-ra"                 => { "idx" => 147, "valtype" => "bool",    "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "ra-param"                  => { "idx" => 148, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
-    "dhcp-reply-delay"          => { "idx" => 149, "valtype" => "var",     "section" => "dhcp",  "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<integer>
-    "enable-tftp"               => { "idx" => 150, "valtype" => "string",  "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # [=<interface>[,<interface>]]
-    "tftp-root"                 => { "idx" => 151, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<directory>[,<interface>]
-    "tftp-no-fail"              => { "idx" => 152, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "tftp-unique-root"          => { "idx" => 153, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [=ip|mac]
-    "tftp-secure"               => { "idx" => 154, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "tftp-lowercase"            => { "idx" => 155, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "tftp-max"                  => { "idx" => 156, "valtype" => "int",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # =<connections>
-    "tftp-mtu"                  => { "idx" => 157, "valtype" => "int",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # =<mtu size>
-    "tftp-no-blocksize"         => { "idx" => 158, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "tftp-port-range"           => { "idx" => 159, "valtype" => "var",     "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<start>,<end>
-    "tftp-single-port"          => { "idx" => 160, "valtype" => "bool",    "section" => "t_b_p", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
-    "conf-file"                 => { "idx" => 161, "valtype" => "path",    "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<file>
-    "conf-dir"                  => { "idx" => 162, "valtype" => "var",     "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<directory>[,<file-extension>......],
-    "servers-file"              => { "idx" => 163, "valtype" => "file",    "section" => "dns",   "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<file>
+    "no-hosts"                  => { "idx" => 0,   "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "addn-hosts"                => { "idx" => 1,   "valtype" => "path",    "section" => "dns",   "page" => "1", "arr" => 1, "mult" => "", "special" => 0 }, # =<file>
+    "hostsdir"                  => { "idx" => 2,   "valtype" => "dir",     "section" => "dns",   "page" => "1", "arr" => 1, "mult" => "", "special" => 0 }, # =<path>
+    "expand-hosts"              => { "idx" => 3,   "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "local-ttl"                 => { "idx" => 4,   "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
+    "dhcp-ttl"                  => { "idx" => 5,   "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
+    "neg-ttl"                   => { "idx" => 6,   "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
+    "max-ttl"                   => { "idx" => 7,   "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
+    "max-cache-ttl"             => { "idx" => 8,   "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
+    "min-cache-ttl"             => { "idx" => 9,   "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
+    "auth-ttl"                  => { "idx" => 10,  "valtype" => "int",     "section" => "dns",   "page" => "7", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # =<time>
+    "log-queries"               => { "idx" => 11,  "valtype" => "string",  "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 }, # [=extra]
+    "log-facility"              => { "idx" => 12,  "valtype" => "string",  "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<facility>
+    "log-debug"                 => { "idx" => 13,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "log-async"                 => { "idx" => 14,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 5, "val_optional" => 1 }, # [=<lines>]
+    "pid-file"                  => { "idx" => 15,  "valtype" => "file",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "user"                      => { "idx" => 16,  "valtype" => "string",  "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => "nobody" }, # =<username>
+    "group"                     => { "idx" => 17,  "valtype" => "string",  "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => "dip" }, # =<groupname>
+    "port"                      => { "idx" => 18,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 53 }, # =<port>
+    "edns-packet-max"           => { "idx" => 19,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 4096 }, # =<size>
+    "query-port"                => { "idx" => 20,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<query_port>
+    "min-port"                  => { "idx" => 21,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 1024 }, # =<port>
+    "max-port"                  => { "idx" => 22,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<port>
+    "interface"                 => { "idx" => 23,  "valtype" => "string",  "section" => "dns",   "page" => "3", "arr" => 1, "mult" => "", "special" => 0 }, # =<interface name>
+    "except-interface"          => { "idx" => 24,  "valtype" => "string",  "section" => "dns",   "page" => "3", "arr" => 1, "mult" => "", "special" => 0 }, # =<interface name>
+    "auth-server"               => { "idx" => 25,  "valtype" => "var",     "section" => "dns",   "page" => "7", "arr" => 0, "mult" => "", "special" => 0 }, # =<domain>,[<interface>|<ip-address>...]
+    "local-service"             => { "idx" => 26,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "no-dhcp-interface"         => { "idx" => 27,  "valtype" => "string",  "section" => "dns",   "page" => "3", "arr" => 1, "mult" => "", "special" => 0 }, # =<interface name>
+    "listen-address"            => { "idx" => 28,  "valtype" => "ip",      "section" => "dns",   "page" => "3", "arr" => 1, "mult" => "", "special" => 0 }, # =<ipaddr>
+    "bind-interfaces"           => { "idx" => 29,  "valtype" => "bool",    "section" => "dns",   "page" => "3", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "bind-dynamic"              => { "idx" => 30,  "valtype" => "bool",    "section" => "dns",   "page" => "3", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "localise-queries"          => { "idx" => 31,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "bogus-priv"                => { "idx" => 32,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "alias"                     => { "idx" => 33,  "valtype" => "var",     "section" => "dns",   "page" => "4", "arr" => 1, "mult" => "", "special" => 0 }, # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>] # previously "dns_forced"?
+    "bogus-nxdomain"            => { "idx" => 34,  "valtype" => "var",     "section" => "dns",   "page" => "4", "arr" => 1, "mult" => "", "special" => 0 }, # =<ipaddr>[/prefix]
+    "ignore-address"            => { "idx" => 35,  "valtype" => "var",     "section" => "dns",   "page" => "4", "arr" => 1, "mult" => "", "special" => 0 }, # =<ipaddr>[/prefix]
+    "filterwin2k"               => { "idx" => 36,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "resolv-file"               => { "idx" => 37,  "valtype" => "file",    "section" => "dns",   "page" => "1", "arr" => 1, "mult" => "", "special" => 0, "default" => "/etc/resolv.conf" }, # =<file>
+    "no-resolv"                 => { "idx" => 38,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "enable-dbus"               => { "idx" => 39,  "valtype" => "string",  "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => "uk.org.thekelleys.dnsmasq", "val_optional" => 1 }, # [=<service-name>]
+    "enable-ubus"               => { "idx" => 40,  "valtype" => "string",  "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => "dnsmasq", "val_optional" => 1 }, # [=<service-name>]
+    "strict-order"              => { "idx" => 41,  "valtype" => "bool",    "section" => "dns",   "page" => "2", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "all-servers"               => { "idx" => 42,  "valtype" => "bool",    "section" => "dns",   "page" => "2", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dns-loop-detect"           => { "idx" => 43,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "stop-dns-rebind"           => { "idx" => 44,  "valtype" => "bool",    "section" => "dns",   "page" => "4", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "rebind-localhost-ok"       => { "idx" => 45,  "valtype" => "bool",    "section" => "dns",   "page" => "4", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "rebind-domain-ok"          => { "idx" => 46,  "valtype" => "string",  "section" => "dns",   "page" => "4", "arr" => 0, "mult" => "/", "special" => 0 }, # =[<domain>]|[[/<domain>/[<domain>/]
+    "no-poll"                   => { "idx" => 47,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "clear-on-reload"           => { "idx" => 48,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "domain-needed"             => { "idx" => 49,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "local"                     => { "idx" => 50,  "valtype" => "var",     "section" => "dns",   "page" => "2", "arr" => 1, "mult" => "", "special" => 1 }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+    "server"                    => { "idx" => 51,  "valtype" => "var",     "section" => "dns",   "page" => "2", "arr" => 1, "mult" => "", "special" => 1 }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+    "rev-server"                => { "idx" => 52,  "valtype" => "var",     "section" => "dns",   "page" => "2", "arr" => 1, "mult" => "", "special" => 0 }, # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
+    "address"                   => { "idx" => 53,  "valtype" => "var",     "section" => "dns",   "page" => "4", "arr" => 1, "mult" => "", "special" => 0 }, # =/<domain>[/<domain>...]/[<ipaddr>]
+    "ipset"                     => { "idx" => 54,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 1, "mult" => "", "special" => 1 }, # TODO edit # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
+    "connmark-allowlist-enable" => { "idx" => 55,  "valtype" => "string",  "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 1, "val_optional" => 1 }, # [=<mask>]
+    "connmark-allowlist"        => { "idx" => 56,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 1, "mult" => "", "special" => 1 }, # TODO edit # =<connmark>[/<mask>][,<pattern>[/<pattern>...]] 
+    "mx-host"                   => { "idx" => 57,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<mx name>[[,<hostname>],<preference>]
+    "mx-target"                 => { "idx" => 58,  "valtype" => "string",  "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # =<hostname>
+    "selfmx"                    => { "idx" => 59,  "valtype" => "bool",    "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "localmx"                   => { "idx" => 60,  "valtype" => "bool",    "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "srv-host"                  => { "idx" => 61,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
+    "host-record"               => { "idx" => 62,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
+    "dynamic-host"              => { "idx" => 63,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,[IPv4-address],[IPv6-address],<interface>
+    "txt-record"                => { "idx" => 64,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>[[,<text>],<text>]
+    "ptr-record"                => { "idx" => 65,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>[,<target>]
+    "naptr-record"              => { "idx" => 66,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
+    "caa-record"                => { "idx" => 67,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<flags>,<tag>,<value>
+    "cname"                     => { "idx" => 68,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<cname>,[<cname>,]<target>[,<TTL>]
+    "dns-rr"                    => { "idx" => 69,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<RR-number>,[<hex data>]
+    "interface-name"            => { "idx" => 70,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<name>,<interface>[/4|/6]
+    "synth-domain"              => { "idx" => 71,  "valtype" => "var",     "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<domain>,<address range>[,<prefix>[*]]
+    "dumpfile"                  => { "idx" => 72,  "valtype" => "file",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path/to/file>
+    "dumpmask"                  => { "idx" => 73,  "valtype" => "string",  "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<mask>
+    "add-mac"                   => { "idx" => 74,  "valtype" => "string",  "section" => "dns",   "page" => "2", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # [=base64|text]
+    "add-cpe-id"                => { "idx" => 75,  "valtype" => "string",  "section" => "dns",   "page" => "2", "arr" => 0, "mult" => "", "special" => 0 }, # =<string>
+    "add-subnet"                => { "idx" => 76,  "valtype" => "var",     "section" => "dns",   "page" => "2", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
+    "umbrella"                  => { "idx" => 77,  "valtype" => "var",     "section" => "dns",   "page" => "2", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [=deviceid:<deviceid>[,orgid:<orgid>]]
+    "cache-size"                => { "idx" => 78,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 150 }, # =<cachesize>
+    "no-negcache"               => { "idx" => 79,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dns-forward-max"           => { "idx" => 80,  "valtype" => "int",     "section" => "dns",   "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 150 }, # =<queries>
+    "dnssec"                    => { "idx" => 81,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "trust-anchor"              => { "idx" => 82,  "valtype" => "var",     "section" => "dns",   "page" => "6", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
+    "dnssec-check-unsigned"     => { "idx" => 83,  "valtype" => "string",  "section" => "dns",   "page" => "6", "arr" => 0, "mult" => "", "special" => 1, "default" => 1, "val_optional" => 1 }, # [=no]
+    "dnssec-no-timecheck"       => { "idx" => 84,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dnssec-timestamp"          => { "idx" => 85,  "valtype" => "file",    "section" => "dns",   "page" => "6", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "proxy-dnssec"              => { "idx" => 86,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dnssec-debug"              => { "idx" => 87,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "auth-zone"                 => { "idx" => 88,  "valtype" => "var",     "section" => "dns",   "page" => "7", "arr" => 0, "mult" => "", "special" => 0 }, # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>]|<interface>.....][,exclude:<subnet>[/<prefix length>]|<interface>].....]
+    "auth-soa"                  => { "idx" => 89,  "valtype" => "var",     "section" => "dns",   "page" => "7", "arr" => 0, "mult" => "", "special" => 0 }, # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
+    "auth-sec-servers"          => { "idx" => 90,  "valtype" => "string",  "section" => "dns",   "page" => "7", "arr" => 0, "mult" => ",", "special" => 0 }, # =<domain>[,<domain>[,<domain>...]]
+    "auth-peer"                 => { "idx" => 91,  "valtype" => "ip",      "section" => "dns",   "page" => "7", "arr" => 0, "mult" => ",", "special" => 0 }, # =<ip-address>[,<ip-address>[,<ip-address>...]]
+    "conntrack"                 => { "idx" => 92,  "valtype" => "bool",    "section" => "dns",   "page" => "5", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-range"                => { "idx" => 93,  "valtype" => "var",     "section" => "dhcp",  "page" => "5", "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
+    "dhcp-host"                 => { "idx" => 94,  "valtype" => "var",     "section" => "dhcp",  "page" => "6", "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
+    "dhcp-hostsfile"            => { "idx" => 95,  "valtype" => "path",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "dhcp-optsfile"             => { "idx" => 96,  "valtype" => "path",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "dhcp-hostsdir"             => { "idx" => 97,  "valtype" => "dir",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "dhcp-optsdir"              => { "idx" => 98,  "valtype" => "dir",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "read-ethers"               => { "idx" => 99,  "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-option"               => { "idx" => 100, "valtype" => "var",     "section" => "dhcp",  "page" => "3", "arr" => 1, "mult" => "", "special" => 0 }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+    "dhcp-option-force"         => { "idx" => 101, "valtype" => "var",     "section" => "dhcp",  "page" => "3", "arr" => 1, "mult" => "", "special" => 0 }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+    "dhcp-no-override"          => { "idx" => 102, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-relay"                => { "idx" => 103, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<local address>,<server address>[,<interface]
+    "dhcp-vendorclass"          => { "idx" => 104, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 1, "mult" => "", "special" => 0 }, # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
+    "dhcp-userclass"            => { "idx" => 105, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 1, "mult" => "", "special" => 0 }, # =set:<tag>,<user-class>
+    "dhcp-mac"                  => { "idx" => 106, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<MAC address>
+    "dhcp-circuitid"            => { "idx" => 107, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<circuit-id>
+    "dhcp-remoteid"             => { "idx" => 108, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<remote-id>
+    "dhcp-subscrid"             => { "idx" => 109, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<subscriber-id>
+    "dhcp-proxy"                => { "idx" => 110, "valtype" => "ip",      "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=<ip addr>]......
+    "dhcp-match"                => { "idx" => 111, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
+    "dhcp-name-match"           => { "idx" => 112, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>,<name>[*]
+    "tag-if"                    => { "idx" => 113, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
+    "dhcp-ignore"               => { "idx" => 114, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => ",", "special" => 0 }, # TODO edit # =tag:<tag>[,tag:<tag>]
+    "dhcp-ignore-names"         => { "idx" => 115, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=tag:<tag>[,tag:<tag>]]
+    "dhcp-generate-names"       => { "idx" => 116, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => ",", "special" => 0 }, # TODO edit # =tag:<tag>[,tag:<tag>]
+    "dhcp-broadcast"            => { "idx" => 117, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "arr" => 0, "mult" => ",", "special" => 0, "val_optional" => 1 }, # TODO edit # [=tag:<tag>[,tag:<tag>]]
+    "dhcp-boot"                 => { "idx" => 118, "valtype" => "var",     "section" => "t_b_p", "page" => "2", "arr" => 0, "mult" => "", "special" => 0 }, # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
+    "dhcp-sequential-ip"        => { "idx" => 119, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-ignore-clid"          => { "idx" => 120, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "pxe-service"               => { "idx" => 121, "valtype" => "var",     "section" => "t_b_p", "page" => "2", "arr" => 0, "mult" => "", "special" => 0 }, # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
+    "pxe-prompt"                => { "idx" => 122, "valtype" => "var",     "section" => "t_b_p", "page" => "2", "arr" => 0, "mult" => "", "special" => 0 }, # =[tag:<tag>,]<prompt>[,<timeout>]
+    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => "t_b_p", "page" => "2", "arr" => 0, "mult" => "", "special" => 0 }, # =<vendor>[,...]
+    "dhcp-lease-max"            => { "idx" => 124, "valtype" => "int",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 1000 }, # =<number>
+    "dhcp-authoritative"        => { "idx" => 125, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-rapid-commit"         => { "idx" => 126, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-alternate-port"       => { "idx" => 127, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # TODO edit # [=<server port>[,<client port>]]
+    "bootp-dynamic"             => { "idx" => 128, "valtype" => "string",  "section" => "t_b_p", "page" => "2", "arr" => 1, "mult" => "", "special" => 0, "val_optional" => 1 }, # [=<network-id>[,<network-id>]]
+    "no-ping"                   => { "idx" => 129, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "log-dhcp"                  => { "idx" => 130, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "quiet-dhcp"                => { "idx" => 131, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "quiet-dhcp6"               => { "idx" => 132, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "quiet-ra"                  => { "idx" => 133, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-leasefile"            => { "idx" => 134, "valtype" => "file",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "dhcp-duid"                 => { "idx" => 135, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<enterprise-id>,<uid>
+    "dhcp-script"               => { "idx" => 136, "valtype" => "file",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "dhcp-luascript"            => { "idx" => 137, "valtype" => "file",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<path>
+    "dhcp-scriptuser"           => { "idx" => 138, "valtype" => "string",  "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => "root" }, # =<username>
+    "script-arp"                => { "idx" => 139, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "leasefile-ro"              => { "idx" => 140, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "script-on-renewal"         => { "idx" => 141, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "bridge-interface"          => { "idx" => 142, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<interface>,<alias>[,<alias>]
+    "shared-network"            => { "idx" => 143, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<interface|addr>,<addr>
+    "domain"                    => { "idx" => 144, "valtype" => "var",     "section" => "dhcp",  "page" => "2", "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<domain>[,<address range>[,local]]
+    "dhcp-fqdn"                 => { "idx" => 145, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "dhcp-client-update"        => { "idx" => 146, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "enable-ra"                 => { "idx" => 147, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "ra-param"                  => { "idx" => 148, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
+    "dhcp-reply-delay"          => { "idx" => 149, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # TODO edit # =[tag:<tag>,]<integer>
+    "enable-tftp"               => { "idx" => 150, "valtype" => "string",  "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # [=<interface>[,<interface>]]
+    "tftp-root"                 => { "idx" => 151, "valtype" => "var",     "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<directory>[,<interface>]
+    "tftp-no-fail"              => { "idx" => 152, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "tftp-unique-root"          => { "idx" => 153, "valtype" => "string",  "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "val_optional" => 1 }, # [=ip|mac]
+    "tftp-secure"               => { "idx" => 154, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "tftp-lowercase"            => { "idx" => 155, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "tftp-max"                  => { "idx" => 156, "valtype" => "int",     "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<connections>
+    "tftp-mtu"                  => { "idx" => 157, "valtype" => "int",     "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<mtu size>
+    "tftp-no-blocksize"         => { "idx" => 158, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "tftp-port-range"           => { "idx" => 159, "valtype" => "var",     "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0 }, # =<start>,<end>
+    "tftp-single-port"          => { "idx" => 160, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "arr" => 0, "mult" => "", "special" => 0, "default" => 0 },
+    "conf-file"                 => { "idx" => 161, "valtype" => "var",     "section" => "dns",   "page" => "6", "arr" => 1, "mult" => "", "special" => 0 }, # =<file>
+    "conf-dir"                  => { "idx" => 162, "valtype" => "var",     "section" => "dns",   "page" => "6", "arr" => 1, "mult" => "", "special" => 0 }, # TODO edit # =<directory>[,<file-extension>......],
+    "servers-file"              => { "idx" => 163, "valtype" => "var",     "section" => "dns",   "page" => "6", "arr" => 1, "mult" => "", "special" => 0 }, # =<file>
 );
 
 our @confbools = ( ); # options which may not contain any parameters/values
+our @confvars = ( ); # options which may contain more than one parameter/value
 our @confsingles = ( ); # options which may contain no more than one parameter/value
 our @confarrs = ( ); # options which may be specified more than once
 our @confdns = ( ); # options which are specific to DNS
@@ -375,7 +209,10 @@ while ( ($key, $vals) = each %dnsmconfigvals ) {
     if ( $vals->{"valtype"} eq "bool" ) {
         push( @confbools, $key );
     }
-    if ( $vals->{"valtype"} ne "var" ) {
+    if ( $vals->{"valtype"} eq "var" ) {
+        push( @confvars, $key ); 
+    }
+    else {
         push( @confsingles, $key );
     }
     if ( $vals->{"arr"} == 1 ) {
@@ -393,10 +230,2591 @@ while ( ($key, $vals) = each %dnsmconfigvals ) {
 }
 @confbools = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confbools );
 @confsingles = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confsingles );
+@confvars = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confvars );
 @confarrs = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confarrs );
 @confdns = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confdns );
 @confdhcp = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confdhcp );
 @conft_b_p = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @conft_b_p );
+our %configfield_fields = ( );
+
+sub init_configfield_fields {
+    %configfield_fields = ( 
+        "no_hosts" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "addn_hosts" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "path",
+                "default" => "",
+                "template" => "<" . $text{"tmpl_path_to_file_or_directory"} . ">"
+            }
+        }, # =<file>
+        "hostsdir" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
+            }
+        }, # =<path>
+        "expand_hosts" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "local_ttl" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            }
+        }, # =<time>
+        "dhcp_ttl" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            }
+        }, # =<time>
+        "neg_ttl" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            }
+        }, # =<time>
+        "max_ttl" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            }
+        }, # =<time>
+        "max_cache_ttl" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            }
+        }, # =<time>
+        "min_cache_ttl" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            }
+        }, # =<time>
+        "auth_ttl" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            }
+        }, # =<time>
+        "log_queries" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "template" => "extra" # literal value
+            }
+        },
+        "log_facility" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "template" => "<" . $text{"tmpl_log_facility"} . ">"
+            }
+        }, # =<facility>
+        "log_debug" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "log_async" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 5,
+                "required" => 0,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_log_async"} . ">"
+            }
+        }, # [=<lines>]
+        "pid_file" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "file",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<path>
+        "user" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_username"},
+                "template" => "<" . $text{"tmpl_username"} . ">"
+            }
+        }, # =<username>
+        "group" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_groupname"},
+                "template" => "<" . $text{"tmpl_groupname"} . ">"
+            }
+        }, # =<groupname>
+        "port" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_port"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            }
+        }, # =<port>
+        "edns_packet_max" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_size"},
+                "template" => "<" . $text{"tmpl_size"} . ">"
+            }
+        }, # =<size>
+        "query_port" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_port"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            }
+        }, # =<query_port>
+        "min_port" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_port"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            }
+        }, # =<port>
+        "max_port" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_port"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            }
+        }, # =<port>
+        "interface" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            }
+        }, # =<interface name>
+        "except_interface" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            }
+        }, # =<interface name>
+        "auth_server" => {
+            "param_order" => [ "domain", "for" ],
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domain"},
+                "template" => "<" . $text{"tmpl_domain"} . ">"
+            },
+            "for" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_interface_or_ip_address"},
+                "template" => "<" . $text{"tmpl_interface"} . ">|<" . $text{"tmpl_ip"} . ">..."
+            }
+        }, # =<domain>,[<interface>|<ip-address>...]
+        "local_service" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "no_dhcp_interface" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            }
+        }, # =<interface name>
+        "listen_address" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"}
+            }
+        }, # =<ipaddr>
+        "bind_interfaces" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "bind_dynamic" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "localise_queries" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "bogus_priv" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "alias" => { 
+            "param_order" => [ "from", "to", "netmask" ],
+            "from" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_from_addresses"},
+                "template" => $text{"tmpl_ip"} . "|" . $text{"tmpl_ip"} . "-" . $text{"tmpl_ip"}
+            },
+            "to" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_to_address"},
+                "template" => $text{"tmpl_ip"}
+            },
+            "netmask" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_netmask"},
+                "template" => $text{"tmpl_netmask"}
+            },
+        }, # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>]
+        "bogus_nxdomain" => { 
+            "param_order" => [ "addr" ],
+            "addr" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"} . "[/" . $text{"tmpl_prefix"} . "]"
+            }
+        }, # =<ipaddr>[/prefix]
+        "ignore_address" => { 
+            "param_order" => [ "ip" ],
+            "ip" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"} . "[/" . $text{"tmpl_prefix"} . "]"
+            }
+        }, # =<ipaddr>[/prefix]
+        "filterwin2k" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "resolv_file" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<file>
+        "no_resolv" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "enable_dbus" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_service_name"},
+                "template" => "<" . $text{"tmpl_service_name"} . ">"
+            }
+        }, # [=<service-name>]
+        "enable_ubus" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_service_name"},
+                "template" => "<" . $text{"tmpl_service_name"} . ">"
+            }
+        }, # [=<service-name>]
+        "strict_order" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "all_servers" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dns_loop_detect" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "stop_dns_rebind" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "rebind_localhost_ok" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "rebind_domain_ok" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_domains"},
+                "template" => "<" . $text{"tmpl_domain"} . ">",
+                "arr" => 1
+            }
+        }, # =[<domain>]|[[/<domain>/[<domain>/]
+        "no_poll" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "clear_on_reload" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "domain_needed" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "local" => { 
+            "param_order" => [ "domain", "ip", "source" ],
+            "domain" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_domains"},
+                "template" => "<" . $text{"tmpl_domain"} . ">/|/<" . $text{"tmpl_domain"} . ">/[<" . $text{"tmpl_domain"} . ">/]",
+            },
+            "ip" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"} . "[#" . $text{"tmpl_port"} . "]"
+            },
+            "source" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_source_interface_or_address"},
+                "template" => "@" . $text{"tmpl_interface"} . "|@" . $text{"tmpl_ip"} . "[#" . $text{"tmpl_port"} . "]"
+            }
+        }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+        "server" => { 
+            "param_order" => [ "domain", "ip", "source" ],
+            "domain" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_domains"},
+                "template" => "<" . $text{"tmpl_domain"} . ">/|/<" . $text{"tmpl_domain"} . ">/[<" . $text{"tmpl_domain"} . ">/]",
+            },
+            "ip" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => "[" . $text{"tmpl_ip"} . "][#" . $text{"tmpl_port"} . "]"
+            },
+            "source" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_source_interface_or_address"},
+                "template" => "@<" . $text{"tmpl_interface"} . ">|@" . $text{"tmpl_ip"} . "[#" . $text{"tmpl_port"} . "]"
+            }
+        }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+        "rev_server" => {
+            "param_order" => [ "domain", "ip", "source" ],
+            "domain" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"} . "/" . $text{"tmpl_prefix_length"}
+            },
+            "ip" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => "[" . $text{"tmpl_ip"} . "][#" . $text{"tmpl_port"} . "]"
+            },
+            "source" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_source_interface_or_address"},
+                "template" => "@<" . $text{"tmpl_interface"} . ">|@" . $text{"tmpl_ip"} . "[#" . $text{"tmpl_port"} . "]"
+            }
+        }, # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
+        "address" => { 
+            "param_order" => [ "domain", "ip" ],
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domains"},
+                "template" => "<" . $text{"tmpl_domain"} . ">/|/<" . $text{"tmpl_domain"} . ">/[<" . $text{"tmpl_domain"} . ">/]",
+            },
+            "ip" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"}
+            },
+        }, # =/<domain>[/<domain>...]/[<ipaddr>]
+        "ipset" => { 
+            "param_order" => [ "domain", "ipset" ],
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domains"},
+                "template" => "<" . $text{"tmpl_domain"} . ">",
+                "arr" => 1
+            },
+            "ipset" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ipsets"},
+                "template" => "<" . $text{"tmpl_ipset"} . ">[,<" . $text{"tmpl_ipset"} . ">...]",
+                "arr" => 1
+            },
+        }, # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
+        "connmark_allowlist_enable" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_mask"},
+                "template" => "<" . $text{"tmpl_mask"} . ">"
+            }
+        }, # [=<mask>]
+        "connmark_allowlist" => { 
+            "param_order" => [ "connmark", "mask", "pattern" ],
+            "connmark" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_connmark"},
+                "template" => "<" . $text{"tmpl_connmark"} . ">"
+            },
+            "mask" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_mask"},
+                "template" => "<" . $text{"tmpl_mask"} . ">"
+            },
+            "pattern" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_pattern"},
+                "template" => "<" . $text{"tmpl_pattern"} . ">[,<" . $text{"tmpl_pattern"} . ">...]"
+            },
+        }, # =<connmark>[/<mask>][,<pattern>[/<pattern>...]]
+        "mx_host" => { 
+            "param_order" => [ "mxname", "host", "preference" ],
+            "mxname" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_mxname"},
+                "template" => "<" . $text{"tmpl_name"} . ">"
+            },
+            "host" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_hostname"},
+                "template" => "<" . $text{"tmpl_hostname"} . ">"
+            },
+            "preference" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_preference"},
+                "template" => "<" . $text{"tmpl_preference"} . ">"
+            },
+        }, # =<mx name>[[,<hostname>],<preference>]
+        "mx_target" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_target"},
+                "template" => "<" . $text{"tmpl_hostname"} . ">"
+            }
+        }, # =<hostname>
+        "selfmx" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "localmx" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "srv_host" => { 
+            "param_order" => [ "service", "prot", "domain", "target", "port", "priority", "weight" ],
+            "service" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_service"},
+                "template" => "<" . $text{"tmpl_srv_host_service"} . ">"
+            },
+            "prot" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_protocol"},
+                "template" => "<" . $text{"tmpl_prot"} . ">"
+            },
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_domain"},
+                "template" => "<" . $text{"tmpl_domain"} . ">"
+            },
+            "target" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_target"},
+                "template" => "<" . $text{"tmpl_target"} . ">"
+            },
+            "port" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_port"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            },
+            "priority" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_priority"},
+                "template" => "<" . $text{"tmpl_srv_host_priority"} . ">"
+            },
+            "weight" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_weight"},
+                "template" => "<" . $text{"tmpl_weight"} . ">"
+            },
+        }, # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
+        "host_record" => { 
+            "param_order" => [ "name", "ipv4", "ipv6", "ttl" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_names"},
+                "template" => "<" . $text{"tmpl_name"} . ">[,<" . $text{"tmpl_name"} . ">]",
+            },
+            "ipv4" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ipv4_address"},
+                "template" => $text{"tmpl_ip"},
+            },
+            "ipv6" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ipv6_address"},
+                "template" => $text{"tmpl_ip6"},
+            },
+            "ttl" => {
+                "length" => 10,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+            },
+        }, # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
+        "dynamic_host" => { 
+            "param_order" => [ "name", "ipv4", "ipv6", "interface" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">"
+            },
+            "ipv4" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ipv4_address"},
+                "template" => $text{"tmpl_ip"}
+            },
+            "ipv6" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ipv6_address"},
+                "template" => $text{"tmpl_ip6"}
+            },
+            "interface" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            },
+        }, # =<name>,[IPv4-address],[IPv6-address],<interface>
+        "txt_record" => { 
+            "param_order" => [ "name", "text" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">"
+            },
+            "text" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_text"},
+                "template" => "[,<" . $text{"tmpl_text"} . ">],<" . $text{"tmpl_text"} . ">"
+            },
+        }, # =<name>[[,<text>],<text>]
+        "ptr_record" => { 
+            "param_order" => [ "name", "target" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">"
+            },
+            "target" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_target"},
+                "template" => "<" . $text{"tmpl_target"} . ">"
+            },
+        }, # =<name>[,<target>]
+        "naptr_record" => { 
+            "param_order" => [ "name", "order", "preference", "flags", "service", "regexp", "replacement" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">",
+            },
+            "order" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_order"},
+                "template" => "<" . $text{"tmpl_order"} . ">",
+            },
+            "preference" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_preference"},
+                "template" => "<" . $text{"tmpl_preference"} . ">",
+            },
+            "flags" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_flags"},
+                "template" => "<" . $text{"tmpl_flags"} . ">",
+            },
+            "service" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_service"},
+                "template" => "<" . $text{"tmpl_service"} . ">",
+            },
+            "regexp" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_regexp"},
+                "template" => "<" . $text{"tmpl_regexp"} . ">",
+            },
+            "replacement" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_replacement"},
+                "template" => "<" . $text{"tmpl_replacement"} . ">",
+            },
+        }, # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
+        "caa_record" => { 
+            "param_order" => [ "name", "flags", "tag", "value" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">"
+            },
+            "flags" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_flags"},
+                "template" => "<" . $text{"tmpl_flags"} . ">"
+            },
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_tag"},
+                "template" => "<" . $text{"tmpl_tag"} . ">"
+            },
+            "value" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_value"},
+                "template" => "<" . $text{"tmpl_value"} . ">"
+            },
+        }, # =<name>,<flags>,<tag>,<value>
+        "cname" => { 
+            "param_order" => [ "cname", "target", "ttl" ],
+            "cname" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_cnames"},
+                "template" => "<" . $text{"tmpl_cname"} . ">[,<" . $text{"tmpl_cname"} . ">]"
+            },
+            "target" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_target"},
+                "template" => "<" . $text{"tmpl_target"} . ">"
+            },
+            "ttl" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_ttl"},
+                "template" => "<" . $text{"tmpl_TTL"} . ">"
+            },
+        }, # =<cname>,[<cname>,]<target>[,<TTL>]
+        "dns_rr" => { 
+            "param_order" => [ "name", "rrnumber", "hexdata" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">"
+            },
+            "rrnumber" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_rrnumber"},
+                "template" => "<" . $text{"tmpl_rrnumber"} . ">"
+            },
+            "hexdata" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_hexdata"},
+                "template" => "<" . $text{"tmpl_hexdata"} . ">"
+            },
+        }, # =<name>,<RR-number>,[<hex data>]
+        "interface_name" => { 
+            "param_order" => [ "name", "interface" ],
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">"
+            },
+            "interface" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">[/4|/6]"
+            },
+        }, # =<name>,<interface>[/4|/6]
+        "synth_domain" => { 
+            "param_order" => [ "domain", "addressrange", "prefix" ],
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domain"},
+                "template" => "<" . $text{"tmpl_domain"} . ">"
+            },
+            "addressrange" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_address_range"},
+                "template" => $text{"tmpl_address_range"}
+            },
+            "prefix" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_prefix"},
+                "template" => "<" . $text{"tmpl_prefix"} . ">[*]"
+            },
+        }, # =<domain>,<address range>[,<prefix>[*]]
+        "dumpfile" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<path/to/file>
+        "dumpmask" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_mask"},
+                "template" => "<" . $text{"tmpl_mask"} . ">"
+            }
+        }, # =<mask>
+        "add_mac" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "template" => "base64|text"
+            }
+        }, # [=base64|text]
+        "add_cpe_id" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "template" => "<" . $text{"tmpl_string"} . ">"
+            }
+        }, # =<string>
+        "add_subnet" => { 
+            "param_order" => [ "ipv4", "ipv6" ],
+            "ipv4" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ipv4_address"},
+                "template" => "<" . $text{"tmpl_ip"} . ">"
+            },
+            "ipv6" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ipv6_address"},
+                "template" => $text{"tmpl_ip6"}
+            },
+        }, # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
+        "umbrella" => {  
+            "param_order" => [ "deviceid", "orgid" ],
+            "deviceid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_deviceid"},
+                "template" => "deviceid:<" . $text{"tmpl_deviceid"} . ">"
+            },
+            "orgid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_orgid"},
+                "template" => "orgid:<" . $text{"tmpl_orgid"} . ">"
+            },
+        }, # [=deviceid:<deviceid>[,orgid:<orgid>]]
+        "cache_size" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            }
+        }, # =<cachesize>
+        "no_negcache" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dns_forward_max" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            }
+        }, # =<queries>
+        "dnssec" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "trust_anchor" => { 
+            "param_order" => [ "class", "domain", "keytag", "algorithm", "digesttype", "digest" ],
+            "class" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_class"},
+                "template" => "<" . $text{"tmpl_class"} . ">"
+            },
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domain"},
+                "template" => "<" . $text{"tmpl_domain"} . ">"
+            },
+            "keytag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_keytag"},
+                "template" => "<" . $text{"tmpl_key_tag"} . ">"
+            },
+            "algorithm" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_algorithm"},
+                "template" => "<" . $text{"tmpl_algorithm"} . ">"
+            },
+            "digesttype" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_digesttype"},
+                "template" => "<" . $text{"tmpl_digest_type"} . ">"
+            },
+            "digest" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_digest"},
+                "template" => "<" . $text{"tmpl_digest"} . ">"
+            },
+        }, # =[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
+        "dnssec_check_unsigned" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "no",
+                "required" => 0,
+                "template" => "[no]" # literal value
+            }
+        }, # [=no]
+        "dnssec_no_timecheck" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dnssec_timestamp" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "file",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<path>
+        "proxy_dnssec" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dnssec_debug" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "auth_zone" => { 
+            "param_order" => [ "domain", "include", "exclude" ],
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domain"},
+                "template" => "<" . $text{"tmpl_domain"} . ">"
+            },
+            "include" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "arr" => 1,
+                "label" => $text{"p_label_val_include_subnets_or_interfaces"},
+                "template" => "<" . $text{"tmpl_subnet"} . ">[/<" . $text{"tmpl_prefix_length"} . ">]|<" . $text{"tmpl_interface"} . ">"
+            },
+            "exclude" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "arr" => 1,
+                "label" => $text{"p_label_val_exclude_subnets_or_interfaces"},
+                "template" => "<" . $text{"tmpl_subnet"} . ">[/<" . $text{"tmpl_prefix_length"} . ">]|<" . $text{"tmpl_interface"} . ">"
+            }
+        }, # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>]|<interface>.....][,exclude:<subnet>[/<prefix length>]|<interface>].....]
+        "auth_soa" => {
+            "param_order" => [ "serial", "hostmaster", "refresh", "retry", "expiry" ],
+            "serial" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_serial"},
+                "template" => "<" . $text{"tmpl_serial"} . ">"
+            },
+            "hostmaster" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_hostmaster"},
+                "template" => "<" . $text{"tmpl_hostmaster"} . ">"
+            },
+            "refresh" => {
+                "length" => 2,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_refresh"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            },
+            "retry" => {
+                "length" => 2,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_retry"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            },
+            "expiry" => {
+                "length" => 2,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_expiry"},
+                "template" => "<" . $text{"tmpl_expiry"} . ">"
+            }
+        }, # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
+        "auth_sec_servers" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domains"},
+                "template" => "<" . $text{"tmpl_domain"} . ">",
+                "arr" => 1
+            }
+        }, # =<domain>[,<domain>[,<domain>...]]
+        "auth_peer" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"},
+                "arr" => 1
+            }
+        }, # =<ip-address>[,<ip-address>[,<ip-address>...]]
+        "conntrack" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_range" => { 
+            "param_order" => [ "tag", "start", "end", "mask", "broadcast", "static", "leasetime", "prefix-length", "ra-only", "ra-names", "ra-stateless", "slaac" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "<tag:" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">][,set:<" . $text{"tmpl_tag"} . ">]"
+            },
+            "start" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_start_ip_address"},
+                "template" => $text{"tmpl_ip"}
+            },
+            "end" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_end_ip_address"},
+                "template" => $text{"tmpl_ip"}
+            },
+            "mask" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_netmask"},
+                "template" => $text{"tmpl_netmask"}
+            },
+            "broadcast" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_broadcast_address"},
+                "template" => $text{"tmpl_netmask"}
+            },
+            "static" => {
+                "valtype" => "bool",
+                "default" => 0,
+                "label" => $text{"p_label_val_static"},
+            },
+            "leasetime" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_leasetime"},
+                "template" => "<" . $text{"tmpl_leasetime"} . ">"
+            },
+            "prefix-length" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_prefix_length"},
+                "template" => "<" . $text{"tmpl_prefix_length"} . ">"
+            },
+            "ra-only" => {
+                "valtype" => "bool",
+                "default" => 0,
+                "label" => $text{"p_label_val_ra_only"},
+            },
+            "ra-names" => {
+                "valtype" => "bool",
+                "default" => 0,
+                "label" => $text{"p_label_val_ra_names"},
+            },
+            "ra-stateless" => {
+                "valtype" => "bool",
+                "default" => 0,
+                "label" => $text{"p_label_val_ra_stateless"},
+            },
+            "slaac" => {
+                "valtype" => "bool",
+                "default" => 0,
+                "label" => $text{"p_label_val_slaac"},
+            },
+        }, # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
+        "dhcp_host" => { 
+            "param_order" => [ "mac", "clientid", "infiniband", "tagname", "ip", "hostname", "leasetime", "ignore" ],
+            "mac" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_hwaddr"},
+                "template" => $text{"tmpl_mac"}
+            },
+            "clientid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_clientid"},
+                "template" => "id:<" . $text{"tmpl_clientid"} . ">|*"
+            },
+            "infiniband" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_infiniband"},
+                "template" => "id:<" . $text{"tmpl_infiniband"} . ">"
+            },
+            "tagname" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "[set:<" . $text{"tmpl_tag"} . ">][tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+            "ip" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => $text{"tmpl_ip"}
+            },
+            "hostname" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_hostname"},
+                "template" => "<" . $text{"tmpl_hostname"} . ">"
+            },
+            "leasetime" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_leasetime"},
+                "template" => "<" . $text{"tmpl_leasetime"} . ">"
+            },
+            "ignore" => {
+                "valtype" => "bool",
+                "default" => 0,
+                "label" => $text{"p_label_val_ignore"},
+            },
+        }, # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
+        "dhcp_hostsfile" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<path>
+        "dhcp_optsfile" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<path>
+        "dhcp_hostsdir" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_dirname"},
+                "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
+            }
+        }, # =<path>
+        "dhcp_optsdir" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_dirname"},
+                "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
+            }
+        }, # =<path>
+        "read_ethers" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_option" => { 
+            "param_order" => [ "tag", "encap", "vi-encap", "vendor", "option", "value" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+            "encap" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_encap"},
+                "template" => "encap:<" . $text{"tmpl_option"} . ">"
+            },
+            "vi-encap" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_vi_encap"},
+                "template" => "vi-encap:<" . $text{"tmpl_enterprise"} . ">"
+            },
+            "vendor" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_option_vendor"},
+                "template" => "vendor:<" . $text{"tmpl_vendorclass"} . ">"
+            },
+            "option" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_option"},
+                "template" => "<" . $text{"tmpl_option"} . ">|option:<" . $text{"tmpl_option_name"} . ">|option6:<" . $text{"tmpl_option"} . ">|option:<" . $text{"tmpl_option_name"} . ">"
+            },
+            "value" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_value"},
+                "template" => "<" . $text{"tmpl_value"} . ">[,<" . $text{"tmpl_value"} . ">]"
+            },
+        }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+        "dhcp_option_force" => { 
+            "param_order" => [ "tag", "encap", "vi-encap", "vendor", "option", "value" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+            "encap" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_encap"},
+                "template" => "encap:<" . $text{"tmpl_option"} . ">"
+            },
+            "vi-encap" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_vi_encap"},
+                "template" => "vi-encap:<" . $text{"tmpl_enterprise"} . ">"
+            },
+            "vendor" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_option_vendor"},
+                "template" => "vendor:<" . $text{"tmpl_vendorclass"} . ">"
+            },
+            "option" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_option"},
+                "template" => "<" . $text{"tmpl_option"} . ">|option:<" . $text{"tmpl_option_name"} . ">|option6:<" . $text{"tmpl_option"} . ">|option:<" . $text{"tmpl_option_name"} . ">"
+            },
+            "value" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_value"},
+                "template" => "<" . $text{"tmpl_value"} . ">[,<" . $text{"tmpl_value"} . ">]"
+            },
+        }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+        "dhcp_no_override" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_relay" => { 
+            "param_order" => [ "local", "server", "interface" ],
+            "local" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_local_address"},
+                "template" => "<" . $text{"tmpl_address"} . ">"
+            },
+            "server" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_server_address"},
+                "template" => "<" . $text{"tmpl_address"} . ">"
+            },
+            "interface" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            },
+        }, # =<local address>,<server address>[,<interface]
+        "dhcp_vendorclass" => { 
+            "param_order" => [ "tag", "vendorclass" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "vendorclass" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_vendorclass"},
+                "template" => "<[enterprise:<" . $text{"tmpl_enterprise"} . ">,]<" . $text{"tmpl_vendorclass"} . ">"
+            },
+        }, # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
+        "dhcp_userclass" => { 
+            "param_order" => [ "tag", "userclass" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "userclass" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_userclass"},
+                "template" => "<" . $text{"tmpl_userclass"} . ">"
+            },
+        }, # =set:<tag>,<user-class>
+        "dhcp_mac" => { 
+            "param_order" => [ "tag", "mac" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "mac" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_hwaddr"},
+                "template" => $text{"tmpl_mac"}
+            },
+        }, # =set:<tag>,<MAC address>
+        "dhcp_circuitid" => { 
+            "param_order" => [ "tag", "circuitid" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "circuitid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_circuitid"},
+                "template" => "<" . $text{"tmpl_circuitid"} . ">"
+            },
+        }, # =set:<tag>,<circuit-id>
+        "dhcp_remoteid" => { 
+            "param_order" => [ "tag", "remoteid" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "remoteid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_remoteid"},
+                "template" => "<" . $text{"tmpl_remoteid"} . ">"
+            },
+        }, # =set:<tag>,<remote-id>
+        "dhcp_subscrid" => { 
+            "param_order" => [ "tag", "subscriberid" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "subscriberid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_subscriberid"},
+                "template" => "<" . $text{"tmpl_subscriberid"} . ">"
+            },
+        }, # =set:<tag>,<subscriber-id>
+        "dhcp_proxy" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "ip",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_ip_addresses"},
+                "template" => $text{"tmpl_ip"}
+            }
+        }, # [=<ip addr>]......
+        "dhcp_match" => { 
+            "param_order" => [ "tag", "option", "vi-encap", "value" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "option" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_option"},
+                "template" => "<" . $text{"tmpl_option"} . ">|option:<" . $text{"tmpl_option_name"} . ">"
+            },
+            "vi-encap" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_vi_encap"},
+                "template" => "vi-encap:<" . $text{"tmpl_enterprise"} . ">"
+            },
+            "value" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_value"},
+                "template" => "<" . $text{"tmpl_value"} . ">"
+            },
+        }, # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
+        "dhcp_name_match" => { 
+            "param_order" => [ "tag", "name" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tag"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">"
+            },
+            "name" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_name"},
+                "template" => "<" . $text{"tmpl_name"} . ">[*]"
+            },
+        }, # =set:<tag>,<name>[*]
+        "tag_if" => { 
+            "param_order" => [ "settag", "iftag" ],
+            "settag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_set_tags"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">[,set:<" . $text{"tmpl_tag"} . ">]"
+            },
+            "iftag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+        }, # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
+        "dhcp_ignore" => { 
+            "param_order" => [ "tag" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+        }, # =tag:<tag>[,tag:<tag>]
+        "dhcp_ignore_names" => { 
+            "param_order" => [ "tag" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+        }, # [=tag:<tag>[,tag:<tag>]]
+        "dhcp_generate_names" => { 
+            "param_order" => [ "tag" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+        }, # =tag:<tag>[,tag:<tag>]
+        "dhcp_broadcast" => { 
+            "param_order" => [ "tag" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tags"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+            },
+        }, # [=tag:<tag>[,tag:<tag>]]
+        "dhcp_boot" => { 
+            "param_order" => [ "tag", "filename", "host", "address" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tag"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">",
+            },
+            "filename" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">",
+            },
+            "host" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_server_name"},
+                "template" => "<" . $text{"tmpl_servername"} . ">",
+            },
+            "address" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_server_address"},
+                "template" => "<" . $text{"tmpl_server_address"} . "|" . $text{"tmpl_tftp_server_name"} . ">",
+            },
+        }, # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
+        "dhcp_sequential_ip" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_ignore_clid" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "pxe_service" => { 
+            "param_order" => [ "tag", "csa", "menutext", "basename", "server" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tag"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">"
+            },
+            "csa" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_csa"},
+                "template" => "<" . $text{"tmpl_csa"} . ">"
+            },
+            "menutext" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_menutext"},
+                "template" => "<" . $text{"tmpl_menu_text"} . ">"
+            },
+            "basename" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_basename"},
+                "template" => "<" . $text{"tmpl_base_name"} . ">|<" . $text{"tmpl_boot_service_type"} . ">"
+            },
+            "server" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_server_address_or_name"},
+                "template" => "<" . $text{"tmpl_server_address"} . ">|<" . $text{"tmpl_servername"} . ">"
+            },
+        }, # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
+        "pxe_prompt" => { 
+            "param_order" => [ "tag", "prompt", "timeout" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tag"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">"
+            },
+            "prompt" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_prompt"},
+                "template" => "<" . $text{"tmpl_prompt"} . ">"
+            },
+            "timeout" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_timeout"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            },
+        }, # =[tag:<tag>,]<prompt>[,<timeout>]
+        "dhcp_pxe_vendor" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_vendor"},
+                "template" => "<" . $text{"tmpl_string"} . ">[,<" . $text{"tmpl_string"} . ">...]"
+            }
+        }, # =<vendor>[,...]
+        "dhcp_lease_max" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_leasetime"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            }
+        }, # =<number>
+        "dhcp_authoritative" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_rapid_commit" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_alternate_port" => { 
+            "param_order" => [ "serverport", "clientport" ],
+            "serverport" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_serverport"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            },
+            "clientport" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_clientport"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            },
+        }, # [=<server port>[,<client port>]]
+        "bootp_dynamic" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 20,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_networkids"},
+                "template" => "<" . $text{"tmpl_bootp_network_id"} . ">[,<" . $text{"tmpl_bootp_network_id"} . ">]"
+            },
+        }, # [=<network-id>[,<network-id>]]
+        "no_ping" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "log_dhcp" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "quiet_dhcp" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "quiet-dhcp6" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "quiet_ra" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_leasefile" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "file",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            },
+        }, # =<path>
+        "dhcp_duid" => { 
+            "param_order" => [ "enterpriseid", "uid" ],
+            "enterpriseid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_enterpriseid"},
+                "template" => "<" . $text{"tmpl_enterprise"} . ">"
+            },
+            "uid" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_uid"},
+                "template" => "<" . $text{"tmpl_uid"} . ">"
+            },
+        }, # =<enterprise-id>,<uid>
+        "dhcp_script" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "file",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<path>
+        "dhcp_luascript" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "file",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<path>
+        "dhcp_scriptuser" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_username"},
+                "template" => "<" . $text{"tmpl_username"} . ">"
+            }
+        }, # =<username>
+        "script_arp" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "leasefile_ro" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "script_on_renewal" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "bridge_interface" => { 
+            "param_order" => [ "interface", "alias" ],
+            "interface" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            },
+            "alias" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_aliases"},
+                "template" => "<" . $text{"tmpl_alias"} . ">[,<" . $text{"tmpl_alias"} . ">]"
+            },
+        }, # =<interface>,<alias>[,<alias>]
+        "shared_network" => { 
+            "param_order" => [ "interface", "addr" ],
+            "interface" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface_or_ip_address"},
+                "template" => "<" . $text{"tmpl_interface"} . ">|<" . $text{"tmpl_address"} . ">"
+            },
+            "addr" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_ip_address"},
+                "template" => "<" . $text{"tmpl_address"} . ">"
+            },
+        }, # =<interface|addr>,<addr>
+        "domain" => { 
+            "param_order" => [ "domain", "range", "local" ],
+            "domain" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_domain"},
+                "template" => "<" . $text{"tmpl_domain"} . ">"
+            },
+            "range" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_address_range"},
+                "template" => "<" . $text{"tmpl_address_range"} . ">"
+            },
+            "local" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_local"},
+                "template" => "local" # literal value
+            },
+        }, # =<domain>[,<address range>[,local]]
+        "dhcp_fqdn" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "dhcp_client_update" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "enable_ra" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "ra_param" => { 
+            "param_order" => [ "interface", "mtu", "priority", "interval", "lifetime" ],
+            "interface" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            },
+            "mtu" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_mtu"},
+                "template" => "mtu:<" . $text{"tmpl_integer"} . ">|<" . $text{"tmpl_interface"} . ">|off"
+            },
+            "priority" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_priority"},
+                "template" => "<high|low>" # literal value
+            },
+            "interval" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_interval"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            },
+            "lifetime" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_lifetime"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            },
+        }, # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
+        "dhcp_reply_delay" => { 
+            "param_order" => [ "tag", "delay" ],
+            "tag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_tag"},
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">"
+            },
+            "delay" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_delay"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            },
+        }, # =[tag:<tag>,]<integer>
+        "enable_tftp" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_interfaces"},
+                "template" => "<" . $text{"tmpl_interface"} . ">[,<" . $text{"tmpl_interface"} . ">]"
+            },
+        }, # [=<interface>[,<interface>]]
+        "tftp_root" => { 
+            "param_order" => [ "directory", "interface" ],
+            "directory" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_dirname"},
+                "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
+            },
+            "interface" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_interface"},
+                "template" => "<" . $text{"tmpl_interface"} . ">"
+            },
+        }, # =<directory>[,<interface>]
+        "tftp_no_fail" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "tftp_unique_root" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 15,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => "ip|mac",
+                "template" => "ip|mac" # literal value
+            },
+        }, # [=ip|mac]
+        "tftp_secure" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "tftp_lowercase" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "tftp_max" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_max_connections"},
+                "template" => "<" . $text{"tmpl_integer"} . ">"
+            }
+        }, # =<connections>
+        "tftp_mtu" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_mtu"},
+                "template" => "<" . $text{"tmpl_mtu"} . ">"
+            }
+        }, # =<mtu size>
+        "tftp_no_blocksize" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "tftp_port_range" => { 
+            "param_order" => [ "start", "end" ],
+            "start" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_start_port"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            },
+            "end" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 1,
+                "label" => $text{"p_label_val_end_port"},
+                "template" => "<" . $text{"tmpl_port"} . ">"
+            },
+        }, # =<start>,<end>
+        "tftp_single_port" => { 
+            "param_order" => [ "val" ],
+            "val" => {
+                "valtype" => "bool",
+                "default" => 0,
+            }
+        },
+        "conf_file" => { 
+            "param_order" => [ "filename" ],
+            "filename" => {
+                "length" => 75,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<file>
+        "conf_dir" => { 
+            "param_order" => [ "dirname", "filter", "exceptions" ],
+            "dirname" => {
+                "length" => 75,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_dirname"},
+                "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
+            },
+            "filter" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_filter"},
+                "template" => $text{"tmpl_filter"}
+            },
+            "exceptions" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_exceptions"},
+                "template" => $text{"tmpl_exceptions"}
+            },
+        }, # =<directory>[,<file-extension>......],
+        "servers_file" => { 
+            "param_order" => [ "filename" ],
+            "filename" => {
+                "length" => 75,
+                "valtype" => "path",
+                "default" => "",
+                "required" => 1,
+                "label" => $text{"p_label_val_filename"},
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+            }
+        }, # =<file>
+    );
+}
 
 # our $IPADDR = "((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])";
 our $IPADDR = "(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])";
@@ -421,6 +2839,7 @@ my $CLIENTID_NAME = "id:([0-9a-zA-Z\_\*\-]*)";
 # parse the configuration file and populate the %dnsmconfig structure
 # 
 sub parse_config_file {
+    &init_configfield_fields();
     my $lineno;
     my ($dnsmconfig_ref, $config_file, $config_filename, $is_not_main_config) = @_;
 
@@ -439,6 +2858,8 @@ sub parse_config_file {
         push ( @{ $$dnsmconfig_ref{"configfiles"} }, $$config_filename);
     }
 
+    my $max_iterations = 20;
+    my $current = 0;
     $lineno=0;
     foreach my $line (@$$config_file) {
         my $remainder;
@@ -502,6 +2923,7 @@ sub parse_config_file {
                     $valtemp{"full"} = $remainder;
                     if ($option eq "local") {
                         $option = "server";
+                        $valtemp{"is_local"} = 1;
                     }
                     given ( "$option" ){
                         when ("auth-server") { # =<domain>,[<interface>[/4|/6]|<ip-address>...]
@@ -547,10 +2969,12 @@ sub parse_config_file {
                                 $valtemp{"ip"} = $1;
                             }
                         }
-                        when ("server") { # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+                        when ("local") { # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+                            $current = 0;
                             while ( $remainder =~ /^\/((?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9\.])?)+[a-z0-9][a-z0-9\-]{0,61}[a-z0-9])\/(.*)$/ ) {
                                 push( @{ $valtemp{"domain"} }, $1 );
                                 $remainder = $2;
+                                last if ($current++ >= $max_iterations);
                             }
                             if ( $remainder =~ /^($IPADDR(#[0-9]{1,5})?)(.*)$/ ) {
                                 $valtemp{"ip"} = $1;
@@ -559,6 +2983,25 @@ sub parse_config_file {
                             elsif ( $remainder =~ /^($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
                                 $valtemp{"ip"} = $1;
                                 $remainder = $2;
+                            }
+                            if ( $remainder =~ /^@(.*)$/ ) {
+                                $valtemp{"source"} = $1;
+                            }
+                        }
+                        when ("server") { # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+                            $current = 0;
+                            while ( $remainder =~ /^\/((?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9\.])?)+[a-z0-9][a-z0-9\-]{0,61}[a-z0-9])\/(.*)$/ ) {
+                                push( @{ $valtemp{"domain"} }, $1 );
+                                $remainder = $2;
+                                last if ($current++ >= $max_iterations);
+                            }
+                            if ( $remainder =~ /^($IPADDR(#[0-9]{1,5})?)(.*)$/ ) {
+                                $valtemp{"ip"} = $1;
+                                $remainder = $3;
+                            }
+                            elsif ( $remainder =~ /^($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
+                                $valtemp{"ip"} = $1;
+                                $remainder = $3;
                             }
                             if ( $remainder =~ /^@(.*)$/ ) {
                                 $valtemp{"source"} = $1;
@@ -585,13 +3028,13 @@ sub parse_config_file {
                             if ( $remainder =~ /^\/(.*)\/($IPADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
                                 if ( defined ($2) ) {
-                                    $valtemp{"addr"}=$2;
+                                    $valtemp{"addr"} = $2;
                                 }
                             }
                             elsif ( $remainder =~ /^\/(.*)\/($IPV6ADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
                                 if ( defined ($2) ) {
-                                    $valtemp{"addr"}=$2;
+                                    $valtemp{"addr"} = $2;
                                 }
                             }
                             else
@@ -602,8 +3045,20 @@ sub parse_config_file {
                         }
                         when ("ipset") { # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
                             if ( $remainder =~ /^\/([a-zA-Z\_\.][0-9a-zA-Z\_\.\-\/]*)\/([0-9a-zA-Z\,\.\-]*)$/ ) {
-                                $valtemp{"domains"}=$1;
-                                $valtemp{"ipsets"}=$2;
+                                my $domains = $1;
+                                my $ipsets = $2;
+                                $current = 0;
+                                while ($domains =~ /^\/([a-zA-Z\_\.][0-9a-zA-Z\_\.\-]*)(\/.*)$/ ) {
+                                    push( @{ $valtemp{"domain"} }, $1 );
+                                    $domains = $2;
+                                    last if ($current++ >= $max_iterations);
+                                }
+                                $current = 0;
+                                while ($ipsets =~ /^([0-9a-zA-Z\.\-]*)((?:,)(.*))*$/ ) {
+                                    push( @{ $valtemp{"ipset"} }, $1 );
+                                    $ipsets = $3;
+                                    last if ($current++ >= $max_iterations);
+                                }
                             }
                         }
                         when ("connmark-allowlist") { # =<connmark>[/<mask>][,<pattern>[/<pattern>...]]
@@ -651,6 +3106,13 @@ sub parse_config_file {
                                     if ( $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
                                         $valtemp{"port"}=$1;
                                         $remainder=$3;
+                                        if ( $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
+                                            $valtemp{"priority"}=$1;
+                                            $remainder=$3;
+                                            if ( $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
+                                                $valtemp{"weight"}=$1;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -825,19 +3287,23 @@ sub parse_config_file {
                             }
                         }
                         when ("auth-zone") { # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>].....][,exclude:<subnet>[/<prefix length>]].....]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
                                 $valtemp{"domain"} = $1;
                                 $remainder = $3;
-                                if ( $remainder =~ /((?:exclude:)(.*))*$/ ) {
-                                    while ( $remainder =~ /^(.*)((?:,exclude:)(.*))$/ ) {
-                                        push( @{ $valtemp{"exclude"} }, $3 );
-                                        $remainder = $1;
+                                if ( $remainder =~ /(exclude:.*)*$/ ) {
+                                    $current = 0;
+                                    while ( $remainder =~ /((?:exclude:)($IPADDR))((?:,exclude:)(.*))*$/ ) {
+                                        push( @{ $valtemp{"exclude"} }, $2 );
+                                        $remainder = $4;
+                                        last if ($current++ >= $max_iterations);
                                     }
                                 }
                                 if ( $remainder ne "" ) {
-                                    while ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
-                                        push( @{ $valtemp{"include"} }, $3 );
-                                        $remainder = $1;
+                                    $current = 0;
+                                    while ( $remainder =~ /^($IPADDR)((?:,)(.*))*$/ ) {
+                                        push( @{ $valtemp{"include"} }, $1 );
+                                        $remainder = $3;
+                                        last if ($current++ >= $max_iterations);
                                     }
                                 }
                             }
@@ -864,6 +3330,7 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-range") { # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
+                            $current = 0;
                             while ($remainder =~ /^($TAG)\,([0-9a-zA-Z\.\,\-\_: ]*)/ ) { # first get tag
                                 my $tagdirective = $1;
                                 $remainder = $4;
@@ -882,6 +3349,7 @@ sub parse_config_file {
                                     #     }
                                     # }
                                 }
+                                last if ($current++ >= $max_iterations);
                             }
                             $valtemp{"ipversion"} = 4;
                             if ($remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) { # IPv4
@@ -894,7 +3362,8 @@ sub parse_config_file {
                                     $remainder = $3;
                                 }
                                 $valtemp{"mask"}="";
-                                $valtemp{"mask-used"}=0;
+                                $valtemp{"static"} = 0;
+                                $valtemp{"mask-used"} = 0;
                                 if ($remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
                                     # ...netmask, time (optionally)
                                     $valtemp{"mask"} = $1;
@@ -902,7 +3371,7 @@ sub parse_config_file {
                                     $remainder = $3;
                                 }
                                 if ($remainder =~ /^(static)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
-                                    $valtemp{"static"} = $1;
+                                    $valtemp{"static"} = 1;
                                     $remainder = $3;
                                 }
                                 if ($remainder =~ /^($TIME)/ ) {
@@ -915,7 +3384,6 @@ sub parse_config_file {
                             elsif ($remainder =~ /^($IPV6ADDR)\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*)/ ) { # IPv6
                                 # start...
                                 # $temp{"id"}="";
-                                $valtemp{"id-used"} = 0;
                                 $valtemp{"start"} = $1;
                                 $remainder = $2 . $3;
                                 $valtemp{"prefix-length"} = 64;
@@ -929,6 +3397,7 @@ sub parse_config_file {
                                 $valtemp{"ra-names"} = 0;
                                 $valtemp{"ra-stateless"} = 0;
                                 $valtemp{"slaac"} = 0;
+                                $current = 0;
                                 while ($remainder =~ /^($IPV6PROP)(\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*))*/ ) {
                                     # ...IPv6-only properties
                                     if ($1 eq "ra-only") {
@@ -944,6 +3413,7 @@ sub parse_config_file {
                                         $valtemp{"slaac"} = 1;
                                     }
                                     $remainder = $3;
+                                    last if ($current++ >= $max_iterations);
                                 }
                                 if ($remainder =~ /^([0-9]{1,3})\,[\s]*($TIME)/ ) {
                                     # ...prefix-length, time (optionally)
@@ -957,8 +3427,7 @@ sub parse_config_file {
                                     $valtemp{"time-used"}=($1 =~ /^\d/);
                                 }
                             }
-                            else
-                            {
+                            else {
                                 print "Error in line $lineno (dhcp-range)! ";
                                 $$dnsmconfig_ref{"errors"}++;
                             }
@@ -999,6 +3468,7 @@ sub parse_config_file {
                                 $remainder = $firstpart . (defined($firstpart) && defined($lastpart) ? ", " . $lastpart : $lastpart);
                             }
                             else {
+                                $current = 0;
                                 while ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\*]*)($MAC)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ ) { # IPv4 only
                                     $remainder = $1 . $4;
                                     if (defined ($2)) {
@@ -1007,6 +3477,7 @@ sub parse_config_file {
                                     else {
                                         last;
                                     }
+                                    last if ($current++ >= $max_iterations);
                                 }
                             }
                             if ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\*]*)($CLIENTID_NAME)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ && defined ($2)) {
@@ -1017,10 +3488,11 @@ sub parse_config_file {
                                     $valtemp{"clientid"} = "";
                                 }
                             }
+                            $valtemp{"ignore"} = 0;
                             if ($remainder =~ /^(([0-9a-zA-Z\.\,\-\_:\*]*)(,))*(ignore)$/  && defined ($4)) {
                                 # ...time (optionally)
                                 $remainder = $2;
-                                $valtemp{"leasetime"} = "ignore";
+                                $valtemp{"ignore"} = 1;
                             }
                             if ($remainder =~ /^((?:[0-9a-zA-Z\,\-\_:]*)(?:,))*($IPADDR)(,([0-9a-zA-Z\.\,\-\_:]*))*$/ && defined ($2)) {
                                 $remainder = $1 . (defined ($3) && defined ($4) ? "," . $4 : "");
@@ -1031,27 +3503,27 @@ sub parse_config_file {
                                 $valtemp{"ip"} = $3;
                                 $valtemp{"ipversion"} = 6;
                             }
-                            $valtemp{"id-used"} = 0;
+                            $valtemp{"hostname-used"} = 0;
                             if ($remainder =~ /^([\h\,]*)($NAME)([\h\,]*)$/ ) {
-                                # network id...
-                                $valtemp{"id"}=$2;
-                                $valtemp{"id-used"} = 1;
+                                # network id...hostname?
+                                $valtemp{"hostname"}=$2;
+                                $valtemp{"hostname-used"} = 1;
                                 # $remainder = $2;
                             }
-                            # $temp{"id"}=$remainder;
-                            # $temp{"id-used"} = 1;
                         }
                         when ("dhcp-option") { # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
                             # too many to classify - all values as string!
                             $remainder =~ s/^\s+|\s+$//g ;
                             $valtemp{"forced"} = 0;
                             $valtemp{"tag"} = ( );
+                            $current = 0;
                             # $TAG = "(set|tag):([0-9a-zA-Z\_\.\-]*)";
                             while ($remainder =~ /^($TAG)((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 my $tag  = $3;
                                 push @{ $valtemp{"tag"} }, $tag;
                                 $remainder = $6;
                                 $remainder =~ s/^\s+|\s+$//g ;
+                                last if ($current++ >= $max_iterations);
                             }
                             if ($remainder =~ /^(vendor:([a-zA-Z\-\_]*))((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 $valtemp{"vendor"} = $2;
@@ -1084,12 +3556,14 @@ sub parse_config_file {
                             $remainder =~ s/^\s+|\s+$//g ;
                             $valtemp{"forced"} = 1;
                             $valtemp{"tag"} = ( );
+                            $current = 0;
                             # $TAG = "(set|tag):([0-9a-zA-Z\_\.\-]*)";
                             while ($remainder =~ /^($TAG)((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 my $tag  = $3;
                                 push @{ $valtemp{"tag"} }, $tag;
                                 $remainder = $6;
                                 $remainder =~ s/^\s+|\s+$//g ;
+                                last if ($current++ >= $max_iterations);
                             }
                             if ($remainder =~ /^(vendor:([a-zA-Z\-\_]*))((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
                                 $valtemp{"vendor"} = $2;
@@ -1194,37 +3668,49 @@ sub parse_config_file {
                             }
                         }
                         when ("tag-if") { # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
+                            $current = 0;
                             while ( $remainder =~ /^((set:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"settag"} }, $3 );
                                 $remainder = $4;
+                                last if ($current++ >= $max_iterations);
                             }
+                            $current = 0;
                             while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"iftag"} }, $3 );
                                 $remainder = $4;
+                                last if ($current++ >= $max_iterations);
                             }
                         }
                         when ("dhcp-ignore") { # =tag:<tag>[,tag:<tag>]
+                            $current = 0;
                             while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
+                                last if ($current++ >= $max_iterations);
                             }
                         }
                         when ("dhcp-ignore-names") { # [=tag:<tag>[,tag:<tag>]]
+                            $current = 0;
                             while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
+                                last if ($current++ >= $max_iterations);
                             }
                         }
                         when ("dhcp-generate-names") { # =tag:<tag>[,tag:<tag>]
+                            $current = 0;
                             while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
+                                last if ($current++ >= $max_iterations);
                             }
                         }
                         when ("dhcp-broadcast") { # [=tag:<tag>[,tag:<tag>]]
+                            $current = 0;
                             while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
+                                last if ($current++ >= $max_iterations);
                             }
                         }
                         when ("dhcp-boot") { # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
@@ -1300,9 +3786,11 @@ sub parse_config_file {
                             if ( $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"interface"} = $1;
                                 $remainder = $2;
+                                $current = 0;
                                 while ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                     push( @{ $valtemp{"alias"} }, $1 );
                                     $remainder = $3;
+                                    last if ($current++ >= $max_iterations);
                                 }
                             }
                         }
@@ -1374,16 +3862,6 @@ sub parse_config_file {
                                 $valtemp{"directory"} = $remainder;
                             }
                         }
-                        when ("tftp-unique-root") { # [=ip|mac]
-                            $valtemp{"ip"} = "";
-                            $valtemp{"mac"} = "";
-                            if ( $remainder =~ /^($IPADDR)$/ ) {
-                                $valtemp{"ip"} = $1;
-                            }
-                            else {
-                                $valtemp{"mac"} = $1;
-                            }
-                        }
                         when ("tftp-port-range") { # =<start>,<end>
                             if ( $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"start"} = $1;
@@ -1445,6 +3923,18 @@ sub parse_config_file {
                                 }
                             }
                         }
+                        when ("servers-file") {
+                            # # Include another lot of configuration options.
+                            # #conf-file=/etc/dnsmasq.reservations.conf
+                            # #conf-file=/etc/dnsmasq.more.conf
+                            $valtemp{"filename"}=$remainder;
+
+                            if ($line !~/^\#/) {
+                                my $supp_config_filename = $remainder;
+                                my $supp_config_file = &read_file_lines( $supp_config_filename );
+                                &parse_config_file( \%$dnsmconfig_ref, \$supp_config_file, \$supp_config_filename, 1 );
+                            }
+                        }
                         default {
 
                         }
@@ -1468,76 +3958,6 @@ sub parse_config_file {
                     # push( @{ $$dnsmconfig_ref{"set_tags"} }, $set_tag );
                 }
             }
-            # resolv.conf file
-            # if (1 == 2) {
-
-            # }
-            # # DHCP
-            # # A SRV record sending LDAP for the first domain to second domain at the specified port
-            # elsif ($line =~ /(^[\#]*[\s]*srv-host\=)($NAME)\,($NAME)\,([0-9]{1,5})/ ) {
-            #     %temp = {};
-            #     $temp{"source"}=$2;
-            #     $temp{"target"}=$3;
-            #     $temp{"port"}=$4;
-            #     $temp{"used"}=($line !~/^\#/);
-            #     $temp{"line"}=$lineno;
-            #     $temp{"file"}=$config_filename;
-            #     push @{ $$dnsmconfig_ref{"srv-host"} }, { %temp };
-            # }
-            # # TODO - ptr-record
-            # elsif ($line =~ /(^[\#]*[\s]*ptr-record\=)([a-zA-Z0-9\_\.\/]*)/ ) {
-            #     %temp = {};
-            #     # $temp{}=$2;
-            #     # $temp{}=$3;
-            #     $temp{"used"}=($line !~/^\#/);
-            #     $temp{"line"}=$lineno;
-            #     $temp{"file"}=$config_filename;
-            #     push @{ $$dnsmconfig_ref{"ptr-record"} }, { %temp };
-            # }
-            # # TODO - txt-record
-            # elsif ($line =~ /(^[\#]*[\s]*txt-record\=)([a-zA-Z0-9\_\.\/]*)/ ) {
-            #     %temp = {};
-            #     # $temp{}=$2;
-            #     # $temp{}=$3;
-            #     $temp{"used"}=($line !~/^\#/);
-            #     $temp{"line"}=$lineno;
-            #     $temp{"file"}=$config_filename;
-            #     push @{ $$dnsmconfig_ref{"txt-record"} }, { %temp };
-            # }
-            # # Provide an alias for a "local" DNS name
-            # elsif ($line =~ /(^[\#]*[\s]*cname\=)($NAME)\,($NAME)/ ) {
-            #     %temp = {};
-            #     $temp{"alias"}=$2;
-            #     $temp{"local"}=$3;
-            #     $temp{"used"}=($line !~/^\#/);
-            #     $temp{"line"}=$lineno;
-            #     $temp{"file"}=$config_filename;
-            #     push @{ $$dnsmconfig_ref{"cname"} }, { %temp };
-            # }
-            # # If a DHCP client claims that its name is "wpad", ignore that.
-            # elsif ($line =~ /(^[\#]*[\s]*dhcp-name-match\=set:wpad-ignore,wpad)/ ) {
-            #     if ($$dnsmconfig_ref->{'dhcp_name_match'}->{"used"} == 0) { # only overwrite if the last value read is not used (commented)
-            #         $$dnsmconfig_ref->{'dhcp_name_match'}->{"used"}=($line !~/^\#/);
-            #         $$dnsmconfig_ref->{'dhcp_name_match'}->{"line"}=$lineno;
-            #         $$dnsmconfig_ref->{'dhcp_name_match'}->{file}=$config_filename;
-            #     }
-            # }
-            # # 
-            # elsif ($line =~ /(^[\#]*[\s]*dhcp-ignore-names\=tag:wpad-ignore)/ ) {
-            #     if ($$dnsmconfig_ref->{'dhcp_ignore_names'}->{"used"} == 0) { # only overwrite if the last value read is not used (commented)
-            #         $$dnsmconfig_ref->{'dhcp_ignore_names'}->{"used"}=($line !~/^\#/);
-            #         $$dnsmconfig_ref->{'dhcp_ignore_names'}->{"line"}=$lineno;
-            #         $$dnsmconfig_ref->{'dhcp_ignore_names'}->{file}=$config_filename;
-            #     }
-            # }
-            # else {
-            #     # everything else that's not a comment 
-            #     # we don't understand so it may be an error!
-            #     if( $line !~ /^#/ ) {
-            #         print "What?:" . $line;
-            #         $$dnsmconfig_ref{"errors"}++;
-            #     }
-            # }
         }
     }
 } #end of sub parse_config_file

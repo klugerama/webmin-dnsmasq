@@ -45,6 +45,7 @@ my @tftp_singles = ();
 foreach my $configfield ( @conft_b_p ) {
     next if ( grep { /^$configfield$/ } ( @confarrs ) );
     next if ( %dnsmconfigvals{"$configfield"}->{"mult"} ne "" );
+    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "1" );
     if ( grep { /^$configfield$/ } ( @confbools ) ) {
         push @tftp_bools, $configfield;
     }
@@ -53,51 +54,28 @@ foreach my $configfield ( @conft_b_p ) {
     }
 }
 
-# check for input data errors
-# if( $in{"bootp_addr"} !~ /^$IPADDR$/ ) {
-#     my $line="error.cgi?line=".$text{"bootp_address"};
-#     $line .= "&type=" . &urlize($text{"err_notip"});
-#     &redirect( $line );
-#     exit;
-# }	
-# if( $in{"bootp_file"} !~ /^$FILE$/ ) {
-#     my $line="error.cgi?line=".$text{"bootp_file"};
-#     $line .= "&type=" . &urlize($text{"err_filebad"});
-#     &redirect( $line );
-#     exit;
-# }	
-# if( $in{"bootp_host"} !~ /^$NAME$/ ) {
-#     my $line="error.cgi?line=".$text{"bootp_host"};
-#     $line .= "&type=" . &urlize($text{"err_hostbad"});
-#     &redirect( $line );
-#     exit;
-# }	
-# adjust everything to what we got
-
-# @sel || &error($text{'selected_none'});
-
 # check user input for obvious errors
 foreach my $configfield ( @tftp_singles ) {
     my $item = $dnsmconfig{"$configfield"};
-    my $inputfield = &config_to_input($configfield);
+    my $internalfield = &config_to_internal($configfield);
     if ( grep { /^$configfield$/ } ( @sel )) {
-        if ( ! $item->{"val_optional"} && $in{$inputfield . "val"} eq "" ) {
+        if ( ! $item->{"val_optional"} && $in{$internalfield . "val"} eq "" ) {
             &send_to_error( $configfield, $text{"err_valreq"}, $returnto, $returnlabel );
         }
     }
     if ( grep { /^$configfield$/ } ( @sel )) {
-        if ( $in{$inputfield . "val"} ne "" ) {
+        if ( $in{$internalfield . "val"} ne "" ) {
             my $item_template = %dnsmconfigvals{"$configfield"};
-            if ( $item_template->{"valtype"} eq "int" && ($in{$inputfield . "val"} !~ /^$NUMBER$/) ) {
+            if ( $item_template->{"valtype"} eq "int" && ($in{$internalfield . "val"} !~ /^$NUMBER$/) ) {
                 &send_to_error( $configfield, $text{"err_numbbad"}, $returnto, $returnlabel );
             }
-            elsif ( $item_template->{"valtype"} eq "file" && ($in{$inputfield . "val"} !~ /^$FILE$/) ) {
+            elsif ( $item_template->{"valtype"} eq "file" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
                 &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
             }
-            elsif ( $item_template->{"valtype"} eq "path" && ($in{$inputfield . "val"} !~ /^$FILE$/) ) {
+            elsif ( $item_template->{"valtype"} eq "path" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
                 &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
             }
-            elsif ( $item_template->{"valtype"} eq "dir" && ($in{$inputfield . "val"} !~ /^$FILE$/) ) {
+            elsif ( $item_template->{"valtype"} eq "dir" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
                 &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
             }
         }

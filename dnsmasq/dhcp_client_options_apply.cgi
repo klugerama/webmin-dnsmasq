@@ -21,12 +21,11 @@ my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button()); # TODO
-
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+
 # read posted data
 &ReadParse();
 

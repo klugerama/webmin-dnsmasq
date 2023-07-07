@@ -26,16 +26,20 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
+# my $headstuff = &add_js($formid, $internalfield);
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_vendorclass"});
+
+my $returnto = $in{"returnto"} || "dhcp_vendorclass.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_vendorclass"};
+
 my $formid = "vendorclass_form";
-my $context = "dhcp_vendorclass";
+my $internalfield = "dhcp_vendorclass";
+my $configfield = &internal_to_config($internalfield);
 my @newfields = ( "tag", "vendorclass" );
 my @editfields = ( "idx", "tag", "vendorclass" );
 my @list_link_buttons = &list_links( "sel", 0 );
-my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"vendorclass"}), $context, $text{"vendorclass"}, 500, 465, $formid, \@newfields );
+my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"vendorclass"}), $internalfield, $text{"vendorclass"}, 500, 465, $formid, \@newfields );
 push(@list_link_buttons, $add_new_button);
-
-# my $headstuff = &add_js(1, 1, 0, $formid, $context);
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 
 my $count;
 $count=0;
@@ -57,8 +61,8 @@ foreach my $class ( @{$dnsmconfig{"dhcp-vendorclass"}} ) {
     local %val = %{ $class->{"val"} };
     local @cols;
     # first call to &edit_item_link should capture link, fields, and script; subsequent calls (1 for each field) only need the link
-    ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"tag"}, $context, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
-    ($edit_link[1]) = &edit_item_link($val{"vendorclass"}, $context, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
+    ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"tag"}, $internalfield, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
+    ($edit_link[1]) = &edit_item_link($val{"vendorclass"}, $internalfield, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
     push ( @cols, &ui_checkbox("enabled", "1", "", $class->{"used"}?1:0, undef, 1) );
     push ( @cols, $edit_link[0] );
     push ( @cols, $edit_link[1] );
@@ -74,7 +78,7 @@ print &ui_submit($text{"delete_sel"}, "delete_sel");
 print &ui_hr();
 print $hidden_edit_input_fields . $edit_script;
 print &ui_form_end( );
-print &add_js(1, 1, 0);
+print &add_js();
 ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
 
 ### END of dhcp_vendorclass.cgi ###.

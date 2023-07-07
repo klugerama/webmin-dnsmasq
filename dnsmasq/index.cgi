@@ -52,9 +52,9 @@ if( $dnsmconfig{"errors"} > 0 ) {
 	print $dnsmconfig{"errors"};
 	print "errors in config file!</h3><br>\n";
 }
-@tabs = (   [ 'dns', 'DNS Settings' ],
-            [ 'dhcp', 'DHCP Settings' ],
-            [ 'tftp', 'TFTP Settings' ] );
+@tabs = (   [ 'dns', $text{'index_dns_settings'} ],
+            [ 'dhcp', $text{'index_dhcp_settings'} ],
+            [ 'tftp', $text{'index_tftp_settings'} ] );
 print ui_tabs_start(\@tabs, 'mode', $mode);
 
 print ui_tabs_start_tab('mode', 'dns');

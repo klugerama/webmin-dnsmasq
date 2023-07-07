@@ -1,8 +1,9 @@
 config_file=/etc/dnsmasq.conf
-log_dir=/var/log/dnsmasq
-dnsmasq_path=dnsmasq
-restart=restart.sh
+dnsmasq_path=/usr/sbin/dnsmasq
 pid_filename=/var/run/dnsmasq/dnsmasq.pid
 dnsmasq_start=systemctl start dnsmasq
 dnsmasq_stop=systemctl stop dnsmasq
-dnsmasq_restart=systemctl reload dnsmasq
+dnsmasq_restart=systemctl restart dnsmasq
+dnsmasq_reload_files=systemctl reload dnsmasq
+dnsmasq_dump_log=/etc/init.d/dnsmasq dump-stats
+test_config=1

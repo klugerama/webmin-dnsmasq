@@ -21,13 +21,18 @@ my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_host_reservations"});
+
+my $returnto = $in{"returnto"} || "dhcp_reservations.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_host_reservations"};
+
+my $internalfield = "dhcp_host";
+my $configfield = &internal_to_config($internalfield);
 my @list_link_buttons = &list_links( "sel", 0, "dhcp_res_apply.cgi", "dhcp-host=new,0.0.0.0", "dhcp_reservations.cgi", &text("add_", $text{"_host"}) );
 
 my $count;
@@ -40,18 +45,18 @@ print &ui_columns_start( [
     # "line", 
     "",
     $text{"enabled"}, 
-    $text{"dhcp_res_name"}, 
+    $text{"p_label_val_hostname"}, 
     $text{"dhcp_res_ip"}, 
     $text{"dhcp_res_mac"}, 
     $text{"dhcp_res_ignore_client_id"}, 
-    $text{"dhcp_res_tag"}, 
+    $text{"p_label_val_tag"}, 
     $text{"dhcp_res_time"}, 
     # "full" 
 ], 100, undef, undef, &ui_columns_header( [ $text{"dhcp_res_title"} . &ui_help($text{"p_man_desc_dhcp_host"}) ], [ 'class="table-title" colspan=4' ] ), 1 );
-foreach my $host ( @{$dnsmconfig{"dhcp-host"}} ) {
+foreach my $host ( @{$dnsmconfig{$configfield}} ) {
     local @cols;
     if ($host->{"val"}->{"ipversion"} == 4) {
-        my $edit = "<a href=dhcp_reservation_edit.cgi?idx=$count>".$host->{"val"}->{"id"}."</a>";
+        my $edit = "<a href=dhcp_reservation_edit.cgi?idx=$count>".$host->{"val"}->{"hostname"}."</a>";
         push ( @cols, &ui_checkbox("enabled", "1", "", $host->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit );
         push ( @cols, $host->{"val"}->{"ip"} );
@@ -80,17 +85,17 @@ print &ui_columns_start( [
     # "line", 
     "",
     $text{"enabled"},
-    $text{"dhcp_res_name"}, 
+    $text{"p_label_val_hostname"}, 
     $text{"dhcp_res_ip"}, 
     $text{"dhcp_res_mac"}, 
     $text{"dhcp_res_ignore_client_id"}, 
-    $text{"dhcp_res_tag"}, 
+    $text{"p_label_val_tag"}, 
     $text{"dhcp_res_time"}, 
     # "full" 
 ], 100, undef, undef, &ui_columns_header( [ $text{"dhcp6_res_title"} ], [ 'class="table-title" colspan=4' ] ), 1 );
 foreach my $host ( @{$dnsmconfig{"dhcp-host"}} ) {
     if ($host->{"val"}->{"ipversion"} == 6) {
-        my $edit = "<a href=dhcp_reservation_edit.cgi?idx=$count>".$host->{"val"}->{"id"}."</a>";
+        my $edit = "<a href=dhcp_reservation_edit.cgi?idx=$count>".$host->{"val"}->{"hostname"}."</a>";
         push ( @cols, &ui_checkbox("enabled", "1", "", $host->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit );
         push ( @cols, $host->{"val"}->{"ip"} );

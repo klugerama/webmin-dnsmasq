@@ -24,8 +24,6 @@ my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-
 ## sanity checks
 
 ## Insert Output code here
@@ -34,11 +32,9 @@ $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
-# read posted data
-&ReadParse();
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-	&header( "DNSMasq settings", "" );
+	&header( $text{"index_title"}, "" );
 	print "<hr><h2>";
 	print $text{"warn_errors"};
 	print $dnsmconfig{"errors"};
@@ -47,8 +43,12 @@ if( $dnsmconfig{"errors"} > 0 ) {
 	&footer( "/", $text{"index"});
 	exit;
 }
+# read posted data
+&ReadParse();
+
 # adjust everything to what we got
 #
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print "<h2>".&text("edit_", $text{"_iface"})."</h2>";
 print &ui_form_start( "iface_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{"idx"} );

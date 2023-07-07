@@ -24,37 +24,38 @@ sub show_dhcp_settings {
         {
             "link" => "dhcp_basic.cgi",
             "title" => $text{"index_dhcp_settings_basic"},
-            "icon" => "basic.gif"
+            "icon" => "basic.gif",
+            "page" => 1
         },
         {
             "link" => "dhcp_domain_name.cgi",
             "title" => $text{"index_dhcp_domain_name"},
-            "icon" => "hostnames.gif"
+            "icon" => "hostnames.gif",
+            "page" => 2
         },
         {
             "link" => "dhcp_client_options.cgi",
             "title" => $text{"index_dhcp_client_options"},
-            "icon" => "clients.gif"
+            "icon" => "clients.gif",
+            "page" => 3
         },
         {
-            "link" => "dhcp_vendorclass.cgi",
-            "title" => $text{"index_dhcp_vendorclass"},
-            "icon" => "vendorclass.gif"
-        },
-        {
-            "link" => "dhcp_userclass.cgi",
-            "title" => $text{"index_dhcp_userclass"},
-            "icon" => "userclass.gif"
+            "link" => "dhcp_tags.cgi",
+            "title" => $text{"index_dhcp_tags"},
+            "icon" => "tag.gif",
+            "page" => 4
         },
         {
             "link" => "dhcp_ranges.cgi",
             "title" => $text{"index_dhcp_range"},
-            "icon" => "ranges.gif"
+            "icon" => "ranges.gif",
+            "page" => 5
         },
         {
             "link" => "dhcp_reservations.cgi",
             "title" => $text{"index_dhcp_host_reservations"},
-            "icon" => "reservations.gif"
+            "icon" => "reservations.gif",
+            "page" => 6
         },
     );
     local $i;

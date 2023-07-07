@@ -15,36 +15,34 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-do '../web-lib.pl';
-do '../ui-lib.pl';
-do 'dnsmasq-lib.pl';
+require 'dnsmasq-lib.pl';
 
-$|=1;
-&init_config("DNSMasq");
-
-%access=&get_module_acl;
+my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
+my $config_filename = $config{config_file};
+my $config_file = &read_file_lines( $config_filename );
 
-## sanity checks
+&parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&header($text{"index_title"}, "", "intro", 1, 1, undef,
-        "Written by Neil Fisher<BR><A HREF=mailto:neil\@magnecor.com.au>Author</A><BR><A HREF=http://www.authorpage.invalid>Home://page</A>");
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 # uses the index_title entry from ./lang/en or appropriate
 
+&ReadParse();
+
 ## Insert Output code here
-
-
 # output as web page
+if ($config{'test_config'}) {
+    $err = &test_config();
+    &error("<pre>".&html_escape($err)."</pre>") if ($err);
+}
 
-my $line=$config{restart};
-&header( "DNSMasq settings", "" );
-print $text{"restarting"} . "<br>"; 
-print `$line`;
-print "<br><hr><a href=index.cgi>";
-print $text{"index_dns_settings"};
-print "</a>";
-&footer("/", $text{"index"});
+&error_setup($text{'start_err'});
+$access{'stop'} || &error($text{'start_ecannot'});
+$err = &restart_dnsmasq();
+&error($err) if ($err);
+&webmin_log("start");
+&redirect($in{'returnto'});
 
 ### END of restart.cgi ###.

@@ -26,9 +26,7 @@ $|=1;
 
 ## put in ACL checks here if needed
 
-
 ## sanity checks
-
 
 ## Insert Output code here
 # read config file
@@ -36,11 +34,9 @@ $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
 # pass into data structure
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
-# read posted data
-&ReadParse();
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
-    &header( "DNSMasq settings", "" );
+    &header( $text{"index_title"}, "" );
     print "<hr><h2>";
     print $text{"warn_errors"};
     print $dnsmconfig{"errors"};
@@ -49,9 +45,11 @@ if( $dnsmconfig{"errors"} > 0 ) {
     &footer( "/", $text{"index"});
     exit;
 }
+# read posted data
+&ReadParse();
 # adjust everything to what we got
 #
-&header( "DNSMasq settings", "" );
+&header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button() );
 print "<h2>".$text{"alias"}."</h2>";
 print &ui_form_start( "forced_edit_apply.cgi", "post" );
 print &ui_hidden( "idx", $in{idx} );
@@ -64,7 +62,7 @@ print "<br>".$text{"enabled"}.&ui_yesno_radio( "used",
                 ($dnsmconfig{"alias"}[$in{idx}]{"used"})?1:0 );
 print "<br><br>" . &ui_submit( $text{"save_button"} )."<br>";
 print &ui_form_end();
-print "<a href=delete.cgi?idx=".$in{idx}."&what="alias"&where=dns_alias.cgi".
+print "<a href=delete.cgi?idx=".$in{idx}."&what=\"alias\"&where=dns_alias.cgi".
     ">".$text{"delet"}."</a>";
 print "<br><a href=dns_alias.cgi>".$text{"index_dns_alias_settings"}."</a>";
 &footer( "/", $text{"index"});
