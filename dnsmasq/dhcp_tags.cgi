@@ -31,6 +31,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dhcp_tags.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_tags"};
+my $apply_cgi = "dhcp_tags_apply.cgi";
 
 sub show_userclass {
     my $formid = "userclass_form";

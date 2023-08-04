@@ -73,28 +73,29 @@ elsif (@resolv_file_adds) {
 
 }
 else {
-    my $action = $in{"enable_sel_addn_hosts"} ? "enable" : $in{"disable_sel_addn_hosts"} ? "disable" : $in{"delete_sel_addn_hosts"} ? "delete" : "";
-    if ($action ne "") {
-        @sel || &error($text{'selected_none'});
+    # my $action = $in{"enable_sel_addn_hosts"} ? "enable" : $in{"disable_sel_addn_hosts"} ? "disable" : $in{"delete_sel_addn_hosts"} ? "delete" : "";
+    # if ($action ne "") {
+    #     @sel || &error($text{'selected_none'});
 
-        &update_selected("addn-hosts", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = $in{"enable_sel_hostsdir"} ? "enable" : $in{"disable_sel_hostsdir"} ? "disable" : $in{"delete_sel_hostsdir"} ? "delete" : "";
-        if ($action ne "") {
-            @sel || &error($text{'selected_none'});
+    #     &update_selected("addn-hosts", $action, \@sel, \%$dnsmconfig);
+    # }
+    # else {
+    #     $action = $in{"enable_sel_hostsdir"} ? "enable" : $in{"disable_sel_hostsdir"} ? "disable" : $in{"delete_sel_hostsdir"} ? "delete" : "";
+    #     if ($action ne "") {
+    #         @sel || &error($text{'selected_none'});
 
-            &update_selected("hostsdir", $action, \@sel, \%$dnsmconfig);
-        }
-        else {
-            $action = $in{"enable_sel_resolv_file"} ? "enable" : $in{"disable_sel_resolv_file"} ? "disable" : $in{"delete_sel_resolv_file"} ? "delete" : "";
-            if ($action ne "") {
-                @sel || &error($text{'selected_none'});
+    #         &update_selected("hostsdir", $action, \@sel, \%$dnsmconfig);
+    #     }
+    #     else {
+    #         $action = $in{"enable_sel_resolv_file"} ? "enable" : $in{"disable_sel_resolv_file"} ? "disable" : $in{"delete_sel_resolv_file"} ? "delete" : "";
+    #         if ($action ne "") {
+    #             @sel || &error($text{'selected_none'});
 
-                &update_selected("resolv-file", $action, \@sel, \%$dnsmconfig);
-            }
-        }
-    }
+    #             &update_selected("resolv-file", $action, \@sel, \%$dnsmconfig);
+    #         }
+    #     }
+    # }
+    &do_selected_action( [ "addn_hosts", "hostsdir", "resolv_file" ], \@sel, \%$dnsmconfig );
 }
 #
 # re-load basic page

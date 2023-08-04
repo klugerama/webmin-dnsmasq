@@ -15,7 +15,7 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-require 'dnsmasq-lib.pl';
+require "dnsmasq-lib.pl";
 
 my %access=&get_module_acl;
 
@@ -29,8 +29,10 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $returnto = $in{"returnto"} || "dns_servers.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+my $returnto = $in{"returnto"} || "dns_records.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_records_settings"};
+my $mode = $in{"mode"} || "basic";
+
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
 	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
@@ -51,50 +53,42 @@ my @sel = split(/\0/, $in{'sel'});
 if ($in{"submit"}) {
     &apply_simple_vals("dns", \@sel, "5");
 }
-elsif ($in{"new_server_domain"} ne "" || $in{"new_server_ip"} ne "") {
-    my $newval = "";
-    if ($in{"new_server_domain"} ne "") {
-        $newval .= "/" . $in{"new_server_domain"} . "/";
-    }
-    if ($in{"new_server_ip"} ne "") {
-        $newval .= $in{"new_server_ip"};
-    }
-    if ($in{"new_server_source"} ne "") {
-        $newval .= "," . $in{"new_server_source"};
-    }
-    &add_to_list("server", $newval);
+elsif ($in{"new_ipset_domain"} ne "" && $in{"new_ipset_ipset"} ne "" ) {
+    my $newval = "/" . $in{"new_ipset_domain"} . "/" . $in{"new_ipset_ipset"};
+    &add_to_list("ipset", $newval);
 }
-elsif ($in{"server_idx"} ne "") {
-    my $item = $dnsmconfig{"server"}[$in{"server_idx"}];
+elsif ($in{"ipset_idx"} ne "") {
+    my $item = $dnsmconfig{"ipset"}[$in{"ipset_idx"}];
     my $file_arr = &read_file_lines($item->{"file"});
-    my $newval = "server=";
-    if ($in{"server_domain"} ne "") {
-        $newval .= "/" . $in{"server_domain"} . "/";
+    my $val = "ipset=/" . $in{"ipset_domain"} . "/" . $in{"ipset_ipset"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
+}
+elsif ($in{"new_connmark_allowlist_connmark"} ne "" ) {
+    my $newval = $in{"new_connmark_allowlist_connmark"};
+    if ($in{"new_connmark_allowlist_mask"}) {
+        $newval .= "/" . $in{"new_connmark_allowlist_mask"};
     }
-    if ($in{"server_ip"} ne "") {
-        $newval .= $in{"server_ip"};
+    if ($in{"new_connmark_allowlist_pattern"}) {
+        $newval .= "," . $in{"new_connmark_allowlist_pattern"};
     }
-    if ($in{"server_source"} ne "") {
-        $newval .= "," . $in{"server_source"};
+    &add_to_list("connmark-allowlist", $newval);
+}
+elsif ($in{"connmark_allowlist_idx"} ne "") {
+    my $item = $dnsmconfig{"connmark_allowlist"}[$in{"connmark_allowlist_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "connmark-allowlist=" . $in{"connmark_allowlist_connmark"};
+    if ($in{"connmark_allowlist_mask"}) {
+        $val .= "/" . $in{"connmark_allowlist_mask"};
     }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
+    if ($in{"connmark_allowlist_pattern"}) {
+        $val .= "," . $in{"connmark_allowlist_pattern"};
+    }
+    &update($item->{"line"}, $val, \@$file_arr, 0);
     &flush_file_lines();
 }
 else {
-    my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
-    if ($action ne "") {
-        @sel || &error($text{'selected_none'});
-
-        &update_selected("server", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
-        if ($action ne "") {
-            @sel || &error($text{'selected_none'});
-
-            &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
-        }
-    }
+    &do_selected_action( [ "ipset", "connmark_allowlist" ], \@sel, \%$dnsmconfig );
 }
 
 #
@@ -102,7 +96,7 @@ else {
 &flush_file_lines();
 #
 # re-load basic page
-&redirect( $returnto );
+&redirect( $returnto . "?mode=" . $mode );
 
 # 
 # sub-routines

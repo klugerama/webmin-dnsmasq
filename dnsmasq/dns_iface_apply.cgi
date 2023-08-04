@@ -109,36 +109,37 @@ elsif ($in{"listen_address_idx"} ne "" && $in{"listen_address_val"} ne "") {
     &flush_file_lines();
 }
 else {
-    my $action = $in{"enable_sel_iface"} ? "enable" : $in{"disable_sel_iface"} ? "disable" : $in{"delete_sel_iface"} ? "delete" : "";
-    if ($action ne "") {
-        @sel || &error($text{'selected_none'});
+    # my $action = $in{"enable_sel_iface"} ? "enable" : $in{"disable_sel_iface"} ? "disable" : $in{"delete_sel_iface"} ? "delete" : "";
+    # if ($action ne "") {
+    #     @sel || &error($text{'selected_none'});
 
-        &update_selected("interface", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = $in{"enable_sel_except_iface"} ? "enable" : $in{"disable_sel_except_iface"} ? "disable" : $in{"delete_sel_except_iface"} ? "delete" : "";
-        if ($action ne "") {
-            @sel || &error($text{'selected_none'});
+    #     &update_selected("interface", $action, \@sel, \%$dnsmconfig);
+    # }
+    # else {
+    #     $action = $in{"enable_sel_except_iface"} ? "enable" : $in{"disable_sel_except_iface"} ? "disable" : $in{"delete_sel_except_iface"} ? "delete" : "";
+    #     if ($action ne "") {
+    #         @sel || &error($text{'selected_none'});
 
-            &update_selected("except-interface", $action, \@sel, \%$dnsmconfig);
-        }
-        else {
-            $action = $in{"enable_sel_no_dhcp_iface"} ? "enable" : $in{"disable_sel_no_dhcp_iface"} ? "disable" : $in{"delete_sel_no_dhcp_iface"} ? "delete" : "";
-            if ($action ne "") {
-                @sel || &error($text{'selected_none'});
+    #         &update_selected("except-interface", $action, \@sel, \%$dnsmconfig);
+    #     }
+    #     else {
+    #         $action = $in{"enable_sel_no_dhcp_iface"} ? "enable" : $in{"disable_sel_no_dhcp_iface"} ? "disable" : $in{"delete_sel_no_dhcp_iface"} ? "delete" : "";
+    #         if ($action ne "") {
+    #             @sel || &error($text{'selected_none'});
 
-                &update_selected("no-dhcp-interface", $action, \@sel, \%$dnsmconfig);
-            }
-            else {
-                $action = $in{"enable_sel_listen_address"} ? "enable" : $in{"disable_sel_listen_address"} ? "disable" : $in{"delete_sel_listen_address"} ? "delete" : "";
-                if ($action ne "") {
-                    @sel || &error($text{'selected_none'});
+    #             &update_selected("no-dhcp-interface", $action, \@sel, \%$dnsmconfig);
+    #         }
+    #         else {
+    #             $action = $in{"enable_sel_listen_address"} ? "enable" : $in{"disable_sel_listen_address"} ? "disable" : $in{"delete_sel_listen_address"} ? "delete" : "";
+    #             if ($action ne "") {
+    #                 @sel || &error($text{'selected_none'});
 
-                    &update_selected("listen-address", $action, \@sel, \%$dnsmconfig);
-                }
-            }
-        }
-    }
+    #                 &update_selected("listen-address", $action, \@sel, \%$dnsmconfig);
+    #             }
+    #         }
+    #     }
+    # }
+    &do_selected_action( [ "interface", "except_interface", "no_dhcp_interface", "listen_address" ], \@sel, \%$dnsmconfig );
 }
 
 # re-load iface page

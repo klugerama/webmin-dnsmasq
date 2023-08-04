@@ -15,27 +15,23 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-require 'dnsmasq-lib.pl';
+require "dnsmasq-lib.pl";
 
 my %access=&get_module_acl;
 
 ## put in ACL checks here if needed
 
-
-## sanity checks
-
-
-## Insert Output code here
-# read config file
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-# pass into data structure
+
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+
 # read posted data
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "dns_alias.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
     my $line="error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
@@ -117,36 +113,37 @@ elsif ($in{"address_idx"} ne "" && $in{"address_domain"} ne "") {
     &flush_file_lines();
 }
 else {
-    my $action = $in{"enable_sel_alias"} ? "enable" : $in{"disable_sel_alias"} ? "disable" : $in{"delete_sel_alias"} ? "delete" : "";
-    if ($action ne "") {
-        @sel || &error($text{'selected_none'});
+    # my $action = $in{"enable_sel_alias"} ? "enable" : $in{"disable_sel_alias"} ? "disable" : $in{"delete_sel_alias"} ? "delete" : "";
+    # if ($action ne "") {
+    #     @sel || &error($text{'selected_none'});
 
-        &update_selected("alias", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = $in{"enable_sel_bogus_nxdomain"} ? "enable" : $in{"disable_sel_bogus_nxdomain"} ? "disable" : $in{"delete_sel_bogus_nxdomain"} ? "delete" : "";
-        if ($action ne "") {
-            @sel || &error($text{'selected_none'});
+    #     &update_selected("alias", $action, \@sel, \%$dnsmconfig);
+    # }
+    # else {
+    #     $action = $in{"enable_sel_bogus_nxdomain"} ? "enable" : $in{"disable_sel_bogus_nxdomain"} ? "disable" : $in{"delete_sel_bogus_nxdomain"} ? "delete" : "";
+    #     if ($action ne "") {
+    #         @sel || &error($text{'selected_none'});
 
-            &update_selected("bogus-nxdomain", $action, \@sel, \%$dnsmconfig);
-        }
-        else {
-            $action = $in{"enable_sel_address"} ? "enable" : $in{"disable_sel_address"} ? "disable" : $in{"delete_sel_address"} ? "delete" : "";
-            if ($action ne "") {
-                @sel || &error($text{'selected_none'});
+    #         &update_selected("bogus-nxdomain", $action, \@sel, \%$dnsmconfig);
+    #     }
+    #     else {
+    #         $action = $in{"enable_sel_address"} ? "enable" : $in{"disable_sel_address"} ? "disable" : $in{"delete_sel_address"} ? "delete" : "";
+    #         if ($action ne "") {
+    #             @sel || &error($text{'selected_none'});
 
-                &update_selected("address", $action, \@sel, \%$dnsmconfig);
-            }
-            else {
-                $action = $in{"enable_sel_ignore_address"} ? "enable" : $in{"disable_sel_ignore_address"} ? "disable" : $in{"delete_sel_ignore_address"} ? "delete" : "";
-                if ($action ne "") {
-                    @sel || &error($text{'selected_none'});
+    #             &update_selected("address", $action, \@sel, \%$dnsmconfig);
+    #         }
+    #         else {
+    #             $action = $in{"enable_sel_ignore_address"} ? "enable" : $in{"disable_sel_ignore_address"} ? "disable" : $in{"delete_sel_ignore_address"} ? "delete" : "";
+    #             if ($action ne "") {
+    #                 @sel || &error($text{'selected_none'});
 
-                    &update_selected("ignore-address", $action, \@sel, \%$dnsmconfig);
-                }
-            }
-        }
-    }
+    #                 &update_selected("ignore-address", $action, \@sel, \%$dnsmconfig);
+    #             }
+    #         }
+    #     }
+    # }
+    &do_selected_action( [ "alias", "bogus_nxdomain", "address", "ignore_address" ], \@sel, \%$dnsmconfig );
 }
 
 #

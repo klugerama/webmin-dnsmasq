@@ -23,7 +23,6 @@ my %access=&get_module_acl;
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
@@ -31,13 +30,17 @@ my %dnsmconfig = ();
 
 my $returnto = $in{"returnto"} || "dhcp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+my $apply_cgi = "dhcp_basic_apply.cgi";
 
 my @page_fields = ();
 foreach my $configfield ( @confdhcp ) {
     next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "1" );
     push( @page_fields, $configfield );
 }
-&show_basic_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, "dhcp_basic_apply.cgi", $text{"index_dhcp_settings_basic"} );
+
+&show_basic_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi, $text{"index_dhcp_settings_basic"} );
+
+&show_other_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi, " " );
 
 &ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
 

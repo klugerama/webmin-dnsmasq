@@ -34,6 +34,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dns_auth.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
+my $apply_cgi = "dns_auth_apply.cgi";
 
 my @page_fields = ();
 foreach my $configfield ( @confdns ) {
@@ -41,9 +42,9 @@ foreach my $configfield ( @confdns ) {
     push( @page_fields, $configfield );
 }
 
-&show_basic_fields( \%dnsmconfig, "dns_auth", \@page_fields, "dns_auth_apply.cgi", $text{"index_basic"} );
+&show_basic_fields( \%dnsmconfig, "dns_auth", \@page_fields, $apply_cgi, $text{"index_basic"} );
 
-&show_other_fields( \%dnsmconfig, "dns_auth", \@page_fields, "dns_auth_apply.cgi", " " );
+&show_other_fields( \%dnsmconfig, "dns_auth", \@page_fields, $apply_cgi, " " );
 
 print &add_js();
 

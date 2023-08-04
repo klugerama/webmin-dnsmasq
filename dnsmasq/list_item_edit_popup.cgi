@@ -23,17 +23,100 @@ require 'dnsmasq-lib.pl';
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-# my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &ReadParse(undef, undef, 2);
 
-my $internalfield = $in{"internalfield"};
+our $internalfield = $in{"internalfield"};
 my $title = $in{"title"};
-my $formid = $in{"formid"};
-my $action = $in{"action"};
-my $idx = $in{"idx"};
+our $formid = $in{"formid"};
+our $action = $in{"action"};
+our $idx = $in{"idx"};
+our $configfield = &internal_to_config("$internalfield");
+our $tddoc = 'colspan=2 style="text-align: left; padding-right: 5px; word-break: break-word; overflow-wrap: break-word;"';
+our $tdlabel = 'style="min-width: 100px; width: 100px !important; text-align: right; padding-right: 5px;"';
+our $tdinput = 'style="min-width: 100px; width: 100px !important; padding-left: 5px !important;"';
+our @doctd = ( $tddoc );
+our @tds = ( $tdlabel, $tdinput );
+our $item;
+our %val;
+our $fieldname_prefix = ( $action eq "add" ? "new_" : "" ) . $internalfield . "_";
+
+sub formtable_ip4 {
+    my ($fieldname_prefix) = @_;
+    
+    my $formtable = "";
+    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_4_input_form\" onSubmit=\"save('".$internalfield."_4_input_form'); return false;\"");
+    $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 4);
+    if ($action eq "edit") {
+        $item = $dnsmconfig{$configfield}[$idx];
+        %val = %{ $item->{"val"} };
+        $formtable .= &ui_hidden($fieldname_prefix . "idx", $idx);
+    }
+    $formtable .= &ui_columns_start( [ undef, undef ], 100);
+    $formtable .= &generate_param_rows(6);
+    $formtable .= &ui_columns_end();
+    $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    my @form_buttons = ();
+    push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel", undef, "style='display:inline; float:right;' onClick='top.close(); return false;'" ) );
+    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_4", undef, "style='display:inline !important; float:right;' onClick='\$(\"#".$internalfield."_input_form\").submit(); return false;'" ) );
+    $formtable .= &ui_form_end( \@form_buttons );
+    return $formtable;
+}
+
+sub formtable_ip6 {
+    my ($fieldname_prefix) = @_;
+    
+    my $formtable = "";
+    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_6_input_form\" onSubmit=\"save('".$internalfield."_6_input_form'); return false;\"");
+    $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 6);
+    if ($action eq "edit") {
+        $item = $dnsmconfig{$configfield}[$idx];
+        %val = %{ $item->{"val"} };
+        $formtable .= &ui_hidden($fieldname_prefix . "idx", $idx);
+    }
+    $formtable .= &ui_columns_start( [ undef, undef ], 100);
+    $formtable .= &generate_param_rows(4);
+    $formtable .= &ui_columns_end();
+    $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    my @form_buttons = ();
+    push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel", undef, "style='display:inline; float:right;' onClick='top.close(); return false;'" ) );
+    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_6", undef, "style='display:inline !important; float:right;' onClick='\$(\"#".$internalfield."_input_form\").submit(); return false;'" ) );
+    $formtable .= &ui_form_end( \@form_buttons );
+    return $formtable;
+}
+
+sub generate_param_rows {
+    my ($ipversionfilter) = @_;
+
+    my $rows = "";
+    my $fielddefinition = %configfield_fields{$internalfield};
+    foreach my $param ( @{ $fielddefinition->{"param_order"} }) {
+        my $paramdefinition = $fielddefinition->{$param};
+        next if ($ipversionfilter && ($paramdefinition->{"ipversion"} eq "$ipversionfilter" || $paramdefinition->{"ipversion"} == $ipversionfilter));
+        my $tmpl = $ipversionfilter == 4 && $paramdefinition->{"template6"} ? $paramdefinition->{"template6"} : $paramdefinition->{"template"};
+        my $label = $paramdefinition->{"label"} || $text{"p_label_" . $internalfield . "_" . $param};
+        if ($paramdefinition->{"required"}) {
+            $label .= "&nbsp;<span color='red'>*</span>&nbsp;";
+        }
+        my $input;
+        if ($paramdefinition->{"valtype"} eq "bool") {
+            $input = &ui_checkbox($fieldname_prefix . $param, "1", "", $val{$param});
+        }
+        else {
+            if ( $paramdefinition->{"arr"} == 1 ) {
+                $input = &ui_textbox($fieldname_prefix . $param, join($paramdefinition->{"sep"}, @{$val{$param}}), $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"");
+            }
+            else {
+                # $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}) ];
+                $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"");
+            }
+        }
+        $rows .= &ui_columns_row( [ $label, $input ], \@tds );
+    }
+    return $rows;
+}
 
 # my $headstuff = $base_headstuff;
 my $headstuff = "<script type='text/javascript'>\n"
@@ -42,98 +125,93 @@ my $headstuff = "<script type='text/javascript'>\n"
     . "      \$( \".opener_table_cell_style_small\" ).removeClass(\"opener_table_cell_style_small\");\n"
     . "    },10);\n"
     . "  });\n"
-    . "  function save() {\n"
+    . "  function save(formname) {\n"
     . "    let vals=[];\n"
-    . "    \$(\"#".$internalfield."_input_form\").find(\":input\").each(function(){\n"
+    . "    \$(\"#\"+formname).find(\":input\").each(function(){\n"
+    . "      if (\$(this).prop('type') == 'checkbox' && !\$(this).is(':checked')) return;\n"
     . "      let o={};\n"
-    . "      o['f']=\$(this).attr('name');\n"
+    . "      o['f']=\$(this).prop('name');\n"
     . "      o['v']=\$(this).val();\n"
     . "      vals.push(o);\n"
     . "    });\n"
-    . "    top.opener.submit_" . ( $action eq "add" ? "new_" : "" ) . "$formid(vals);\n"
+    . "    top.opener.submit_" . ( $action eq "add" ? "new_" : "" ) . $formid . "(vals);\n"
     . "    top.close();\n"
     . "  }\n"
     . "</script>\n";
+
 # &popup_header($title, $headstuff);
 # header(title, image, [help], [config], [nomodule], [nowebmin], [rightside], [head-stuff], [body-stuff], [below])
 &header($title, undef, undef, 0, 1, 1, undef, $headstuff);
-print &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_input_form\" onSubmit=\"save(); return false;\"");
-my $tddoc = 'colspan=2 style="text-align: left; padding-right: 5px; word-break: break-word; overflow-wrap: break-word;"';
-my $tdlabel = 'style="min-width: 100px; width: 100px !important; text-align: right; padding-right: 5px;"';
-my $tdinput = 'style="min-width: 100px; width: 100px !important; padding-left: 5px !important;"';
-my @doctd = ( $tddoc );
-my @tds = ( $tdlabel, $tdinput );
-print &ui_columns_start( [ undef, undef ], 100);
-my $item;
-my %val;
-my $fieldname_prefix = ( $action eq "add" ? "new_" : "" ) . $internalfield . "_";
-if ($action eq "edit") {
-    my $configfield = &internal_to_config("$internalfield");
-    $item = $dnsmconfig{$configfield}[$idx];
-    %val = %{ $item->{"val"} };
-    print &ui_hidden($fieldname_prefix . "idx", $idx);
-}
-# my $desc = &ui_hidden_start($text{"description"} . "<img src='images/down.gif' border=0 />", "mandesc", 0, "list_item_edit_popup.cgi");
-my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_popup.cgi");
-$desc .= $text{"p_man_desc_" . $internalfield};
-$desc .= &ui_hidden_end("mandesc");
-print &ui_columns_row( [ $desc ], \@doctd );
 
-if ($internalfield eq "dhcp_vendorclass") {
-    print &ui_columns_row( [ $text{"p_label_val_set_tag"} . "  ", &ui_textbox($fieldname_prefix . "tag", $val{"tag"}, 5) ], \@tds );
-    print &ui_columns_row( [ $text{"vendorclass"} . "  ", &ui_textbox($fieldname_prefix . "vendorclass", $val{"vendorclass"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "dhcp_userclass") {
-    print &ui_columns_row( [ $text{"p_label_val_set_tag"} . "  ", &ui_textbox($fieldname_prefix . "tag", $val{"tag"}, 5) ], \@tds );
-    print &ui_columns_row( [ $text{"userclass"} . "  ", &ui_textbox($fieldname_prefix . "userclass", $val{"userclass"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "server") {
-    print &ui_columns_row( [ $text{"domain"}, &ui_textbox($fieldname_prefix . "domain", join("/", @{$val{"domain"}}), 10) ], \@tds );
-    print &ui_columns_row( [ $text{"ip_address"}, &ui_textbox($fieldname_prefix . "ip", $val{"ip"}, 10) ], \@tds );
-    print &ui_columns_row( [ $text{"source"}, &ui_textbox($fieldname_prefix . "source", $val{"source"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "rev_server") {
-    print &ui_columns_row( [ $text{"domain"}, &ui_textbox($fieldname_prefix . "domain", join("/", @{$val{"domain"}}), 10) ], \@tds );
-    print &ui_columns_row( [ $text{"ip_address"}, &ui_textbox($fieldname_prefix . "ip", $val{"ip"}, 10) ], \@tds );
-    print &ui_columns_row( [ $text{"source"}, &ui_textbox($fieldname_prefix . "source", $val{"source"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "listen_address") {
-    print &ui_columns_row( [ $text{"p_label_listen_address"}, &ui_textbox($fieldname_prefix . "listen_address_val", $item->{"val"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "alias") {
-    print &ui_columns_row( [ $text{"from_ip"}, &ui_textbox($fieldname_prefix . "from", $val{"from"}, 15) ], \@tds );
-    print &ui_columns_row( [ $text{"to_ip"}, &ui_textbox($fieldname_prefix . "to", $val{"to"}, 10) ], \@tds );
-    print &ui_columns_row( [ $text{"netmask"}, &ui_textbox($fieldname_prefix . "netmask", $val{"netmask"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "bogus_nxdomain") {
-    print &ui_columns_row( [ $text{"ip_address"}, &ui_textbox($fieldname_prefix . "ip", $val{"addr"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "address") {
-    print &ui_columns_row( [ $text{"domain"}, &ui_textbox($fieldname_prefix . "domain", $val{"domain"}, 10) ], \@tds );
-    print &ui_columns_row( [ $text{"ip_address"}, &ui_textbox($fieldname_prefix . "addr", $val{"addr"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "ignore_address") {
-    print &ui_columns_row( [ $text{"ip_address"}, &ui_textbox($fieldname_prefix . "ip", $val{"ip"}, 10) ], \@tds );
-}
-elsif ($internalfield eq "domain") {
-    print &ui_columns_row( [ $text{"domain_name"}, &ui_textbox($fieldname_prefix . "domain", $val{"domain"}, 10) ], \@tds );
-    print &ui_columns_row( [ $text{"subnet"}, &ui_textbox($fieldname_prefix . "subnet", $val{"subnet"}, 10) ], \@tds );
-    print &ui_columns_row( [ $text{"range"}, &ui_textbox($fieldname_prefix . "range", $val{"range"}, 10) ], \@tds );
+if ($internalfield eq "dhcp_range") {
+    my $ipversion = $in{"ipversion"} || "ip4";
+    print &ui_columns_start( [ "", "" ], 100);
+    # my $desc = &ui_hidden_start($text{"description"} . "<img src='images/down.gif' border=0 />", "mandesc", 0, "list_item_edit_popup.cgi");
+    my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_popup.cgi");
+    my $descstring = $text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr; 
+    $desc .= $descstring;
+    $desc .= &ui_hidden_end("mandesc");
+    print &ui_columns_row( [ $desc ], \@doctd );
+    if ($action eq "edit") {
+        if ($ipversion eq "ip4") {
+            print &ui_columns_row( [ &formtable_ip4($fieldname_prefix) ], [ "colspan=2 style=\"text-align: left; width: auto;\"" ] );
+        }
+        else {
+            print &ui_columns_row( [ &formtable_ip6($fieldname_prefix) ], [ "colspan=2 style=\"text-align: left; width: auto;\"" ] );
+        }
+    }
+    else {
+
+        my @tabs = ( [ 'ip4', $text{"dhcp_ipversion4"} ],
+                    [ 'ip6', $text{"dhcp_ipversion6"} ] );
+        $tabrow .= &ui_tabs_start(\@tabs, "ipversion", $ipversion);
+
+        $tabrow .= &ui_tabs_start_tab("ipversion", 'ip4');
+        $tabrow .= &formtable_ip4($fieldname_prefix);
+        $tabrow .= &ui_tabs_end_tab("ipversion", 'ip4');
+
+        $tabrow .= &ui_tabs_start_tab("ipversion", 'ip6');
+        $tabrow .= &formtable_ip6($fieldname_prefix);
+        $tabrow .= &ui_tabs_end_tab("ipversion", 'ip6');
+        $tabrow .= &ui_tabs_end();
+
+        print &ui_columns_row( [ $tabrow ], [ "colspan=2 style=\"text-align: left; width: auto;\"" ] );
+    }
+    print &ui_columns_end();
 }
 else {
-    my $definition = %configfield_fields{$internalfield};
-    foreach my $key ( @{ $definition->{"param_order"} }) {
-        print &ui_columns_row( [ $text{"p_label_" . $internalfield . "_" . $key}, &ui_textbox($fieldname_prefix . $key, $val{$key}, $definition->{$key}->{"length"}) ], \@tds );
+    print &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_input_form\" onSubmit=\"save('".$internalfield."_input_form'); return false;\"");
+    if ($action eq "edit") {
+        $item = $dnsmconfig{$configfield}[$idx];
+        %val = %{ $item->{"val"} };
+        print &ui_hidden($fieldname_prefix . "idx", $idx);
     }
+    print &ui_columns_start( [ undef, undef ], 100);
+    # my $desc = &ui_hidden_start($text{"description"} . "<img src='images/down.gif' border=0 />", "mandesc", 0, "list_item_edit_popup.cgi");
+    my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_popup.cgi");
+    $desc .= $text{"p_man_desc_" . $internalfield};
+    $desc .= &ui_hidden_end("mandesc");
+    print &ui_columns_row( [ $desc ], \@doctd );
+    if ($in{"ipversion"} eq "ip6") {
+        print &generate_param_rows(4);
+    }
+    elsif ($in{"ipversion"} eq "ip4") {
+        print &generate_param_rows(6);
+    }
+    else {
+        print &generate_param_rows();
+    }
+    print &ui_table_end();
+    print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    my @form_buttons = ();
+    push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel", undef, "style='display:inline; float:right;' onClick='top.close(); return false;'" ) );
+    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='display:inline !important; float:right;' onClick='\$(\"#".$internalfield."_input_form\").submit(); return false;'" ) );
+    print &ui_form_end( \@form_buttons );
 }
 # elsif ($internalfield eq "") {
 #     print &ui_columns_row( [ $text{""}, &ui_textbox($fieldname_prefix . "fieldname", $val{""}, 10) ], \@tds );
 # }
-my @form_buttons = ();
-push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel", undef, "style='display:inline; float:right;' onClick='top.close(); return false;'" ) );
-push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='display:inline !important; float:right;' onClick='\$(\"#".$internalfield."_input_form\").submit(); return false;'" ) );
-print &ui_table_end();
-print &ui_form_end( \@form_buttons );
+
 &footer();
 
 ### END of list_item_edit_popup.cgi ###.

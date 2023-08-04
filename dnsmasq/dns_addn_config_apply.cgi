@@ -25,7 +25,6 @@ my %access=&get_module_acl;
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-# my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
@@ -84,25 +83,26 @@ elsif (@conf_dir_adds) {
     }
 }
 else {
-    $action = $in{"enable_sel_conf_file"} ? "enable" : $in{"disable_sel_conf_file"} ? "disable" : $in{"delete_sel_conf_file"} ? "delete" : "";
-    if ($action ne "") {
-        @sel || &error($text{'selected_none'});
-        &update_selected("conf-file", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = $in{"enable_sel_servers_file"} ? "enable" : $in{"disable_sel_servers_file"} ? "disable" : $in{"delete_sel_servers_file"} ? "delete" : "";
-        if ($action ne "") {
-            @sel || &error($text{'selected_none'});
-            &update_selected("servers-file", $action, \@sel, \%$dnsmconfig);
-        }
-        else {
-            $action = $in{"enable_sel_conf_dir"} ? "enable" : $in{"disable_sel_conf_dir"} ? "disable" : $in{"delete_sel_conf_dir"} ? "delete" : "";
-            if ($action ne "") {
-                @sel || &error($text{'selected_none'});
-                &update_selected("conf-dir", $action, \@sel, \%$dnsmconfig);
-            }
-        }
-    }
+    # $action = $in{"enable_sel_conf_file"} ? "enable" : $in{"disable_sel_conf_file"} ? "disable" : $in{"delete_sel_conf_file"} ? "delete" : "";
+    # if ($action ne "") {
+    #     @sel || &error($text{'selected_none'});
+    #     &update_selected("conf-file", $action, \@sel, \%$dnsmconfig);
+    # }
+    # else {
+    #     $action = $in{"enable_sel_servers_file"} ? "enable" : $in{"disable_sel_servers_file"} ? "disable" : $in{"delete_sel_servers_file"} ? "delete" : "";
+    #     if ($action ne "") {
+    #         @sel || &error($text{'selected_none'});
+    #         &update_selected("servers-file", $action, \@sel, \%$dnsmconfig);
+    #     }
+    #     else {
+    #         $action = $in{"enable_sel_conf_dir"} ? "enable" : $in{"disable_sel_conf_dir"} ? "disable" : $in{"delete_sel_conf_dir"} ? "delete" : "";
+    #         if ($action ne "") {
+    #             @sel || &error($text{'selected_none'});
+    #             &update_selected("conf-dir", $action, \@sel, \%$dnsmconfig);
+    #         }
+    #     }
+    # }
+    &do_selected_action( [ "conf_file", "servers_file", "conf_dir" ], \@sel, \%$dnsmconfig );
 }
 #
 # re-load additional config files page

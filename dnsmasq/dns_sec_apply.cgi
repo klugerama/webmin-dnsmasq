@@ -88,20 +88,21 @@ elsif ($in{"server_idx"} ne "") {
     &flush_file_lines();
 }
 else {
-    my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
-    if ($action ne "") {
-        @sel || &error($text{'selected_none'});
+    # my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
+    # if ($action ne "") {
+    #     @sel || &error($text{'selected_none'});
 
-        &update_selected("server", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
-        if ($action ne "") {
-            @sel || &error($text{'selected_none'});
+    #     &update_selected("server", $action, \@sel, \%$dnsmconfig);
+    # }
+    # else {
+    #     $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
+    #     if ($action ne "") {
+    #         @sel || &error($text{'selected_none'});
 
-            &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
-        }
-    }
+    #         &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
+    #     }
+    # }
+    &do_selected_action( [ "server", "rev_server" ], \@sel, \%$dnsmconfig );
 }
 
 #

@@ -30,6 +30,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dns_sec.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_sec_settings"};
+my $apply_cgi = "dns_sec_apply.cgi";
 
 my @page_fields = ();
 foreach my $configfield ( @confdns ) {
@@ -40,7 +41,7 @@ foreach my $configfield ( @confdns ) {
 sub show_dnssec() {
     my $formid = "dns_sec_form";
 
-    print &ui_form_start( "dns_sec_apply.cgi", "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     my @tds = ( $td_label, $td_left, $td_left, $td_left, $td_left, $td_left );
     print &ui_columns_start( [
         "",
@@ -67,7 +68,7 @@ sub show_dnssec() {
 
 }
 
-&show_basic_fields( \%dnsmconfig, "dns_sec", \@page_fields, "dns_sec_apply.cgi", $text{"index_dns_sec"} );
+&show_basic_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, $text{"index_dns_sec"} );
 
 &show_dnssec();
 print &add_js();

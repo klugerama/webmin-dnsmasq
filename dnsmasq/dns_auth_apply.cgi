@@ -98,7 +98,7 @@ if ($in{"submit"}) {
         my $item = $dnsmconfig{"auth-soa"};
         my $file_arr = &read_file_lines($item->{"file"});
         my $val = "auth-soa=" . $in{"auth_soa_serial"};
-        foreach my $p ( [ "hostmaster", "refresh", "retry", "expiry" ] ) {
+        foreach my $p ( "hostmaster", "refresh", "retry", "expiry" ) {
             if ($in{"auth_soa_$p"}) {
                 $val .= "," . $in{"auth_soa_$p"};
             }
@@ -187,20 +187,21 @@ elsif ($in{"auth_soa_serial"} ne "") { # =<serial>[,<hostmaster>[,<refresh>[,<re
     &flush_file_lines();
 }
 else {
-    my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
-    if ($action ne "") {
-        @sel || &error($text{'selected_none'});
+    # my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
+    # if ($action ne "") {
+    #     @sel || &error($text{'selected_none'});
 
-        &update_selected("server", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
-        if ($action ne "") {
-            @sel || &error($text{'selected_none'});
+    #     &update_selected("server", $action, \@sel, \%$dnsmconfig);
+    # }
+    # else {
+    #     $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
+    #     if ($action ne "") {
+    #         @sel || &error($text{'selected_none'});
 
-            &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
-        }
-    }
+    #         &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
+    #     }
+    # }
+    &do_selected_action( [ "server", "rev_server" ], \@sel, \%$dnsmconfig );
 }
 
 #

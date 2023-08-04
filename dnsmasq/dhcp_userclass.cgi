@@ -31,6 +31,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dhcp_userclass.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_userclass"};
+my $apply_cgi = "dhcp_userclass_apply.cgi";
 
 my $formid = "userclass_form";
 my $internalfield = "dhcp_userclass";
@@ -43,7 +44,7 @@ push(@list_link_buttons, $add_new_button);
 
 my $count;
 $count=0;
-print &ui_form_start( "dhcp_userclass_apply.cgi", "post", undef, "id=\"$formid\"" );
+print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
 print &ui_links_row(\@list_link_buttons);
 
 print $hidden_add_input_fields . $add_new_script;

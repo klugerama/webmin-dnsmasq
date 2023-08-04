@@ -23,7 +23,6 @@ my %access=&get_module_acl;
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
@@ -31,14 +30,14 @@ my %dnsmconfig = ();
 
 my $returnto = $in{"returnto"} || "dns_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
-
+my $apply_cgi = "dns_basic_apply.cgi";
 
 sub show_addn_hosts {
     my $internalfield = "addn_hosts";
     my $configfield = &internal_to_config($internalfield);
     my $count=0;
     my $formid = $internalfield . "_form";
-    my $g = &ui_form_start( 'dns_basic_apply.cgi', "post", undef, "id='$formid'" );
+    my $g = &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     my @list_link_buttons = &list_links( "sel", 2 );
     my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"_hostsfile"}), "new_" . $internalfield . "_file", 0, $formid );
     $g .= &ui_links_row(\@list_link_buttons);
@@ -78,7 +77,7 @@ sub show_hostsdir {
     my $configfield = &internal_to_config($internalfield);
     my $count=0;
     my $formid = $internalfield . "_form";
-    my $g = &ui_form_start( 'dns_basic_apply.cgi', "post", undef, "id='$formid'" );
+    my $g = &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     my @list_link_buttons = &list_links( "sel", 2);
     my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"_hostsdir"}), "new_" . $internalfield . "_dir", 1, $formid );
     $g .= &ui_links_row(\@list_link_buttons);
@@ -118,7 +117,7 @@ sub show_resolv_file {
     my $configfield = &internal_to_config($internalfield);
     my $count=0;
     my $formid = $internalfield . "_form";
-    my $g = &ui_form_start( 'dns_basic_apply.cgi', "post", undef, "id='$formid'" );
+    my $g = &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     my @list_link_buttons = &list_links( "sel", 3 );
     my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"_resolvfile"}), "new_" . $internalfield . "_file", 0, $formid );
     $g .= &ui_links_row(\@list_link_buttons);

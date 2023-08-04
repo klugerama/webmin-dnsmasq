@@ -30,6 +30,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dns_alias.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_alias_settings"};
+my $apply_cgi = "dns_alias_apply.cgi";
 
 sub show_alias {
     my @edit_link = ( "", "", "" );
@@ -48,15 +49,15 @@ sub show_alias {
     my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
 
     my $count=0;
-    print &ui_form_start( "dns_alias_apply.cgi", "post", undef, "id=\"$formid\"" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
     print $hidden_add_input_fields . $add_new_script;
     print &ui_columns_start( [ 
         "",
         $text{"enabled"},
-        $text{"from_ip"},
-        $text{"to_ip"},
-        $text{"netmask"},
+        $text{"p_label_val_start_ip_address"},
+        $text{"p_label_val_end_ip_address"},
+        $text{"p_label_val_netmask"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=5' ] ), 1 );
     foreach my $alias ( @{$dnsmconfig{$configfield}} ) {
         local %val = %{ $alias->{"val"} };
@@ -236,11 +237,11 @@ my $mode = $in{mode} || "basic";
 print ui_tabs_start(\@tabs, 'mode', $mode);
 
 print ui_tabs_start_tab('mode', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_alias", \@page_fields, "dns_alias_apply.cgi", $text{"index_dns_alias"} );
+&show_basic_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi, $text{"index_dns_alias"} );
 print ui_tabs_end_tab('mode', 'basic');
 
 print ui_tabs_start_tab('mode', 'other');
-&show_other_fields( \%dnsmconfig, "dns_alias", \@page_fields, "dns_alias_apply.cgi", $text{"index_other"} );
+&show_other_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi, $text{"index_other"} );
 print ui_tabs_end_tab('mode', 'other');
 
 print ui_tabs_start_tab('mode', 'alias');

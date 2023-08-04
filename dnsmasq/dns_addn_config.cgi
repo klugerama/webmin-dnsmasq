@@ -23,7 +23,6 @@ my %access=&get_module_acl;
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
@@ -31,14 +30,15 @@ my %dnsmconfig = ();
 
 my $returnto = $in{"returnto"} || "dns_addn_config.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_addn_config"};
+my $apply_cgi = "dns_addn_config_apply.cgi";
 
 sub show_conf_file {
     my $count=0;
     my $internalfield = "conf_file";
     my $configfield = &internal_to_config($internalfield);
-    my $definition = %configfield_fields{$internalfield}->{"filename"};
+    my $definition = %configfield_fields{$internalfield};
     my $formid = "addnconf_" . $internalfield . "_form";
-    print &ui_form_start( 'dns_addn_config_apply.cgi', "post", undef, "id=\"$formid\"" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
     # @list_link_buttons = &list_links( "sel", 0, "dns_addn_config_apply.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
     @list_link_buttons = &list_links( "sel", 0 );
     my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"filename"}), "new_" . $internalfield, 0, $formid );
@@ -56,7 +56,7 @@ sub show_conf_file {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local @cols;
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
-        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"filename"}, $definition->{"length"}, 0, undef, "idx=\"$count\"") );
+        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"filename"}, $definition->{"filename"}->{"length"}, 0, undef, "idx=\"$count\"") );
         print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $configfield, 0 );
         $count++;
 
@@ -78,9 +78,9 @@ sub show_servers_file {
     my $count=0;
     my $internalfield = "servers_file";
     my $configfield = &internal_to_config($internalfield);
-    my $definition = %configfield_fields{$internalfield}->{"filename"};
+    my $definition = %configfield_fields{$internalfield};
     my $formid = "addnconf_" . $internalfield . "_form";
-    print &ui_form_start( 'dns_addn_config_apply.cgi', "post", undef, "id=\"$formid\"" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
     # @list_link_buttons = &list_links( "sel", 1, "dns_addn_config_apply.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
     @list_link_buttons = &list_links( "sel", 1 );
     my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"filename"}), "new_" . $internalfield, 0, $formid );
@@ -101,7 +101,7 @@ sub show_servers_file {
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # push ( @cols, $edit );
-        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"filename"}, $definition->{"length"}, 0, undef, "idx=\"$count\"") );
+        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"filename"}, $definition->{"filename"}->{"length"}, 0, undef, "idx=\"$count\"") );
         # print &ui_checked_columns_row( \@cols, undef, "sel", $count );
         print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $configfield, 0 );
         $count++;
@@ -127,11 +127,11 @@ sub show_conf_dir {
     my $count=0;
     my $internalfield = "conf_dir";
     my $configfield = &internal_to_config($internalfield);
-    my $definition = %configfield_fields{$internalfield}->{"dirname"};
+    my $definition = %configfield_fields{$internalfield};
     my $formid = "addnconf_" . $internalfield . "_form";
     my @newfields = ( "dirname", "filter", "exceptions" );
     my @editfields = ( "idx", @newfields );
-    print &ui_form_start( 'dns_addn_config_apply.cgi', "post", undef, "id=\"$formid\"" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
     # @list_link_buttons = &list_links( "sel", 2, "dns_addn_config_edit.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
     my $w = 500;
     my $h = 505;
@@ -159,7 +159,7 @@ sub show_conf_dir {
         # my $edit = "<a href=dns_addn_config_edit.cgi?idx=$count>".$confdir->{"val"}->{"dirname"}."</a>";
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # push ( @cols, $edit );
-        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"dirname"}, $definition->{"length"}, 0, undef, "idx=\"$count\"", 1) );
+        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"dirname"}, $definition->{"dirname"}->{"length"}, 0, undef, "idx=\"$count\"", 1) );
         # push ( @cols, $item->{"val"}->{"filter"} );
         # push ( @cols, $item->{"val"}->{"exceptions"} );
         push ( @cols, $edit_link[0] );

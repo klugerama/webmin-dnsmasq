@@ -23,11 +23,12 @@ my %access=&get_module_acl;
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
-my %dnsmconfig = ();
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_tftp_settings_basic"});
+
+my $apply_cgi = "tftp_basic_apply.cgi";
 
 my @page_fields = ();
 foreach my $configfield ( @conft_b_p ) {
@@ -35,9 +36,9 @@ foreach my $configfield ( @conft_b_p ) {
     push( @page_fields, $configfield );
 }
 
-&show_basic_fields( \%dnsmconfig, "tftp_basic", \@page_fields, "tftp_basic_apply.cgi", $text{"index_tftp_settings_basic"} );
+&show_basic_fields( \%dnsmconfig, "tftp_basic", \@page_fields, $apply_cgi, $text{"index_tftp_settings_basic"} );
 
-&show_other_fields( \%dnsmconfig, "tftp_basic", \@page_fields, "tftp_basic_apply.cgi", " " );
+&show_other_fields( \%dnsmconfig, "tftp_basic", \@page_fields, $apply_cgi, " " );
 
 &ui_print_footer("index.cgi?mode=tftp", $text{"index_tftp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
 

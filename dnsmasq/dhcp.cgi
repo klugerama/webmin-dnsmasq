@@ -46,7 +46,7 @@ sub show_dhcp_settings {
             "page" => 4
         },
         {
-            "link" => "dhcp_ranges.cgi",
+            "link" => "dhcp_range.cgi",
             "title" => $text{"index_dhcp_range"},
             "icon" => "ranges.gif",
             "page" => 5

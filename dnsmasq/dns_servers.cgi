@@ -30,6 +30,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dns_servers.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_servers"};
+my $apply_cgi = "dns_servers_apply.cgi";
 
 sub show_server {
     my $formid = "dns_upstream_servers_form";
@@ -42,7 +43,7 @@ sub show_server {
     push(@list_link_buttons, $button);
 
     my $count=0;
-    print &ui_form_start( "dns_servers_apply.cgi", "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
     my @edit_link = ( "", "", "" );
     my $w = 700;
@@ -99,7 +100,7 @@ sub show_rev_server {
     push(@list_link_buttons, $button);
 
     my $count=0;
-    print &ui_form_start( "dns_servers_apply.cgi", "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
     my $edit_link = ( "", "", "" );
     my $w = 700;
@@ -155,8 +156,8 @@ foreach my $configfield ( @confdns ) {
     next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "2" );
     push( @page_fields, $configfield );
 }
-&show_basic_fields( \%dnsmconfig, "dns_servers", \@page_fields, "dns_servers_apply.cgi", $text{"index_dns_servers"} );
-&show_other_fields( \%dnsmconfig, "dns_servers", \@page_fields, "dns_servers_apply.cgi", $text{"index_dns_servers"} );
+&show_basic_fields( \%dnsmconfig, "dns_servers", \@page_fields, $apply_cgi, $text{"index_dns_servers"} );
+&show_other_fields( \%dnsmconfig, "dns_servers", \@page_fields, $apply_cgi, $text{"index_dns_servers"} );
 print ui_tabs_end_tab('mode', 'basic');
 
 print ui_tabs_start_tab('mode', 'server');

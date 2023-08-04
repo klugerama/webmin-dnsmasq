@@ -5,6 +5,7 @@
 #
 
 BEGIN { push(@INC, ".."); };
+use POSIX 'ceil';
 use WebminCore;
 init_config();
 our %access = &get_module_acl();
@@ -852,7 +853,7 @@ sub add_interface_chooser_button {
     return ($iface_chooser_button, $hidden_input_fields, $submit_script);
 }
 
-=head2 edit_item_popup_window_link(url, internalfield, formid, link_text, width, height, [scrollbars], field-mappings)
+=head2 edit_item_popup_window_link(url, internalfield, formid, link_text, width, height[, scrollbars])
     Returns HTML for a link that will popup, hidden fields, and some JS to handle it 
     for a simple edit window of some kind.
         url - Base URL of the popup window's contents
@@ -869,7 +870,11 @@ sub edit_item_popup_window_link {
 
     my $sep = $url =~ /\?/ ? "&" : "?";
     $url .= $sep . "internalfield=$internalfield";
-    $url .= "&formid=$formid";
+    $url .= "&formid=" . $formid;
+
+    if ($link_text eq "") {
+        $link_text = "<span style='color: #595959 !important; font-style: italic;'>" . $text{"empty_value"} . "</span>"
+    }
 
     my $link = "<span onClick='";
     $link .= "var h = $h;var w = $w;var left = (window.innerWidth/2)-(w/2);var top = (window.innerHeight/2)-(h/2);";
@@ -879,7 +884,7 @@ sub edit_item_popup_window_link {
     return $link;
 }
 
-=head2 edit_item_link(link_text, internalfield, title, idx, formid, width, height, field-mappings)
+=head2 edit_item_link(link_text, internalfield, title, idx, formid, width, height, field-mappings[, extra-url-params])
     Returns HTML for a link that will popup, hidden fields, and some JS to handle it 
     for a simple edit window of some kind.
         link_text - Text to appear in link
@@ -889,12 +894,18 @@ sub edit_item_popup_window_link {
         formid - Id of the form on the source page to submit
         width - Width of the window in pixels
         height - Height in pixels
+        field-mappings - Array of fields to include in form
+        [extra-url-params] - URL-formatted string of any extra param=value pairs (if multiple, delimited with "&")
 =cut
 sub edit_item_link {
     my ($link_text, $internalfield, $title, $idx, $formid, $w, $h, $fields) = @_;
+    my $extra_url_params = @_[8] || "";
+    if ($extra_url_params) {
+        $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
+    }
     my $scrollyn = $scrollbars ? "yes" : "no";
 
-    my $link = &edit_item_popup_window_link("list_item_edit_popup.cgi?action=edit&idx=$idx&title=$title", $internalfield, $formid, $link_text, $w, $h, 0);
+    my $link = &edit_item_popup_window_link("list_item_edit_popup.cgi?action=edit&idx=$idx&title=$title" . $extra_url_params, $internalfield, $formid, $link_text, $w, $h, 0);
 
     my $hidden_input_fields = "<div>\n";
     foreach my $fieldname ( @$fields ) {
@@ -903,12 +914,12 @@ sub edit_item_link {
     $hidden_input_fields .= "</div>\n";
 
     my $edit_script = "<script>\n"
-        . "function submit_$formid(vals) {\n"
+        . "function submit_" . $formid . "(vals) {\n"
         . "  vals.forEach((o) => {\n"
         . "    let f=o.f;let v=o.v;\n"
-        . "    \$(\"#$formid input[name=\"+f+\"]\").val(v);\n"
+        . "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);\n"
         . "  });\n"
-        . "  \$(\"#$formid\").submit();\n"
+        . "  \$(\"#" . $formid . "\").submit();\n"
         . "}\n"
         . "</script>\n";
     return ($link, $hidden_input_fields, $edit_script);
@@ -944,7 +955,7 @@ sub add_item_popup_window_button {
     return $rv;
 }
 
-=head2 add_item_button(buttontext, internalfield, title, width, height, formid, field-mappings)
+=head2 add_item_button(buttontext, internalfield, title, width, height, formid, field-mappings[, extra-url-params])
     Returns HTML for a button that will popup a window, hidden fields, and some JS to handle it 
     for entry of a new item of some kind.
         buttontext - Text to appear in button
@@ -957,11 +968,15 @@ sub add_item_popup_window_button {
 =cut
 sub add_item_button {
     my ($button_text, $internalfield, $title, $w, $h, $formid, $fields) = @_;
+    my $extra_url_params = @_[7] || "";
+    if ($extra_url_params) {
+        $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
+    }
     my @fieldmapping = ();
     foreach my $fieldname ( @$fields ) {
         push( @fieldmapping, [ $fieldname, $fieldname ] );
     }
-    my $button = &add_item_popup_window_button("list_item_edit_popup.cgi?action=add&title=$title", $internalfield, $formid, $button_text, $w, $h, 0, \@fieldmapping );
+    my $button = &add_item_popup_window_button("list_item_edit_popup.cgi?action=add&title=$title" . $extra_url_params, $internalfield, $formid, $button_text, $w, $h, 0, \@fieldmapping );
     my $hidden_input_fields = "<div>\n";
     foreach my $fieldname ( @$fields ) {
         $hidden_input_fields .= "<input type=\"hidden\" name=\"new_" . $internalfield . "_" . $fieldname . "\" class=\"add-item-val\"></input>";
@@ -969,12 +984,12 @@ sub add_item_button {
     $hidden_input_fields .= "</div>\n";
 
     my $add_new_script = "<script>\n";
-    $add_new_script .= "function submit_new_$formid(vals) {";
+    $add_new_script .= "function submit_new_" . $formid . "(vals) {";
     $add_new_script .= "  vals.forEach((o) => {";
     $add_new_script .= "    let f=o.f;let v=o.v;";
-    $add_new_script .= "    \$(\"#$formid input[name=\"+f+\"]\").val(v);";
+    $add_new_script .= "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);";
     $add_new_script .= "  });";
-    $add_new_script .= "  \$(\"#$formid\").submit();";
+    $add_new_script .= "  \$(\"#" . $formid . "\").submit();";
     $add_new_script .= "}\n";
     $add_new_script .= "</script>\n";
     return ($button, $hidden_input_fields, $add_new_script);
@@ -1219,6 +1234,98 @@ sub get_field_auto_columns {
         push( @cols, "&nbsp;" );
     }
     return @cols;
+}
+
+# &show_field_table("listen_address", "dns_iface_apply.cgi", $text{"_listen"}, \%dnsmconfig);
+sub show_field_table {
+    my ($internalfield, $apply_cgi, $addtext, $dnsmconfig) = @_;
+    my $configfield = &internal_to_config($internalfield);
+    my $definition = %configfield_fields{$internalfield};
+    my $edit_link;
+    my $hidden_edit_input_fields;
+    my $edit_script;
+    my @newfields = @{$definition->{"param_order"}};
+    my @editfields = ( "idx", @newfields );
+    my $formid = $internalfield . "_form";
+    my $w = 520;
+    my $h = 340; # base value
+    my $extralines = length($text{"p_man_desc_$internalfield"}) / 75;
+    $extralines = ceil($extralines) * 15;
+    $h += $extralines;
+    my @tds = ( $td_label, $td_left );
+    my @column_headers = ( 
+        "",
+        $text{"enabled"}
+    );
+    if ( @newfields == 1 ) {
+        push(@column_headers, $text{"p_label_$internalfield"} );
+        push( @tds, $td_left );
+        $h = $h + 31;
+    }
+    else {
+        foreach my $param ( @newfields ) {
+            push(@column_headers, $definition->{"$param"}->{"label"} );
+            push( @tds, $td_left );
+            $h = $h + 31;
+        }
+    }
+    my @list_link_buttons = &list_links( "sel", 3 );
+    my ($add_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $addtext), $internalfield, $text{"p_label_$internalfield"}, $w, $h, $formid, \@newfields );
+    push(@list_link_buttons, $add_button);
+
+    my $count=0;
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
+    print &ui_links_row(\@list_link_buttons);
+    print $hidden_add_input_fields . $add_new_script;
+    print &ui_columns_start( \@column_headers, 100, undef, undef, 
+        &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], 
+        [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
+    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
+        local @cols;
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
+        foreach my $param ( @newfields ) {
+            my $val = ($param eq "val") ? $item->{"$param"} : $item->{"val"}->{"$param"};
+            if ($definition->{"$param"}->{"arr"} == 1) {
+                $val = join($definition->{"$param"}->{"sep"}, @{$val})
+            }
+            elsif ($definition->{"$param"}->{"valtype"} eq "bool") {
+                $val = &ui_checkbox("boolval", "1", "", $val, undef, 1)
+            }
+            if ($count == 0) {
+                ($edit_link, $hidden_edit_input_fields, $edit_script) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+            }
+            else {
+                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+            }
+            push ( @cols, $edit_link );
+        }
+        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        $count++;
+    }
+    print &ui_columns_end();
+    print $hidden_edit_input_fields . $edit_script;
+    print &ui_links_row(\@list_link_buttons);
+    print "<p>" . $text{"with_selected"} . "</p>";
+    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print &ui_form_end();
+    print &ui_hr();
+}
+
+sub do_selected_action {
+    my ($internalfields, $sel, $dnsmconfig) = @_;
+
+    foreach my $internalfield ( @{$internalfields}) {
+        my $configfield = &internal_to_config($internalfield);
+        my $action = $in{"enable_sel_$internalfield"} ? "enable" : $in{"disable_sel_$internalfield"} ? "disable" : $in{"delete_sel_$internalfield"} ? "delete" : "";
+        if ($action ne "") {
+            @{$sel} || &error($text{'selected_none'});
+
+            &update_selected($configfield, $action, $sel, $dnsmconfig);
+            last;
+        }
+    }
 }
 
 =head2 ui_clickable_checked_columns_row($columns, $tdtags, checkname, checkvalue, [checked?], [disabled], [tags])

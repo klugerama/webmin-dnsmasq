@@ -68,16 +68,17 @@ else {
     my @sel = split(/\0/, $in{'sel'});
     @sel || &error($text{'selected_none'});
 
-    $action = ( $in{"enable_sel_userclass"} ? "enable" : ( $in{"disable_sel_userclass"} ? "disable" : ( $in{"delete_sel_userclass"} ? "delete" : "" ) ) );
-    if ($action ne "") {
-        &update_selected("dhcp-userclass", $action, \@sel, \%$dnsmconfig);
-    }
-    else {
-        $action = ( $in{"enable_sel_vendorclass"} ? "enable" : ( $in{"disable_sel_vendorclass"} ? "disable" : ( $in{"delete_sel_vendorclass"} ? "delete" : "" ) ) );
-        if ($action ne "") {
-            &update_selected("dhcp-vendorclass", $action, \@sel, \%$dnsmconfig);
-        }
-    }
+    # $action = ( $in{"enable_sel_userclass"} ? "enable" : ( $in{"disable_sel_userclass"} ? "disable" : ( $in{"delete_sel_userclass"} ? "delete" : "" ) ) );
+    # if ($action ne "") {
+    #     &update_selected("dhcp-userclass", $action, \@sel, \%$dnsmconfig);
+    # }
+    # else {
+    #     $action = ( $in{"enable_sel_vendorclass"} ? "enable" : ( $in{"disable_sel_vendorclass"} ? "disable" : ( $in{"delete_sel_vendorclass"} ? "delete" : "" ) ) );
+    #     if ($action ne "") {
+    #         &update_selected("dhcp-vendorclass", $action, \@sel, \%$dnsmconfig);
+    #     }
+    # }
+    &do_selected_action( [ "dhcp_userclass", "dhcp_vendorclass" ], \@sel, \%$dnsmconfig );
 }
 
 #

@@ -34,6 +34,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dns_iface.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_iface_settings"};
+my $apply_cgi = "dns_iface_apply.cgi";
 
 my $td_left = "style=\"text-align: left; width: auto;\"";
 my $td_right = "style=\"text-align: right; width: auto;\"";
@@ -46,8 +47,8 @@ sub show_interface {
     my $edit_script;
     my $formid = "listen_iface_form";
     my $count=0;
-    print &ui_form_start( 'dns_iface_apply.cgi', "post", undef, "id='$formid'" );
-    # my @list_link_buttons = &list_links( "sel", 0, "dns_iface_apply.cgi", "interface=new", "dns_iface.cgi", &text("add_", $text{"_iface"}) );
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
+    # my @list_link_buttons = &list_links( "sel", 0, $apply_cgi, "interface=new", "dns_iface.cgi", &text("add_", $text{"_iface"}) );
     my @list_link_buttons = &list_links( "sel", 0 );
     my ($iface_chooser_button, $hidden_input_fields, $submit_script) = &add_interface_chooser_button( &text("add_", $text{"_iface"}), "new_listen_iface", $formid );
     print &ui_links_row(\@list_link_buttons);
@@ -57,12 +58,12 @@ sub show_interface {
         $text{"enabled"},
         $text{"p_label_interface"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=4' ] ), 1 );
-    foreach my $iface ( @{$dnsmconfig{"interface"}} ) {
+    foreach my $item ( @{$dnsmconfig{"interface"}} ) {
         local @cols;
-        # my $edit = "<a href=iface_edit.cgi?idx=$count>".$$iface{"val"}."</a>"; # TODO edit
-        push ( @cols, &ui_checkbox("enabled", "1", "", $iface->{"used"}?1:0, undef, 1) );
+        # my $edit = "<a href=iface_edit.cgi?idx=$count>".$$item{"val"}."</a>"; # TODO edit
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # push ( @cols, $edit );
-        push ( @cols, $iface->{"val"} );
+        push ( @cols, $item->{"val"} );
         print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
@@ -70,9 +71,9 @@ sub show_interface {
     print &ui_links_row(\@list_link_buttons);
     print $hidden_input_fields . $iface_chooser_button;
     print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_iface");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_iface");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_iface");
+    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
     print $submit_script;
     print &ui_form_end();
     print &ui_hr();
@@ -83,7 +84,7 @@ sub show_except_interface {
     my $configfield = &internal_to_config($internalfield);
     my $formid = "except_iface_form";
     my $count=0;
-    print &ui_form_start( 'dns_iface_apply.cgi', "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
 
     # @list_link_buttons = &list_links( "sel", 1, "dns_iface_apply.cgi", "except-interface=new", "dns_iface.cgi", &text("add_", $text{"_iface"}) );
     my @list_link_buttons = &list_links( "sel", 1 );
@@ -95,12 +96,12 @@ sub show_except_interface {
         $text{"enabled"},
         $text{"p_label_interface"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=4' ] ), 1 );
-    foreach my $iface ( @{$dnsmconfig{"except-interface"}} ) {
+    foreach my $item ( @{$dnsmconfig{"except-interface"}} ) {
         local @cols;
-        # my $edit = "<a href=xiface_edit.cgi?idx=$count>".$$iface{"val"}."</a>"; # TODO edit
-        push ( @cols, &ui_checkbox("enabled", "1", "", $iface->{"used"}?1:0, undef, 1) );
+        # my $edit = "<a href=xiface_edit.cgi?idx=$count>".$$item{"val"}."</a>"; # TODO edit
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # push ( @cols, $edit );
-        push ( @cols, $iface->{"val"} );
+        push ( @cols, $item->{"val"} );
         print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
@@ -108,9 +109,9 @@ sub show_except_interface {
     print &ui_links_row(\@list_link_buttons);
     print $hidden_input_fields . $iface_chooser_button;
     print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_except_iface");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_except_iface");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_except_iface");
+    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
     print $submit_script;
     print &ui_form_end();
     print &ui_hr();
@@ -124,7 +125,7 @@ sub show_no_dhcp_interface {
     my $edit_script;
     my $formid = "no_dhcp_iface_form";
     my $count=0;
-    print &ui_form_start( 'dns_iface_apply.cgi', "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     # @list_link_buttons = &list_links( "sel", 2, "dns_iface_apply.cgi", "no-dhcp-interface=new", "dns_iface.cgi", &text("add_", $text{"_iface"}) );
     my @list_link_buttons = &list_links( "sel", 2 );
     my ($iface_chooser_button, $hidden_input_fields, $submit_script) = &add_interface_chooser_button( &text("add_", $text{"_iface"}), "new_no_dhcp_iface", $formid );
@@ -135,12 +136,12 @@ sub show_no_dhcp_interface {
         $text{"enabled"},
         $text{"p_label_interface"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=4' ] ), 1 );
-    foreach my $iface ( @{$dnsmconfig{"no-dhcp-interface"}} ) {
+    foreach my $item ( @{$dnsmconfig{"no-dhcp-interface"}} ) {
         local @cols;
-        # my $edit = "<a href=xiface_edit.cgi?idx=$count>".$$iface{"val"}."</a>";
-        push ( @cols, &ui_checkbox("enabled", "1", "", $iface->{"used"}?1:0, undef, 1) );
+        # my $edit = "<a href=xiface_edit.cgi?idx=$count>".$$item{"val"}."</a>";
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # push ( @cols, $edit );
-        push ( @cols, $iface->{"val"} );
+        push ( @cols, $item->{"val"} );
         print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
@@ -148,9 +149,9 @@ sub show_no_dhcp_interface {
     print &ui_links_row(\@list_link_buttons);
     print $hidden_input_fields . $iface_chooser_button;
     print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_no_dhcp_iface");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_no_dhcp_iface");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_no_dhcp_iface");
+    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
     print $submit_script;
     print &ui_form_end();
     print &ui_hr();
@@ -164,9 +165,9 @@ sub show_listen_address {
     my $edit_script;
     my @newfields = ("val");
     my @editfields = ( "idx", @newfields );
-    my $formid = "listen_address_form";
+    my $formid = "$internalfield_form";
     my $count=0;
-    print &ui_form_start( 'dns_iface_apply.cgi', "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     # @list_link_buttons = &list_links( "sel", 3, "dns_iface_apply.cgi", "listen-address=0.0.0.0", "dns_iface.cgi", &text("add_", $text{"_addr"}) );
     my @list_link_buttons = &list_links( "sel", 3 );
     my ($add_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_listen"}), $internalfield, $text{"p_label_listen_address"}, 700, 355, $formid, \@newfields );
@@ -178,12 +179,10 @@ sub show_listen_address {
         $text{"enabled"},
         $text{"ip_address"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=3' ] ), 1 );
-    foreach my $address ( @{$dnsmconfig{"listen-address"}} ) {
+    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local @cols;
-        # my $edit = "<a href=listen_edit.cgi?idx=$count>".$$address{"val"}."</a>";
-        ($edit_link, $hidden_edit_input_fields, $edit_script) = &edit_item_link($address->{"val"}, $internalfield, $text{"p_label_listen_address"}, $count, $formid, 700, 355, \@editfields);
-        push ( @cols, &ui_checkbox("enabled", "1", "", $address->{"used"}?1:0, undef, 1) );
-        # push ( @cols, $edit );
+        ($edit_link, $hidden_edit_input_fields, $edit_script) = &edit_item_link($item->{"val"}, $internalfield, $text{"p_label_$internalfield"}, $count, $formid, 700, 355, \@editfields);
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link );
         print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
@@ -192,9 +191,9 @@ sub show_listen_address {
     print $hidden_edit_input_fields . $edit_script;
     print &ui_links_row(\@list_link_buttons);
     print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_listen_address");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_listen_address");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_listen_address");
+    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
     print &ui_form_end();
     print &ui_hr();
 }
@@ -214,7 +213,7 @@ foreach my $configfield ( @confdns ) {
     next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "3" );
     push( @page_fields, $configfield );
 }
-&show_basic_fields( \%dnsmconfig, "dns_iface", \@page_fields, "dns_iface_apply.cgi", $text{"index_dns_iface_settings"} );
+&show_basic_fields( \%dnsmconfig, "dns_iface", \@page_fields, $apply_cgi, $text{"index_dns_iface_settings"} );
 print ui_tabs_end_tab('mode', 'basic');
 
 print ui_tabs_start_tab('mode', 'interface');
