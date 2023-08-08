@@ -27,7 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 # &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), &header_js(), "body-stuff-test", $text{"index_dns_servers"});
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript>//test</script>", "body-stuff-test", $text{"index_dns_servers"});
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>", "body-stuff-test", $text{"index_dns_servers"});
 
 my $returnto = $in{"returnto"} || "dns_servers.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_servers"};
