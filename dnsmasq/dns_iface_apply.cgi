@@ -28,6 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
+my $mode = $in{"mode"} || "basic";
 my $returnto = $in{"returnto"} || "dns_iface.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_iface_settings"};
 # check for errors in read config

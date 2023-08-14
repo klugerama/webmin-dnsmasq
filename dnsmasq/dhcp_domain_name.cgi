@@ -50,12 +50,12 @@ my $apply_cgi = "dhcp_domain_name_apply.cgi";
 #     my $count=0;
 #     # my @list_link_buttons = &list_links( "sel", 0, "dhcp_domain_name_apply.cgi", "domain=new", "dhcp_domain_name.cgi", &text("add_", $text{"_domain"}) );
 #     my @list_link_buttons = &list_links( "sel", 0 );
-#     my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_domain"}), $internalfield, $text{"p_label_domain"}, $w, $h, $formid, \@newfields );
+#     my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_domain"}), $internalfield, $text{"p_label_domain"}, $w, $h, $formid, \@newfields );
 #     push(@list_link_buttons, $add_new_button);
 
 #     print &ui_form_start( 'dhcp_domain_name_apply.cgi', "post" );
 #     print &ui_links_row(\@list_link_buttons);
-#     print $hidden_add_input_fields . $add_new_script;
+#     print $hidden_add_input_fields;
 #     print &ui_columns_start( [ 
 #         # "line", 
 #         # $text{""}, 
@@ -72,7 +72,7 @@ my $apply_cgi = "dhcp_domain_name_apply.cgi";
 #         local @cols;
 #         # my $edit = "<a href=dhcp_domain_edit.cgi?idx=$count>".$domain->{"val"}->{"domain"}."</a>";
 #         push ( @cols, &ui_checkbox("enabled", "1", "", $domain->{"used"}?1:0, undef, 1) );
-#         ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"domain"}, $internalfield, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
+#         ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"domain"}, $internalfield, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
 #         ($edit_link[1]) = &edit_item_link($val{"subnet"}, $internalfield, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
 #         ($edit_link[2]) = &edit_item_link($val{"range"}, $internalfield, $text{"p_label_domain"}, $count, $formid, $w, $h, \@editfields);
 #         # push ( @cols, $edit );
@@ -91,7 +91,7 @@ my $apply_cgi = "dhcp_domain_name_apply.cgi";
 #     print &ui_submit($text{"enable_sel"}, "enable_sel_domain");
 #     print &ui_submit($text{"disable_sel"}, "disable_sel_domain");
 #     print &ui_submit($text{"delete_sel"}, "delete_sel_domain");
-#     print $hidden_edit_input_fields . $edit_script;
+#     print $hidden_edit_input_fields;
 #     print &ui_form_end( );
 # }
 

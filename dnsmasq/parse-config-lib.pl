@@ -269,7 +269,7 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "valtype" => "bool",
-                "default" => 0,
+                "default" => 0
             }
         },
         "local_ttl" => { 
@@ -369,14 +369,14 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_log_facility"} . ">"
             }
         }, # =<facility>
-        "log_debug" => { 
+        "log_debug" => {
             "param_order" => [ "val" ],
             "val" => {
                 "valtype" => "bool",
-                "default" => 0,
+                "default" => 0
             }
         },
-        "log_async" => { 
+        "log_async" => {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -384,10 +384,10 @@ sub init_configfield_fields {
                 "default" => 5,
                 "required" => 0,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_log_async"} . ">"
+                "template" => "<" . $text{"tmpl_log_async"} . ">",
             }
-        }, # [=<lines>]
-        "pid_file" => { 
+        }, # [=<lines>] 
+        "pid_file" => {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -643,8 +643,8 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "valtype" => "bool",
-                "default" => 0,
-            }
+                "default" => 0
+            },
         },
         "enable_dbus" => { 
             "param_order" => [ "val" ],
@@ -655,7 +655,7 @@ sub init_configfield_fields {
                 "required" => 0,
                 "label" => $text{"p_label_val_service_name"},
                 "template" => "<" . $text{"tmpl_service_name"} . ">"
-            }
+            },
         }, # [=<service-name>]
         "enable_ubus" => { 
             "param_order" => [ "val" ],
@@ -666,7 +666,7 @@ sub init_configfield_fields {
                 "required" => 0,
                 "label" => $text{"p_label_val_service_name"},
                 "template" => "<" . $text{"tmpl_service_name"} . ">"
-            }
+            },
         }, # [=<service-name>]
         "strict_order" => { 
             "param_order" => [ "val" ],
@@ -2432,7 +2432,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_networkids"},
-                "template" => "<" . $text{"tmpl_bootp_network_id"} . ">[,<" . $text{"tmpl_bootp_network_id"} . ">]"
+                "template" => "<" . $text{"tmpl_network_id"} . ">[,<" . $text{"tmpl_network_id"} . ">]",
+                "arr" => 1,
+                "sep" => ",",
             },
         }, # [=<network-id>[,<network-id>]]
         "no_ping" => { 

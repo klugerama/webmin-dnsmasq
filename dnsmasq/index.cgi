@@ -39,14 +39,14 @@ my $config_file = &read_file_lines( $config_filename );
 
 &ReadParse();
 
-&ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+# &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>");
+&header($text{"index_title"}, "", "intro", 1, 0, 0, "<!-- test rightside -->", "<script type='text/javascript'>//test</script>");
 
 my $mode = "dns";
 if ( defined ($in{mode}) ) {
     $mode = $in{mode};
 }
 
-print "<hr>\n";
 if( $dnsmconfig{"errors"} > 0 ) {
 	print "<h3>WARNING: found ";
 	print $dnsmconfig{"errors"};

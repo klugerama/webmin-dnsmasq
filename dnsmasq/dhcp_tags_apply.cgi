@@ -28,8 +28,10 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
+my $mode = $in{"mode"} || "basic";
 my $returnto = $in{"returnto"} || "dhcp_tags.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_tags"};
+
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
     my $line="error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});

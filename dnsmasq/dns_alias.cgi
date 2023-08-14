@@ -26,32 +26,30 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_alias_settings"});
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>", "body-stuff-test", $text{"index_dns_alias_settings"});
 
 my $returnto = $in{"returnto"} || "dns_alias.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_alias_settings"};
 my $apply_cgi = "dns_alias_apply.cgi";
 
 sub show_alias {
-    my @edit_link = ( "", "", "" );
-    my $hidden_edit_input_fields;
-    my $edit_script;
+    my $formid = "alias_form";
     my $internalfield = "alias";
     my $configfield = &internal_to_config($internalfield);
-    my $formid = "alias_form";
     my @newfields = ( "from", "to", "netmask" );
     my @editfields = ( "idx", @newfields );
-    my $w = 500;
-    my $h = 505;
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_alias"}), $internalfield, $text{"alias"}, $w, $h, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_alias"}), $internalfield, $text{"alias"}, $w, $h, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
-    my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
 
     my $count=0;
-    print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
+    print &ui_form_start( $apply_cgi . "?mode=alias", "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
+    my @edit_link = ( "", "", "" );
+    my $w = 500;
+    my $h = 505;
+    my $hidden_edit_input_fields;
+    my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
     print &ui_columns_start( [ 
         "",
         $text{"enabled"},
@@ -59,17 +57,17 @@ sub show_alias {
         $text{"p_label_val_end_ip_address"},
         $text{"p_label_val_netmask"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=5' ] ), 1 );
-    foreach my $alias ( @{$dnsmconfig{$configfield}} ) {
-        local %val = %{ $alias->{"val"} };
+    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
+        local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"from"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"from"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
         ($edit_link[1]) = &edit_item_link($val{"to"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
         ($edit_link[2]) = &edit_item_link($val{"netmask-used"} ? $val{"netmask"} : "(255.255.255.255)", $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
-        push ( @cols, &ui_checkbox("enabled", "1", "", $alias->{"used"}?1:0, undef, 1) );
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );
         push ( @cols, $edit_link[2] );
-        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
@@ -78,7 +76,8 @@ sub show_alias {
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_add_input_fields;
+    print $hidden_edit_input_fields;
     print &ui_form_end();
     print &ui_hr();
 }
@@ -86,7 +85,6 @@ sub show_alias {
 sub show_nx {
     my @edit_link = ( "" );
     my $hidden_edit_input_fields;
-    my $edit_script;
     my $internalfield = "bogus_nxdomain";
     my $configfield = &internal_to_config($internalfield);
     my $formid = $internalfield . "_form";
@@ -95,26 +93,26 @@ sub show_nx {
     my $w = 500;
     my $h = 375;
     my @list_link_buttons = &list_links( "sel", 1 );
-    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_nx"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_nx"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
     my @tds = ( $td_left, $td_left, $td_left );
 
     my $count=0;
     print &ui_form_start( "dns_alias_apply.cgi", "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
+    print $hidden_add_input_fields;
     print &ui_columns_start( [
         "",
         $text{"enabled"},
         $text{"ip_address"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=3' ] ), 1 );
-    foreach my $nxdomain ( @{$dnsmconfig{$configfield}} ) {
-        local %val = %{ $nxdomain->{"val"} };
+    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
+        local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"addr"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
-        push ( @cols, &ui_checkbox("enabled", "1", "", $nxdomain->{"used"}?1:0, undef, 1) );
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"addr"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
-        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
@@ -123,7 +121,7 @@ sub show_nx {
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_edit_input_fields;
     print &ui_form_end();
     print &ui_hr();
 }
@@ -131,7 +129,6 @@ sub show_nx {
 sub show_address {
     my @edit_link = ( "", "", "" );
     my $hidden_edit_input_fields;
-    my $edit_script;
     my $internalfield = "address";
     my $configfield = &internal_to_config($internalfield);
     my $formid = $internalfield . "_form";
@@ -140,29 +137,29 @@ sub show_address {
     my $w = 500;
     my $h = 565;
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
     my @tds = ( $td_left, $td_left, $td_left, $td_left );
 
     my $count=0;
     print &ui_form_start( "dns_alias_apply.cgi", "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
+    print $hidden_add_input_fields;
     print &ui_columns_start( [ 
         "",
         $text{"enabled"},
         $text{"domain"},
         $text{"ip_address"},
         ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=4' ] ), 1 );
-    foreach my $address ( @{$dnsmconfig{$configfield}} ) {
-        local %val = %{ $address->{"val"} };
+    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
+        local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"domain"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"domain"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
         ($edit_link[1]) = &edit_item_link($val{"addr"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
-        push ( @cols, &ui_checkbox("enabled", "1", "", $address->{"used"}?1:0, undef, 1) );
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );
-        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
@@ -171,7 +168,7 @@ sub show_address {
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_edit_input_fields;
     print &ui_form_end();
     print &ui_hr();
 }
@@ -179,7 +176,6 @@ sub show_address {
 sub show_ignore_address {
     my @edit_link = ( "", "", "" );
     my $hidden_edit_input_fields;
-    my $edit_script;
     my $internalfield = "ignore_address";
     my $configfield = &internal_to_config($internalfield);
     my $formid = $internalfield . "_form";
@@ -188,14 +184,13 @@ sub show_ignore_address {
     my $w = 500;
     my $h = 565;
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
     my @tds = ( $td_left, $td_left, $td_left, $td_left );
 
     my $count=0;
     print &ui_form_start( "dns_alias_apply.cgi", "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
     print &ui_columns_start( [ 
         "",
         $text{"enabled"},
@@ -204,10 +199,10 @@ sub show_ignore_address {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"ip"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"ip"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
-        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
@@ -216,7 +211,8 @@ sub show_ignore_address {
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_add_input_fields;
+    print $hidden_edit_input_fields;
     print &ui_form_end();
 }
 

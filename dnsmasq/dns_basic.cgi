@@ -96,7 +96,7 @@ sub show_hostsdir {
         local @cols;
         push ( @cols, &ui_checkbox("enabled", "1", "", $dir->{"used"}?1:0, undef, 1) );
         push ( @cols, $dir->{"val"} );
-        $g .= &ui_checked_columns_row( \@cols, undef, "sel", $count );
+        $g .= &ui_clickable_checked_columns_row( \@cols, undef, "sel", $count );
         $count++;
     }
     $g .= &ui_columns_end();
@@ -137,7 +137,7 @@ sub show_resolv_file {
         local @cols;
         push ( @cols, &ui_checkbox("enabled", "1", "", $rfile->{"used"}?1:0, undef, 1) );
         push ( @cols, $rfile->{"val"} );
-        $g .= &ui_checked_columns_row( \@cols, undef, "sel", $count );
+        $g .= &ui_clickable_checked_columns_row( \@cols, undef, "sel", $count );
         $count++;
     }
     $g .= &ui_columns_end();

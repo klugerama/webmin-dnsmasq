@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $returnto = $in{"returnto"} || "tftp_bootp_apply.cgi";
+my $returnto = $in{"returnto"} || "tftp_bootp.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_bootp_pxe_settings"};
 
 # check for errors in read config
@@ -147,7 +147,7 @@ if ($in{"submit"}) {
         &update($item->{"line"}, $val, \@$file_arr, 1);
         &flush_file_lines();
     }
-    elsif ($in{"pxe_prompt_"}) { # =[tag:<tag>,]<prompt>[,<timeout>]
+    elsif ($in{"pxe_prompt_prompt"}) { # =[tag:<tag>,]<prompt>[,<timeout>]
         # "tag", "prompt", "timeout"
         my $item = $dnsmconfig{"pxe-prompt"};
         my $file_arr = &read_file_lines($item->{"file"});
@@ -162,6 +162,22 @@ if ($in{"submit"}) {
         &update($item->{"line"}, $val, \@$file_arr, 0);
         &flush_file_lines();
     }
+}
+elsif ($in{"new_bootp_dynamic_val"} ne "") {
+    my $newval = "";
+    $newval .= $in{"new_bootp_dynamic_val"};
+    &add_to_list("bootp-dynamic", $newval);
+}
+elsif ($in{"bootp_dynamic_idx"} ne "") {
+    my $item = $dnsmconfig{"bootp-dynamic"}[$in{"bootp_dynamic_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $newval = "bootp-dynamic=";
+    $newval .= $in{"bootp_dynamic_val"};
+    &update($item->{"line"}, $newval, \@$file_arr, 0);
+    &flush_file_lines();
+}
+else {
+    &do_selected_action( [ "bootp_dynamic" ], \@sel, \%$dnsmconfig );
 }
 #
 # re-load basic page

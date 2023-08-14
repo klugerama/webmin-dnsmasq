@@ -26,7 +26,6 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-# my $headstuff = &add_js($formid, $internalfield);
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_tags"});
 
 my $returnto = $in{"returnto"} || "dhcp_tags.cgi";
@@ -40,7 +39,7 @@ sub show_userclass {
     my @newfields = ( "tag", "userclass" );
     my @editfields = ( "idx", @newfields );
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"userclass"}), $internalfield, $text{"userclass"}, 500, 435, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"userclass"}), $internalfield, $text{"userclass"}, 500, 435, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
 
     my $count;
@@ -48,11 +47,10 @@ sub show_userclass {
     print &ui_form_start( "dhcp_userclass_apply.cgi", "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
 
-    print $hidden_add_input_fields . $add_new_script;
+    print $hidden_add_input_fields;
     my $edit_link_tag;
     my $edit_link_userclass;
     my $hidden_edit_input_fields;
-    my $edit_script;
     my @tds = ( $td_left, $td_left, $td_left, $td_left );
     print &ui_columns_start( [ 
             "",
@@ -63,12 +61,12 @@ sub show_userclass {
     foreach my $class ( @{$dnsmconfig{"dhcp-userclass"}} ) {
         local %val = %{ $class->{"val"} };
         local @cols;
-        ($edit_link_tag, $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"tag"}, $internalfield, $text{"userclass"}, $count, $formid, 500, 465, \@editfields);
+        ($edit_link_tag, $hidden_edit_input_fields) = &edit_item_link($val{"tag"}, $internalfield, $text{"userclass"}, $count, $formid, 500, 465, \@editfields);
         ($edit_link_userclass) = &edit_item_link($val{"userclass"}, $internalfield, $text{"userclass"}, $count, $formid, 500, 465, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $class->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link_tag );
         push ( @cols, $edit_link_userclass );
-        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
@@ -78,7 +76,7 @@ sub show_userclass {
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
     print &ui_hr();
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_edit_input_fields;
     print &ui_form_end( );
 }
 
@@ -89,7 +87,7 @@ sub show_vendorclass {
     my @newfields = ( "tag", "vendorclass" );
     my @editfields = ( "idx", "tag", "vendorclass" );
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"vendorclass"}), $internalfield, $text{"vendorclass"}, 500, 465, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"vendorclass"}), $internalfield, $text{"vendorclass"}, 500, 465, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
 
     my $count;
@@ -97,10 +95,9 @@ sub show_vendorclass {
     print &ui_form_start( "dhcp_vendorclass_apply.cgi", "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
 
-    print $hidden_add_input_fields . $add_new_script;
+    print $hidden_add_input_fields;
     my @edit_link = ( "", "" );
     my $hidden_edit_input_fields;
-    my $edit_script;
     my @tds = ( $td_left, $td_left, $td_left, $td_left );
     print &ui_columns_start( [
             "",
@@ -112,12 +109,12 @@ sub show_vendorclass {
         local %val = %{ $class->{"val"} };
         local @cols;
         # first call to &edit_item_link should capture link, fields, and script; subsequent calls (1 for each field) only need the link
-        ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"tag"}, $internalfield, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"tag"}, $internalfield, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
         ($edit_link[1]) = &edit_item_link($val{"vendorclass"}, $internalfield, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $class->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );
-        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
@@ -127,7 +124,7 @@ sub show_vendorclass {
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
     print &ui_hr();
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_edit_input_fields;
     print &ui_form_end( );
 }
 

@@ -29,6 +29,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
+my $mode = $in{"mode"} || "basic";
 my $returnto = $in{"returnto"} || "dhcp_range.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_range"};
 

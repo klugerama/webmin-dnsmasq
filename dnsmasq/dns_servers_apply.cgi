@@ -28,7 +28,8 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $returnto = $in{"returnto"} || "dns_servers.cgi";
+my $mode = $in{"mode"} || "basic";
+my $returnto = $in{"returnto"} || "dns_servers.cgi?mode=$mode";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {
@@ -90,6 +91,7 @@ elsif ($in{"new_rev_server_domain"} ne "" || $in{"new_rev_server_ip"} ne "") {
 elsif ($in{"rev_server_idx"} ne "") {
     my $item = $dnsmconfig{"rev-server"}[$in{"rev_server_idx"}];
     my $file_arr = &read_file_lines($item->{"file"});
+    my $newval = "rev-server=";
     if ($in{"rev_server_domain"} ne "") {
         $newval .= "/" . $in{"rev_server_domain"} . "/";
     }

@@ -39,14 +39,13 @@ my $definition = %configfield_fields{$internalfield};
 sub show_reservations() {
     my $edit_link;
     my $hidden_edit_input_fields;
-    my $edit_script;
     my @newfields = ( "ipversion" );
     foreach my $param ( @{$definition->{"param_order"}} ) {
         next if ($definition->{$param}->{"ipversion"} == 6);
         push( @newfields, $param );
     }
     my @editfields = ( "idx", @newfields );
-    my $formid = $internalfield . "_4_form";
+    my $formid = $internalfield . "_form";
     my $w = 520;
     my $h = 340; # base value
     my $extralines = length($text{"p_man_desc_$internalfield"}) / 75;
@@ -67,13 +66,13 @@ sub show_reservations() {
     }
     # my @list_link_buttons = &list_links( "sel", 0, "dhcp_res_apply.cgi", "dhcp-host=new,0.0.0.0", "dhcp_reservations.cgi", &text("add_", $text{"_host"}) );
     my @list_link_buttons = &list_links( "sel", 3 );
-    my ($add_button, $hidden_add_input_fields, $add_new_script) = &add_item_button( &text("add_", $text{"_host"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button( &text("add_", $text{"_host"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
     push(@list_link_buttons, $add_button);
 
     my $count = 0;
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
+    print $hidden_add_input_fields;
     print &ui_columns_start( \@column_headers, 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local @cols;
@@ -87,18 +86,18 @@ sub show_reservations() {
             $item->{"val"}->{"leasetime"});
         foreach my $val ( @vals ) {
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields, $edit_script) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields );
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields );
             }
             else {
                 ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields );
             }
             push( @cols, $edit_link );
         }
-        print &ui_checked_columns_row( \@cols, undef, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_edit_input_fields;
     print &ui_links_row(\@list_link_buttons);
     print "<p>" . $text{"with_selected"} . "</p>";
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");

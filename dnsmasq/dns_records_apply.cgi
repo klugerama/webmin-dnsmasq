@@ -29,9 +29,9 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
+my $mode = $in{"mode"} || "basic";
 my $returnto = $in{"returnto"} || "dns_records.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_records_settings"};
-my $mode = $in{"mode"} || "basic";
 
 # check for errors in read config
 if( $dnsmconfig{"errors"} > 0 ) {

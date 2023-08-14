@@ -6,6 +6,7 @@
 
 BEGIN { push(@INC, ".."); };
 use POSIX 'ceil';
+use URI::Escape;
 use WebminCore;
 init_config();
 our %access = &get_module_acl();
@@ -47,7 +48,7 @@ sub restart_button {
     my $args = "returnto=".&urlize(&this_url());
     if (&is_dnsmasq_running()) {
         return ($access{'restart'} ?
-            "<a href='restart.cgi?" . $args . "'>" . $text{"index_button_restart"} . "</a>" : "").
+            "<a href='restart.cgi?" . $args . "'>" . $text{"index_button_restart"} . "</a><br>\n" : "").
             ($access{'start'} ?
             "<a href='stop.cgi?" . $args . "'>" . $text{"index_button_stop"} . "</a>" : "");
         # return "<a href=\"restart.cgi?$args\">$text{"lib_buttac"}</a><br>\n".
@@ -703,7 +704,7 @@ sub list_links {
                 &select_invert_link($sel_name, $form)
                 );
     if (defined($addcgi)) {
-        push(@links, ui_link("$addcgi?new=1&what=$what&where=$where",$link_text));
+        push(@links, &ui_link("$addcgi?new=1&what=$what&where=$where",$link_text));
     }
     return @links;
 }
@@ -884,11 +885,39 @@ sub edit_item_popup_window_link {
     return $link;
 }
 
+=head2 edit_item_popup_modal_link(url, internalfield, formid, link_text, width, height[, scrollbars])
+    Returns HTML for a link that will popup, hidden fields, and some JS to handle it 
+    for a simple edit window of some kind.
+        url - Base URL of the popup window's contents
+        internalfield - Keyword that identifies what to edit
+        formid - Id of the form on the source page to submit
+        link_text - Text to appear in link
+        width - Width of the window in pixels
+        height - Height in pixels
+        scrollbars - Set to 1 if the window should have scrollbars
+=cut
+sub edit_item_popup_modal_link {
+    my ($url, $internalfield, $formid, $link_text) = @_;
+
+    my $sep = $url =~ /\?/ ? "&" : "?";
+    $url .= $sep . "internalfield=$internalfield";
+    $url .= "&formid=" . $formid;
+
+    if ($link_text eq "") {
+        $link_text = "<span style='color: #595959 !important; font-style: italic;'>" . $text{"empty_value"} . "</span>"
+    }
+
+    my $link = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\">";
+    $link .= "$link_text";
+    $link .= "</a>";
+    return $link;
+}
+
 =head2 edit_item_link(link_text, internalfield, title, idx, formid, width, height, field-mappings[, extra-url-params])
     Returns HTML for a link that will popup, hidden fields, and some JS to handle it 
     for a simple edit window of some kind.
         link_text - Text to appear in link
-        internalfield - Keyword that identifies what to edit; handling must be defined in list_item_edit_popup.cgi
+        internalfield - Keyword that identifies what to edit
         title - Text to appear in the popup window title
         idx - Index of the item to edit
         formid - Id of the form on the source page to submit
@@ -903,9 +932,11 @@ sub edit_item_link {
     if ($extra_url_params) {
         $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
     }
-    my $scrollyn = $scrollbars ? "yes" : "no";
 
-    my $link = &edit_item_popup_window_link("list_item_edit_popup.cgi?action=edit&idx=$idx&title=$title" . $extra_url_params, $internalfield, $formid, $link_text, $w, $h, 0);
+    $title =~ s/ /+/g ;
+    my $qparams = "action=edit&idx=$idx&title=$title" . $extra_url_params;
+    # my $link = &edit_item_popup_window_link("list_item_edit_popup.cgi?action=edit&idx=$idx&title=$title" . $extra_url_params, $internalfield, $formid, $link_text, $w, $h, 0);
+    my $link = &edit_item_popup_modal_link("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $link_text);
 
     my $hidden_input_fields = "<div>\n";
     foreach my $fieldname ( @$fields ) {
@@ -913,24 +944,25 @@ sub edit_item_link {
     }
     $hidden_input_fields .= "</div>\n";
 
-    my $edit_script = "<script>\n"
-        . "function submit_" . $formid . "(vals) {\n"
-        . "  vals.forEach((o) => {\n"
-        . "    let f=o.f;let v=o.v;\n"
-        . "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);\n"
-        . "  });\n"
-        . "  \$(\"#" . $formid . "\").submit();\n"
-        . "}\n"
-        . "</script>\n";
-    return ($link, $hidden_input_fields, $edit_script);
+    # my $edit_script = "<script>\n"
+    #     . "function submit_" . $formid . "(vals) {\n"
+    #     . "  vals.forEach((o) => {\n"
+    #     . "    let f=o.f;let v=o.v;\n"
+    #     . "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);\n"
+    #     . "  });\n"
+    #     . "  \$(\"#" . $formid . "\").submit();\n"
+    #     . "}\n"
+    #     . "</script>\n";
+    # return ($link, $hidden_input_fields, $edit_script);
+    return ($link, $hidden_input_fields);
 }
 
-=head2 add_item_popup_window_button(url, internalfield, formid, button_text, width, height, [scrollbars], field-mappings)
+=head2 add_item_popup_window_button(url, internalfield, formid, button_content, width, height, [scrollbars], field-mappings)
     Returns HTML for a button that will popup a simple list item add window of some kind.
     url - Base URL of the popup window's contents
     internalfield - Keyword that identifies what to add; handling must be defined in list_item_add_popup.cgi
     formid - Id of the form on the source page to submit
-    button_text - Text to appear in button
+    button_content - Text to appear in button
     width - Width of the window in pixels
     height - Height in pixels
     scrollbars - Set to 1 if the window should have scrollbars
@@ -941,17 +973,46 @@ sub edit_item_link {
         - CGI parameter to URL for value, if any
 =cut
 sub add_item_popup_window_button {
-    my ($url, $internalfield, $formid, $button_text, $w, $h, $scrollbars, $fields) = @_;
+    my ($url, $internalfield, $formid, $button_content, $w, $h, $scrollbars, $fields) = @_;
     my $scrollyn = $scrollbars ? "yes" : "no";
 
-    my $rv = "<a class='btn btn-inverse btn-tiny add-item-button' href=\"#\" onClick='";
     my $sep = $url =~ /\?/ ? "&" : "?";
     $url .= $sep . "internalfield=$internalfield";
     $url .= "&formid=$formid";
+    my $rv = "<a class='btn btn-inverse btn-tiny add-item-button chooser_button' href=\"#\" onclick='";
     $rv .= "var h = $h;var w = $w;var left = (window.innerWidth/2)-(w/2);var top = (window.innerHeight/2)-(h/2);";
     $rv .= "chooser = window.open(\"$url\"";
-    $rv .= ", \"chooser\", \"location=no,status=no,toolbar=no,menubar=no,scrollbars=$scrollyn,resizable=yes,left=\"+left+\",top=\"+top+\",width=$w,height=$h\"); ";
-    $rv .= "'>$button_text</a>";
+    $rv .= ", \"chooser\", \"location=no,status=no,toolbar=no,menubar=no,scrollbars=$scrollyn,resizable=yes,";
+    $rv .= "left=\"+left+\",top=\"+top+\",width=$w,height=$h\"); ";
+    $rv .= "'>$button_content</a>";
+    return $rv;
+}
+
+=head2 add_item_popup_modal_button(url, internalfield, formid, button_content, width, height, [scrollbars], field-mappings)
+    Returns HTML for a button that will popup a simple list item add window of some kind.
+    url - Base URL of the popup window's contents
+    internalfield - Keyword that identifies what to add; handling must be defined in list_item_add_popup.cgi
+    formid - Id of the form on the source page to submit
+    button_content - Text to appear in button
+    width - Width of the window in pixels
+    height - Height in pixels
+    scrollbars - Set to 1 if the window should have scrollbars
+    field-mappings - See below
+        The field-mappings parameter is an array ref of array refs containing
+        - Attribute to assign field to in the popup window
+        - Form field name
+        - CGI parameter to URL for value, if any
+=cut
+sub add_item_popup_modal_button {
+    my ($url, $internalfield, $formid, $button_content) = @_;
+
+    my $sep = $url =~ /\?/ ? "&" : "?";
+    $url .= $sep . "internalfield=$internalfield";
+    $url .= "&formid=$formid";
+    my $rv = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" class='btn btn-inverse btn-tiny add-item-button' ";
+    $rv .= ">";
+    $rv .= "$button_content";
+    $rv .= "</a>";
     return $rv;
 }
 
@@ -972,27 +1033,33 @@ sub add_item_button {
     if ($extra_url_params) {
         $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
     }
-    my @fieldmapping = ();
-    foreach my $fieldname ( @$fields ) {
-        push( @fieldmapping, [ $fieldname, $fieldname ] );
-    }
-    my $button = &add_item_popup_window_button("list_item_edit_popup.cgi?action=add&title=$title" . $extra_url_params, $internalfield, $formid, $button_text, $w, $h, 0, \@fieldmapping );
+
+    # my @fieldmapping = ();
     my $hidden_input_fields = "<div>\n";
     foreach my $fieldname ( @$fields ) {
         $hidden_input_fields .= "<input type=\"hidden\" name=\"new_" . $internalfield . "_" . $fieldname . "\" class=\"add-item-val\"></input>";
+    #     push( @fieldmapping, [ $fieldname, $fieldname ] );
     }
     $hidden_input_fields .= "</div>\n";
 
-    my $add_new_script = "<script>\n";
-    $add_new_script .= "function submit_new_" . $formid . "(vals) {";
-    $add_new_script .= "  vals.forEach((o) => {";
-    $add_new_script .= "    let f=o.f;let v=o.v;";
-    $add_new_script .= "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);";
-    $add_new_script .= "  });";
-    $add_new_script .= "  \$(\"#" . $formid . "\").submit();";
-    $add_new_script .= "}\n";
-    $add_new_script .= "</script>\n";
-    return ($button, $hidden_input_fields, $add_new_script);
+    $title =~ s/ /+/g ;
+    my $qparams = "action=add&title=$title" . $extra_url_params;
+    # my $button = &add_item_popup_window_button("list_item_edit_popup.cgi?" . $qparams, $internalfield, $formid, $button_text, $w, $h, 0, \@fieldmapping );
+    # my $button = &add_item_popup_modal_button("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $button_text, $w, $h, 0, \@fieldmapping );
+    my $button = &add_item_popup_modal_button("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $button_text );
+
+    # my $add_new_script = "<script>\n";
+    # $add_new_script .= "function submit_new_" . $formid . "(vals) {";
+    # $add_new_script .= "  vals.forEach((o) => {";
+    # $add_new_script .= "    let f=o.f;let v=o.v;";
+    # $add_new_script .= "    if (f==\"submit\") return;";
+    # $add_new_script .= "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);";
+    # $add_new_script .= "  });";
+    # $add_new_script .= "  \$(\"#" . $formid . "\").submit();";
+    # $add_new_script .= "}\n";
+    # $add_new_script .= "</script>\n";
+    # return ($button, $hidden_input_fields, $add_new_script);
+    return ($button, $hidden_input_fields);
 }
 
 sub ui_selectbox_with_controls {
@@ -1241,9 +1308,7 @@ sub show_field_table {
     my ($internalfield, $apply_cgi, $addtext, $dnsmconfig) = @_;
     my $configfield = &internal_to_config($internalfield);
     my $definition = %configfield_fields{$internalfield};
-    my $edit_link;
     my $hidden_edit_input_fields;
-    my $edit_script;
     my @newfields = @{$definition->{"param_order"}};
     my @editfields = ( "idx", @newfields );
     my $formid = $internalfield . "_form";
@@ -1258,7 +1323,7 @@ sub show_field_table {
         $text{"enabled"}
     );
     if ( @newfields == 1 ) {
-        push(@column_headers, $text{"p_label_$internalfield"} );
+        push(@column_headers, $definition->{"@newfields[0]"}->{"label"} );
         push( @tds, $td_left );
         $h = $h + 31;
     }
@@ -1270,13 +1335,12 @@ sub show_field_table {
         }
     }
     my @list_link_buttons = &list_links( "sel", 3 );
-    my ($add_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $addtext), $internalfield, $text{"p_label_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $addtext), $internalfield, $text{"p_label_$internalfield"}, $w, $h, $formid, \@newfields );
     push(@list_link_buttons, $add_button);
 
     my $count=0;
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
     print &ui_columns_start( \@column_headers, 100, undef, undef, 
         &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], 
         [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
@@ -1284,6 +1348,7 @@ sub show_field_table {
         local @cols;
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         foreach my $param ( @newfields ) {
+            my $edit_link;
             my $val = ($param eq "val") ? $item->{"$param"} : $item->{"val"}->{"$param"};
             if ($definition->{"$param"}->{"arr"} == 1) {
                 $val = join($definition->{"$param"}->{"sep"}, @{$val})
@@ -1292,23 +1357,24 @@ sub show_field_table {
                 $val = &ui_checkbox("boolval", "1", "", $val, undef, 1)
             }
             if ($count == 0) {
-                ($edit_link, $hidden_edit_input_fields, $edit_script) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
             }
             else {
                 ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
             }
             push ( @cols, $edit_link );
         }
-        print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
-    print $hidden_edit_input_fields . $edit_script;
     print &ui_links_row(\@list_link_buttons);
     print "<p>" . $text{"with_selected"} . "</p>";
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print $hidden_add_input_fields;
+    print $hidden_edit_input_fields;
     print &ui_form_end();
     print &ui_hr();
 }
@@ -1409,34 +1475,10 @@ sub custom_theme_ui_links_row {
     }
 }
 
-=head2 add_js(uses_select_none, uses_add_item, uses_add_file, uses_add_interface, formid, internalfield)
-=cut
-sub add_js {
+sub header_js {
     my ($formid, $internalfield) = @_;
     my $script = "";
     $script .= "<script type='text/javascript'>\n"
-             . "\$(document).ready(function() {\n"
-             . "  setTimeout(function() {\n"
-             . "    \$(\"<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".select-none\");\n"
-             . "    \$(\"<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".file-chooser-button\");\n"
-            #  . "    \$(\".new-file-input\").each(function(){\$(this).on(\"input\", function(){this.form.submit();return false;});});"
-             . "    \$(\".new-file-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());});"
-             . "    \$(\"<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".iface-chooser-button\");\n"
-            #  . "    \$(\".new-iface-input\").each(function(){\$(this).on(\"input\", function(){this.form.submit();return false;});});"
-             . "    \$(\".new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());});"
-             . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".remove-item-button\");\n"
-             . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".remove-item-button-small\");\n"
-             . "    \$(\".remove-item-button-small\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"height: 28px !important; margin-right: 4px; display: inline-block;\";});\n"
-             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 5px;'></i>\").prependTo(\".add-item-button\");\n"
-             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".add-item-button-small\");\n"
-             . "    \$(\".add-item-button-small\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"height: 28px !important; margin-left: -4px; display: inline-block;\";});\n"
-            #  . "    \$(\"input[name\$=_additem]\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"height: 28px !important; margin-right: 0px !important;\";});\n"
-             . "    \$(\"input[dummy_field]\").hide();"
-            #  . "    \$(\"select[multiple]\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"min-height: 28px !important; max-height: 120px !important;\";});"
-             . "    \$(\"select[multiple]\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"min-height: unset !important; max-height: unset !important;\";});\n" # TODO fixed upstream in theme; remove when released/supported
-             . "  }, 5);\n"
-             . "\n"
-             . "});\n"
              . "function addItemToSelect(sel){\n"
              . "    let v=\$(\"input[name=\"+sel+\"_additem]\").val();\n"
              . "    if (v) \$(\"select[name=\"+sel+\"]\").append(\$(\"<option></option>\").attr(\"value\",v).text(v));\n"
@@ -1454,6 +1496,89 @@ sub add_js {
              . "            }\n"
              . "        });\n"
              . "    });\n"
+             . "}\n"
+             . "</script>\n"
+            . "<style type='text/css'>\n"
+            # . "\n"
+            # . ".modal-content {\n"
+            # . "  margin: 10px;\n"
+            # . "}\n"
+            # . ".modal-button {\n"
+            # . "  float: right;\n"
+            # . "}\n"
+            # . ".modal-button-cancel {\n"
+            # . "  display: inline;\n"
+            # . "}\n"
+            # . ".modal-button-save {\n"
+            # . "  display: inline !important;\n"
+            # . "}\n"
+            # . "\n"
+            . "</style>\n";
+    return $script;
+}
+=head2 add_js()
+=cut
+sub add_js {
+    my $script = "";
+    $script .= "<script type='text/javascript'>\n"
+             . "\$(document).ready(function() {\n"
+             . "  setTimeout(function() {\n"
+             . "    \$(\"<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".select-none\");\n" # adds icon to "select none" link/button
+             . "    \$(\"<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".file-chooser-button\");\n" # adds icon to "new file" link/button
+             . "    \$(\".new-file-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());});" # adds "new file" link to button list
+             . "    \$(\"<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".iface-chooser-button\");\n" # adds icon to "new interface" link/button
+             . "    \$(\".new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());});" # adds "new interface" link to button list
+             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 5px;'></i>\").prependTo(\".add-item-button\");\n" # adds icon to "new <item>" link/button
+             . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".remove-item-button\");\n" # adds icon to "remove <item>" link/button
+             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".add-item-button-small\");\n" # adds icon to mini "new <item>" button for select box
+             . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".remove-item-button-small\");\n" # adds icon to mini "remove <item>" button for select box
+             . "    \$(\".add-item-button-small\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"height: 28px !important; margin-left: -4px; display: inline-block;\";});\n"
+             . "    \$(\".remove-item-button-small\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"height: 28px !important; margin-right: 4px; display: inline-block;\";});\n"
+             . "    \$(\"input[dummy_field]\").hide();"
+             . "    \$(\"select[multiple]\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"min-height: unset !important; max-height: unset !important;\";});\n" # TODO fixed upstream in theme; remove when released/supported
+             . "  }, 0);\n";
+    $script .= "  if (!\$('#list-item-edit-modal').length) {\n"
+             . "    var g='<div class=\"modal fade fade5 in\" id=\"list-item-edit-modal\" tabindex=\"-1\" role=\"dialog\" aria-hidden=\"true\">"
+             . "      <div class=\"modal-dialog\">"
+             . "        <div class=\"modal-content\" style=\"padding: 10px;\">"
+            #  . "          <div class=\"modal-header \"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button><h4 class=\"modal-title\"></h4></div>"
+             . "        </div>"
+             . "      </div>"
+             . "    </div>';\n"
+             . "    \$(document.body).append(g);\n"
+             . "    \$(\"#list-item-edit-modal\").on('hidden.bs.modal', function () {\n"
+             . "      \$(this).data('bs.modal', null);\n"
+             . "      \$(this).find(\".modal-content\").html(\"\");\n"
+             . "    });\n"
+             . "  }\n"
+             . "\n"
+             . "});\n";
+    $script .= "function addItemToSelect(sel){\n"
+             . "    let v=\$(\"input[name=\"+sel+\"_additem]\").val();\n"
+             . "    if (v) \$(\"select[name=\"+sel+\"]\").append(\$(\"<option></option>\").attr(\"value\",v).text(v));\n"
+             . "    \$(\"input[name=\"+sel+\"_additem]\").val(\"\");\n"
+             . "}\n"
+             . "function removeSelectItem(sel){\n"
+             . "    var sItems=[];\n"
+             . "    \$(\"select[name=\"+sel+\"]\").each(function(){\n"
+             . "        sItems.push(\$(this).val());\n"
+             . "    });\n"
+             . "    \$(\"select[name=\"+sel+\"]\").each(function(i,select){\n"
+             . "        \$(\"select[name=\"+sel+\"] option\").each(function(ii,option){\n"
+             . "            if(\$(option).val() != \"\" && sItems[i] == \$(option).val() && sItems[i] != \$(option).parent().val()){\n"
+             . "                \$(option).remove();\n"
+             . "            }\n"
+             . "        });\n"
+             . "    });\n"
+             . "}\n";
+    $script .= "function submit_form(vals, formid) {"
+             . "  vals.forEach((o) => {"
+             . "    let f=o.f;let v=o.v;"
+             . "    if (f==\"submit\") return;"
+             . "    var selector = \"#\" + formid + \" input[name=\"+f+\"]\";"
+             . "    \$( selector ).val(v);"
+             . "  });"
+             . "  \$(\"#\"+formid).submit();"
              . "}\n"
              . "</script>\n";
     #          . "</div>\n";

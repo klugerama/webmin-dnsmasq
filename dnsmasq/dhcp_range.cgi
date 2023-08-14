@@ -25,6 +25,8 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+# read posted data
+&ReadParse();
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_range"});
 
@@ -32,14 +34,13 @@ my $returnto = $in{"returnto"} || "dhcp_range.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_range"};
 my $apply_cgi = "dhcp_range_apply.cgi";
 
-my $internalfield = "dhcp_range";
+our $internalfield = "dhcp_range";
 my $configfield = &internal_to_config($internalfield);
 my $definition = %configfield_fields{$internalfield};
 
 sub show_ip4 {
     my $edit_link;
     my $hidden_edit_input_fields;
-    my $edit_script;
     my @modes = ();
     my @newfields = ( "ipversion" );
     foreach my $param ( @{$definition->{"param_order"}} ) {
@@ -75,13 +76,12 @@ sub show_ip4 {
     }
     # my @list_link_buttons = &list_links( "sel", 0, $apply_cgi, "dhcp-range=0.0.0.0,0.0.0.0", $returnto, &text("add_", $text{"_range"}) );
     my @list_link_buttons = &list_links( "sel", 3 );
-    my ($add_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields, "ipversion=ip4" );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields, "ipversion=ip4" );
     push(@list_link_buttons, $add_button);
 
     my $count = -1;
-    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi . "?mode=modal_ip4", "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
     print &ui_columns_start( \@column_headers, 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         $count++;
@@ -101,29 +101,29 @@ sub show_ip4 {
         }
         foreach my $val ( @vals ) {
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields, $edit_script) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields, "ipversion=ip4");
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields, "ipversion=ip4");
             }
             else {
                 ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields, "ipversion=ip4");
             }
             push( @cols, $edit_link );
         }
-        print &ui_checked_columns_row( \@cols, undef, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
     }
     print &ui_columns_end();
-    print $hidden_edit_input_fields . $edit_script;
     print &ui_links_row(\@list_link_buttons);
     print "<p>" . $text{"with_selected"} . "</p>";
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print $hidden_add_input_fields;
+    print $hidden_edit_input_fields;
     print &ui_form_end();
 }
 
 sub show_ip6 {
     my $edit_link;
     my $hidden_edit_input_fields;
-    my $edit_script;
     my @modes = ();
     my @newfields = ( "ipversion" );
     foreach my $param ( @{$definition->{"param_order"}} ) {
@@ -134,7 +134,7 @@ sub show_ip6 {
         push( @newfields, $param );
     }
     my @editfields = ( "idx", @newfields );
-    my $formid = "dhcp_range_6";
+    my $formid = $internalfield . "_6_form";
     my $w = 520;
     my $h = 340; # base value
     my $extralines = length($text{"p_man_desc_$internalfield"}) / 75;
@@ -157,13 +157,12 @@ sub show_ip6 {
         $h = $h + 31;
     }
     my @list_link_buttons = &list_links( "sel", 3 );
-    my ($add_button, $hidden_add_input_fields, $add_new_script) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields, "ipversion=ip6" );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields, "ipversion=ip6" );
     push(@list_link_buttons, $add_button);
 
     my $count = -1;
-    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi . "?mode=modal_ip4", "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields . $add_new_script;
     print &ui_columns_start( \@column_headers, 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         $count++;
@@ -182,22 +181,23 @@ sub show_ip6 {
         }
         foreach my $val ( @vals ) {
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields, $edit_script) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields, "ipversion=ip6");
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields, "ipversion=ip6");
             }
             else {
                 ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields, "ipversion=ip6");
             }
             push( @cols, $edit_link );
         }
-        print &ui_checked_columns_row( \@cols, undef, "sel", $count );
+        print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $count );
     }
     print &ui_columns_end();
-    print $hidden_edit_input_fields . $edit_script;
     print &ui_links_row(\@list_link_buttons);
     print "<p>" . $text{"with_selected"} . "</p>";
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print $hidden_add_input_fields;
+    print $hidden_edit_input_fields;
     print &ui_form_end();
 }
 

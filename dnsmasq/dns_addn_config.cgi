@@ -41,7 +41,7 @@ sub show_conf_file {
     print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
     # @list_link_buttons = &list_links( "sel", 0, "dns_addn_config_apply.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
     @list_link_buttons = &list_links( "sel", 0 );
-    my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"filename"}), "new_" . $internalfield, 0, $formid );
+    my ($file_chooser_button, $hidden_input_fields) = &add_file_chooser_button( &text("add_", $text{"filename"}), "new_" . $internalfield, 0, $formid );
     print &ui_links_row(\@list_link_buttons);
     print $hidden_input_fields;
     print $file_chooser_button;
@@ -69,7 +69,6 @@ sub show_conf_file {
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $submit_script;
     print &ui_form_end( );
     print &ui_hr();
 }
@@ -102,7 +101,6 @@ sub show_servers_file {
         # push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # push ( @cols, $edit );
         push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"filename"}, $definition->{"filename"}->{"length"}, 0, undef, "idx=\"$count\"") );
-        # print &ui_checked_columns_row( \@cols, undef, "sel", $count );
         print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $configfield, 0 );
         $count++;
 
@@ -123,7 +121,6 @@ sub show_servers_file {
 sub show_conf_dir {
     my @edit_link = ( "", "" );
     my $hidden_edit_input_fields;
-    my $edit_script;
     my $count=0;
     my $internalfield = "conf_dir";
     my $configfield = &internal_to_config($internalfield);
@@ -154,7 +151,7 @@ sub show_conf_dir {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields, $edit_script) = &edit_item_link($val{"filter"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"filter"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
         ($edit_link[1]) = &edit_item_link($val{"exceptions"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
         # my $edit = "<a href=dns_addn_config_edit.cgi?idx=$count>".$confdir->{"val"}->{"dirname"}."</a>";
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
@@ -164,7 +161,6 @@ sub show_conf_dir {
         # push ( @cols, $item->{"val"}->{"exceptions"} );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );
-        # print &ui_checked_columns_row( \@cols, undef, "sel", $count );
         print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $configfield, 0 );
         $count++;
 
@@ -177,7 +173,7 @@ sub show_conf_dir {
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $hidden_edit_input_fields . $edit_script;
+    print $hidden_edit_input_fields;
     print &ui_form_end( );
 }
 
