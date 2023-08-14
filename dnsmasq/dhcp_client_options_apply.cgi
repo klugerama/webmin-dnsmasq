@@ -29,7 +29,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $returnto = $in{"returnto"} || "dhcp_client_option.cgi";
+my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 
 # check for errors in read config
@@ -143,7 +143,7 @@ else {
 
 #
 # re-load client options page
-&redirect( "dhcp_client_options.cgi" );
+&redirect( $returnto );
 
 # 
 # sub-routines

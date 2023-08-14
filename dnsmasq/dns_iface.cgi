@@ -188,7 +188,7 @@ sub show_listen_address {
     print &ui_hr();
 }
 
-@tabs = (   [ 'basic', $text{'index_basic'} ],
+my @tabs = (   [ 'basic', $text{'index_basic'} ],
             [ 'interface', $text{"p_desc_interface"} ],
             [ 'except_interface', $text{"p_desc_except_interface"} ],
             [ 'no_dhcp_interface', $text{"p_desc_no_dhcp_interface"} ],

@@ -36,7 +36,7 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
-
+# read posted data
 &ReadParse();
 
 # &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>");
@@ -52,7 +52,7 @@ if( $dnsmconfig{"errors"} > 0 ) {
 	print $dnsmconfig{"errors"};
 	print "errors in config file!</h3><br>\n";
 }
-@tabs = (   [ 'dns', $text{'index_dns_settings'} ],
+my @tabs = (   [ 'dns', $text{'index_dns_settings'} ],
             [ 'dhcp', $text{'index_dhcp_settings'} ],
             [ 'tftp', $text{'index_tftp_settings'} ] );
 print ui_tabs_start(\@tabs, 'mode', $mode);

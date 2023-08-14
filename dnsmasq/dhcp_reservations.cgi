@@ -58,6 +58,7 @@ sub show_reservations() {
         $text{"p_label_val_ip_address"}, 
         $text{"p_label_val_mac"}, 
         $text{"p_label_val_ignore"}, 
+        $text{"p_label_val_set_tags"}, 
         $text{"p_label_val_tag"}, 
         $text{"p_label_val_leasetime"}, );
     foreach my $param ( @newfields ) {
@@ -72,7 +73,6 @@ sub show_reservations() {
     my $count = 0;
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
-    print $hidden_add_input_fields;
     print &ui_columns_start( \@column_headers, 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local @cols;
@@ -82,7 +82,8 @@ sub show_reservations() {
             $item->{"val"}->{"ip"}, 
             $item->{"val"}->{"infiniband"} . $item->{"val"}->{"clientid"} . $item->{"val"}->{"mac"}, 
             &ui_checkbox("enabled", "1", "", $item->{"val"}->{"ignore_clientid"}?1:0, undef, 1),
-            $item->{"val"}->{"tagname"}, 
+            join(",", @{$item->{"val"}->{"settag"}}), 
+            $item->{"val"}->{"tag"}, 
             $item->{"val"}->{"leasetime"});
         foreach my $val ( @vals ) {
             if ( ! $hidden_edit_input_fields) {
@@ -97,12 +98,13 @@ sub show_reservations() {
         $count++;
     }
     print &ui_columns_end();
-    print $hidden_edit_input_fields;
     print &ui_links_row(\@list_link_buttons);
     print "<p>" . $text{"with_selected"} . "</p>";
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print $hidden_add_input_fields;
+    print $hidden_edit_input_fields;
     print &ui_form_end( );
 }
 

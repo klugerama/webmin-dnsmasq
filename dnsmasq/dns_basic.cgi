@@ -25,6 +25,8 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+# read posted data
+&ReadParse();
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_settings_basic"});
 
@@ -153,7 +155,7 @@ sub show_resolv_file {
     print $g;
 }
 
-@tabs = (   [ 'basic', $text{'index_basic'} ],
+my @tabs = (   [ 'basic', $text{'index_basic'} ],
             [ 'addn_hosts', $text{"p_desc_addn_hosts"} ],
             [ 'hostsdir', $text{"p_desc_hostsdir"} ],
             [ 'resolv_file', $text{"p_desc_resolv_file"} ] );

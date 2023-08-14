@@ -1751,7 +1751,7 @@ sub init_configfield_fields {
             },
         }, # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
         "dhcp_host" => { 
-            "param_order" => [ "mac", "clientid", "infiniband", "tagname", "ip", "hostname", "leasetime", "ignore" ],
+            "param_order" => [ "mac", "clientid", "infiniband", "settag", "tag", "ip", "hostname", "leasetime", "ignore" ],
             "mac" => {
                 "length" => 10,
                 "valtype" => "string",
@@ -1776,13 +1776,23 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_infiniband"},
                 "template" => "id:<" . $text{"tmpl_infiniband"} . ">"
             },
-            "tagname" => {
+            "settag" => {
+                "length" => 10,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_set_tags"},
+                "template" => "set:<" . $text{"tmpl_tag"} . ">",
+                "arr" => 1,
+                "sep" => ",",
+            },
+            "tag" => {
                 "length" => 10,
                 "valtype" => "string",
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_tags"},
-                "template" => "[set:<" . $text{"tmpl_tag"} . ">][tag:<" . $text{"tmpl_tag"} . ">]"
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">"
             },
             "ip" => {
                 "length" => 10,
@@ -2880,6 +2890,7 @@ our $TIME = "[0-9]{1,3}[mh]";
 our $FILE = "[0-9a-zA-Z\_\.\/\-]+";
 our $NUMBER="[0-9]+";
 my $TAG = "(set|tag):([!0-9a-zA-Z\_\.\-]*)";
+my $SETTAG = "(?:set:)[!0-9a-zA-Z\_\.\-]*";
 my $IPV6PROP = "static|ra-only|ra-names|ra-stateless|slaac|ra-advrouter|off-link";
 my $OPTION = "option6?:([0-9a-zA-Z\-]*)|[0-9]{1,3}";
 my $NAME = "[a-zA-Z\_\.][0-9a-zA-Z\_\.\-]*";
@@ -2946,7 +2957,8 @@ sub parse_config_file {
             }
             next if ($found == 1);
             if ($line =~ /(^[\#]*[\s]*([a-z0-9\-]+))\=(.*)$/ ) {
-                my $option = $2;
+                my $configfield = $2;
+                my $internalfield = &config_to_internal($configfield);
                 $remainder = $3;
                 %temp = ( );
                 $temp{"used"} = ($line !~ /^\#/);
@@ -2954,12 +2966,12 @@ sub parse_config_file {
                 $temp{"file"} = $config_filename;
                 $temp{"full"} = $line;
                 # $temp{"filearray"}=\$config_file;
-                if ( ! grep { /^$option$/ } ( keys %dnsmconfigvals ) ) {
-                    print "Error in line $lineno ($option: unknown option)! ";
+                if ( ! grep { /^$configfield$/ } ( keys %dnsmconfigvals ) ) {
+                    print "Error in line $lineno ($configfield: unknown option)! ";
                     $$dnsmconfig_ref{"errors"}++;
                     next;
                 }
-                my %confvar = %dnsmconfigvals{"$option"};
+                my %confvar = %dnsmconfigvals{"$configfield"};
                 if ( $confvar{"mult"} ne "" ) {
                     my $sep = $confvar{"mult"};
                     # $temp{"val"} = @();
@@ -2968,18 +2980,23 @@ sub parse_config_file {
                         $remainder = $2;
                     }
                 }
-                elsif ( grep { /^$option$/ } ( @confsingles ) ) {
-                    $temp{"val"} = $remainder;
+                elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
+                    if ($configfield_fields->{$internalfield}->{"val"}->{"arr"} == 1) {
+                        push( @{$temp{"val"}}, split(",", $remainder) );
+                    }
+                    else {
+                        $temp{"val"} = $remainder;
+                    }
                     # $temp{"val"} = "test";
                 }
                 else {
                     my %valtemp = ();
                     $valtemp{"full"} = $remainder;
-                    if ($option eq "local") {
-                        $option = "server";
+                    if ($configfield eq "local") {
+                        $configfield = "server";
                         $valtemp{"is_local"} = 1;
                     }
-                    given ( "$option" ){
+                    given ( "$configfield" ){
                         when ("auth-server") { # =<domain>,[<interface>[/4|/6]|<ip-address>...]
                             if( $remainder =~ /^($NAME),(.*)$/ ) {
                                 $valtemp{"domain"} = $1;
@@ -3509,9 +3526,14 @@ sub parse_config_file {
                                 $valtemp{"leasetime"}=$4;
                                 $valtemp{"time-used"}=($4 =~ /^\d/);
                             }
+                            $current = 0;
+                            while ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\* ]*)($SETTAG)((,)([0-9a-zA-Z\.\,\-\_:\* ]*))*$/ && defined ($3) && defined ($4)) {
+                                push( @{$valtemp{"settag"}}, $2);
+                                $remainder = $1 . $5;
+                                last if ($current++ >= $max_iterations);
+                            }
                             if ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\* ]*)($TAG)((,)([0-9a-zA-Z\.\,\-\_:\* ]*))*$/ && defined ($3) && defined ($4)) {
-                                $valtemp{"tag-set"}=($3 eq "set");
-                                $valtemp{"tagname"}=$4;
+                                $valtemp{"tag"}=$4;
                                 $remainder = $1 . $7;
                             }
                             $valtemp{"mac"} = "";
@@ -3621,7 +3643,7 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-option-force") { # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-                            $option = "dhcp-option";
+                            $configfield = "dhcp-option";
                             # too many to classify - all values as string!
                             $remainder =~ s/^\s+|\s+$//g ;
                             $valtemp{"forced"} = 1;
@@ -4014,12 +4036,12 @@ sub parse_config_file {
                     }
                     $temp{"val"} = { %valtemp };
                 }
-                if ( grep { /^$option$/ } ( @confarrs ) ) {
-                    push @{ $$dnsmconfig_ref{"$option"} }, { %temp };
+                if ( grep { /^$configfield$/ } ( @confarrs ) ) {
+                    push @{ $$dnsmconfig_ref{"$configfield"} }, { %temp };
                 }
                 else {
-                    if ($$dnsmconfig_ref{"$option"}{"used"} == 0) {
-                        $$dnsmconfig_ref{"$option"} = { %temp };
+                    if ($$dnsmconfig_ref{"$configfield"}{"used"} == 0) {
+                        $$dnsmconfig_ref{"$configfield"} = { %temp };
                     }
                 }
                 foreach my $set_tag ( @line_set_tags ) {

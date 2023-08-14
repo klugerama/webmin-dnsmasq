@@ -141,7 +141,7 @@ sub show_rev_server {
     print &ui_form_end();
 }
 
-@tabs = (   [ 'basic', $text{'index_basic'} ],
+my @tabs = (   [ 'basic', $text{'index_basic'} ],
             [ 'server', $text{"p_desc_server"} ],
             [ 'rev_server', $text{"p_desc_rev_server"} ],
         );

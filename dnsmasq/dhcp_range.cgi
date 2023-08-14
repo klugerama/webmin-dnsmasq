@@ -201,7 +201,7 @@ sub show_ip6 {
     print &ui_form_end();
 }
 
-@tabs = (   [ 'ip4', $text{"dhcp_ipversion4"} ],
+my @tabs = (   [ 'ip4', $text{"dhcp_ipversion4"} ],
             [ 'ip6', $text{"dhcp_ipversion6"} ] );
 my $ipversion = $in{"ipversion"} || "ip4";
 print ui_tabs_start(\@tabs, "ipversion", $ipversion);

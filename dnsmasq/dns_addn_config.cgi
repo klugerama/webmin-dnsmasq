@@ -25,6 +25,8 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+# read posted data
+&ReadParse();
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_addn_config"});
 
@@ -177,7 +179,7 @@ sub show_conf_dir {
     print &ui_form_end( );
 }
 
-@tabs = (   [ 'conf_file', $text{'p_desc_conf_file'} ],
+my @tabs = (   [ 'conf_file', $text{'p_desc_conf_file'} ],
             [ 'servers_file', $text{"p_desc_servers_file"} ],
             [ 'conf_dir', $text{"p_desc_conf_dir"} ],
         );

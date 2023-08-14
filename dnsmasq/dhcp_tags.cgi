@@ -25,6 +25,8 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+# read posted data
+&ReadParse();
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_tags"});
 
@@ -133,7 +135,7 @@ foreach my $configfield ( @confdhcp ) {
     next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "4" );
     push( @page_fields, $configfield );
 }
-@tabs = (
+my @tabs = (
             # [ 'basic', $text{'index_basic'} ], # there aren't any basic fields here!
             [ 'basic_match', $text{"index_dhcp_other_tags"} ],
             [ 'userclass', $text{"index_dhcp_userclass"} ],

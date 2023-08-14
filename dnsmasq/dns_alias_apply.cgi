@@ -30,7 +30,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $mode = $in{"mode"} || "basic";
-my $returnto = $in{"returnto"} || "dns_alias.cgi";
+my $returnto = $in{"returnto"} || "dns_alias.cgi?mode=$mode";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 
 # check for errors in read config

@@ -29,7 +29,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $mode = $in{"mode"} || "basic";
-my $returnto = $in{"returnto"} || "dhcp_tags.cgi";
+my $returnto = $in{"returnto"} || "dhcp_tags.cgi?mode=$mode";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_tags"};
 
 # check for errors in read config
