@@ -40,7 +40,7 @@ sub show_server {
     my $configfield = &internal_to_config($internalfield);
     my @newfields = ( "domain", "ip", "source" );
     my @editfields = ( "idx", @newfields );
-    my $formid = "dns_upstream_servers_form";
+    my $formid = $internalfield . "_form";
     my @list_link_buttons = &list_links( "sel", 0 );
     my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_upstream_srv"}), $internalfield, $text{"index_dns_servers"}, 700, 505, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);

@@ -43,7 +43,7 @@ sub show_conf_file {
     print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
     # @list_link_buttons = &list_links( "sel", 0, "dns_addn_config_apply.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
     @list_link_buttons = &list_links( "sel", 0 );
-    my ($file_chooser_button, $hidden_input_fields) = &add_file_chooser_button( &text("add_", $text{"filename"}), "new_" . $internalfield, 0, $formid );
+    my ($file_chooser_button, $hidden_input_fields) = &add_file_chooser_button( &text("add_", $text{"_filename"}), "new_" . $internalfield, 0, $formid );
     print &ui_links_row(\@list_link_buttons);
     print $hidden_input_fields;
     print $file_chooser_button;
@@ -84,7 +84,7 @@ sub show_servers_file {
     print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
     # @list_link_buttons = &list_links( "sel", 1, "dns_addn_config_apply.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
     @list_link_buttons = &list_links( "sel", 1 );
-    my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"filename"}), "new_" . $internalfield, 0, $formid );
+    my ($file_chooser_button, $hidden_input_fields) = &add_file_chooser_button( &text("add_", $text{"_filename"}), "new_" . $internalfield, 0, $formid );
     print &ui_links_row(\@list_link_buttons);
     print $hidden_input_fields;
     print $file_chooser_button;
@@ -115,7 +115,6 @@ sub show_servers_file {
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $submit_script;
     print &ui_form_end( );
     print &ui_hr();
 }
@@ -135,7 +134,7 @@ sub show_conf_dir {
     my $w = 500;
     my $h = 505;
     @list_link_buttons = &list_links( "sel", 2 );
-    my ($file_chooser_button, $hidden_input_fields, $submit_script) = &add_file_chooser_button( &text("add_", $text{"directory"}), "new_" . $internalfield, 1, $formid );
+    my ($file_chooser_button, $hidden_input_fields) = &add_file_chooser_button( &text("add_", $text{"_directory"}), "new_" . $internalfield, 1, $formid );
     print &ui_links_row(\@list_link_buttons);
     print $hidden_input_fields;
     print $file_chooser_button;

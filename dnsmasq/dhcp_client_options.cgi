@@ -32,7 +32,7 @@ my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_client_options"};
 my $apply_cgi = "dhcp_client_options_apply.cgi";
 
-&show_field_table("dhcp_option", $apply_cgi, $text{"_dhcp_option"}, \%dnsmconfig);
+&show_field_table("dhcp_option", $apply_cgi, $text{"_dhcp_option"}, \%dnsmconfig, 1);
 
 print &add_js();
 

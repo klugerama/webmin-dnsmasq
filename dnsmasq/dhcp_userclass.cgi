@@ -32,9 +32,9 @@ my $returnto = $in{"returnto"} || "dhcp_userclass.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_userclass"};
 my $apply_cgi = "dhcp_userclass_apply.cgi";
 
-my $formid = "userclass_form";
 my $internalfield = "dhcp_userclass";
 my $configfield = &internal_to_config($internalfield);
+my $formid = $internalfield . "_form";
 my @newfields = ( "tag", "userclass" );
 my @editfields = ( "idx", @newfields );
 my @list_link_buttons = &list_links( "sel", 0 );

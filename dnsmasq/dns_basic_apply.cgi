@@ -39,8 +39,8 @@ if( $dnsmconfig{"errors"} > 0 ) {
 }
 
 my @sel = split(/\0/, $in{'sel'});
-my @hosts_file_adds = split(/\0/, $in{'new_addn_hosts_file'});
-my @hostsdir_adds = split(/\0/, $in{'new_hostsdir_dir'});
+my @hosts_file_adds = split(/\0/, $in{'new_addn_hosts'});
+my @hostsdir_adds = split(/\0/, $in{'new_hostsdir'});
 my @resolv_file_adds = split(/\0/, $in{'new_resolv_file'});
 
 if ($in{"submit"}) {
@@ -55,6 +55,13 @@ elsif (@hosts_file_adds) {
     }
 
 }
+elsif ($in{"addn_hosts"} ne "" && $in{"addn_hosts_idx"} ne "") {
+    my $item = $dnsmconfig{"addn-hosts"}[$in{"addn_hosts_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "addn-hosts=" . $in{"addn_hosts"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
+}
 elsif (@hostsdir_adds) {
 
     foreach my $hostsdir_add (@hostsdir_adds) {
@@ -63,6 +70,13 @@ elsif (@hostsdir_adds) {
         }
     }
 
+}
+elsif ($in{"hostsdir"} ne "" && $in{"hostsdir_idx"} ne "") {
+    my $item = $dnsmconfig{"hostsdir"}[$in{"hostsdir_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "hostsdir=" . $in{"hostsdir"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
 }
 elsif (@resolv_file_adds) {
 
@@ -73,29 +87,14 @@ elsif (@resolv_file_adds) {
     }
 
 }
+elsif ($in{"resolv_file"} ne "" && $in{"resolv_file_idx"} ne "") {
+    my $item = $dnsmconfig{"resolv-file"}[$in{"resolv_file_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "resolv-file=" . $in{"resolv_file"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
+}
 else {
-    # my $action = $in{"enable_sel_addn_hosts"} ? "enable" : $in{"disable_sel_addn_hosts"} ? "disable" : $in{"delete_sel_addn_hosts"} ? "delete" : "";
-    # if ($action ne "") {
-    #     @sel || &error($text{'selected_none'});
-
-    #     &update_selected("addn-hosts", $action, \@sel, \%$dnsmconfig);
-    # }
-    # else {
-    #     $action = $in{"enable_sel_hostsdir"} ? "enable" : $in{"disable_sel_hostsdir"} ? "disable" : $in{"delete_sel_hostsdir"} ? "delete" : "";
-    #     if ($action ne "") {
-    #         @sel || &error($text{'selected_none'});
-
-    #         &update_selected("hostsdir", $action, \@sel, \%$dnsmconfig);
-    #     }
-    #     else {
-    #         $action = $in{"enable_sel_resolv_file"} ? "enable" : $in{"disable_sel_resolv_file"} ? "disable" : $in{"delete_sel_resolv_file"} ? "delete" : "";
-    #         if ($action ne "") {
-    #             @sel || &error($text{'selected_none'});
-
-    #             &update_selected("resolv-file", $action, \@sel, \%$dnsmconfig);
-    #         }
-    #     }
-    # }
     &do_selected_action( [ "addn_hosts", "hostsdir", "resolv_file" ], \@sel, \%$dnsmconfig );
 }
 #

@@ -48,9 +48,9 @@ if( $dnsmconfig{"errors"} > 0 ) {
 #
 
 my @sel = split(/\0/, $in{'sel'});
-my @listen_iface_adds = split(/\0/, $in{'new_listen_iface'});
-my @except_iface_adds = split(/\0/, $in{'new_except_iface'});
-my @no_dhcp_iface_adds = split(/\0/, $in{'new_no_dhcp_iface'});
+my @listen_iface_adds = split(/\0/, $in{'new_interface'});
+my @except_iface_adds = split(/\0/, $in{'new_except_interface'});
+my @no_dhcp_iface_adds = split(/\0/, $in{'new_no_dhcp_interface'});
 my @listen_address_adds = split(/\0/, $in{'new_listen_address'});
 
 my @dns_bools = ();
@@ -75,6 +75,13 @@ if (@listen_iface_adds && join("", @listen_iface_adds) ne "") {
     }
 
 }
+elsif ($in{"interface_idx"} ne "" && $in{"interface_val"} ne "") {
+    my $item = $dnsmconfig{"interface"}[$in{"interface_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "interface=" . $in{"interface_val"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
+}
 elsif (@except_iface_adds && join("", @except_iface_adds) ne "") {
 
     foreach my $except_iface_add (@except_iface_adds) {
@@ -84,6 +91,13 @@ elsif (@except_iface_adds && join("", @except_iface_adds) ne "") {
     }
 
 }
+elsif ($in{"except_interface_idx"} ne "" && $in{"except_interface_val"} ne "") {
+    my $item = $dnsmconfig{"except-interface"}[$in{"except_interface_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "except-interface=" . $in{"except_interface_val"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
+}
 elsif (@no_dhcp_iface_adds && join("", @no_dhcp_iface_adds) ne "") {
 
     foreach my $no_dhcp_iface_add (@no_dhcp_iface_adds) {
@@ -92,6 +106,13 @@ elsif (@no_dhcp_iface_adds && join("", @no_dhcp_iface_adds) ne "") {
         }
     }
 
+}
+elsif ($in{"no_dhcp_interface_idx"} ne "" && $in{"no_dhcp_interface_val"} ne "") {
+    my $item = $dnsmconfig{"no-dhcp-interface"}[$in{"no_dhcp_interface_idx"}];
+    my $file_arr = &read_file_lines($item->{"file"});
+    my $val = "no-dhcp-interface=" . $in{"no_dhcp_interface_val"};
+    &update($item->{"line"}, $val, \@$file_arr, 0);
+    &flush_file_lines();
 }
 elsif (@listen_address_adds && join("", @listen_address_adds) ne "") {
 
@@ -110,36 +131,6 @@ elsif ($in{"listen_address_idx"} ne "" && $in{"listen_address_val"} ne "") {
     &flush_file_lines();
 }
 else {
-    # my $action = $in{"enable_sel_iface"} ? "enable" : $in{"disable_sel_iface"} ? "disable" : $in{"delete_sel_iface"} ? "delete" : "";
-    # if ($action ne "") {
-    #     @sel || &error($text{'selected_none'});
-
-    #     &update_selected("interface", $action, \@sel, \%$dnsmconfig);
-    # }
-    # else {
-    #     $action = $in{"enable_sel_except_iface"} ? "enable" : $in{"disable_sel_except_iface"} ? "disable" : $in{"delete_sel_except_iface"} ? "delete" : "";
-    #     if ($action ne "") {
-    #         @sel || &error($text{'selected_none'});
-
-    #         &update_selected("except-interface", $action, \@sel, \%$dnsmconfig);
-    #     }
-    #     else {
-    #         $action = $in{"enable_sel_no_dhcp_iface"} ? "enable" : $in{"disable_sel_no_dhcp_iface"} ? "disable" : $in{"delete_sel_no_dhcp_iface"} ? "delete" : "";
-    #         if ($action ne "") {
-    #             @sel || &error($text{'selected_none'});
-
-    #             &update_selected("no-dhcp-interface", $action, \@sel, \%$dnsmconfig);
-    #         }
-    #         else {
-    #             $action = $in{"enable_sel_listen_address"} ? "enable" : $in{"disable_sel_listen_address"} ? "disable" : $in{"delete_sel_listen_address"} ? "delete" : "";
-    #             if ($action ne "") {
-    #                 @sel || &error($text{'selected_none'});
-
-    #                 &update_selected("listen-address", $action, \@sel, \%$dnsmconfig);
-    #             }
-    #         }
-    #     }
-    # }
     &do_selected_action( [ "interface", "except_interface", "no_dhcp_interface", "listen_address" ], \@sel, \%$dnsmconfig );
 }
 

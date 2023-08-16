@@ -57,11 +57,11 @@ print ui_tabs_start_tab('mode', 'recs');
 print ui_tabs_end_tab('mode', 'recs');
 
 print ui_tabs_start_tab('mode', 'ipset');
-&show_field_table("ipset", $apply_cgi . "?mode=ipset", $text{"_listen"}, \%dnsmconfig);
+&show_field_table("ipset", $apply_cgi . "?mode=ipset", $text{"_listen"}, \%dnsmconfig, 1);
 print ui_tabs_end_tab('mode', 'ipset');
 
 print ui_tabs_start_tab('mode', 'connmark');
-&show_field_table("connmark_allowlist", $apply_cgi . "?mode=connmark", $text{"_connmark"}, \%dnsmconfig);
+&show_field_table("connmark_allowlist", $apply_cgi . "?mode=connmark", $text{"_connmark"}, \%dnsmconfig, 2);
 print ui_tabs_end_tab('mode', 'connmark');
 
 print ui_tabs_end();

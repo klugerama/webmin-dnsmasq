@@ -35,9 +35,9 @@ my $returnlabel = $in{"returnlabel"} || $text{"index_dns_alias_settings"};
 my $apply_cgi = "dns_alias_apply.cgi";
 
 sub show_alias {
-    my $formid = "alias_form";
     my $internalfield = "alias";
     my $configfield = &internal_to_config($internalfield);
+    my $formid = $internalfield . "_form";
     my @newfields = ( "from", "to", "netmask" );
     my @editfields = ( "idx", @newfields );
     my @list_link_buttons = &list_links( "sel", 0 );

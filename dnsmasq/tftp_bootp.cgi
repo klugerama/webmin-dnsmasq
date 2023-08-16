@@ -88,7 +88,7 @@ foreach my $configfield ( @conft_b_p ) {
 print &ui_hr();
 
 # &show_bootp_dynamic();
-&show_field_table("bootp_dynamic", $apply_cgi, $text{"_networkid"}, \%dnsmconfig);
+&show_field_table("bootp_dynamic", $apply_cgi, $text{"_networkid"}, \%dnsmconfig, 1);
 
 print &add_js();
 

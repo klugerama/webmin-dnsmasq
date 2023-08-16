@@ -32,9 +32,9 @@ my $returnto = $in{"returnto"} || "dhcp_vendorclass.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_vendorclass"};
 my $apply_cgi = "dhcp_vendorclass_apply.cgi";
 
-my $formid = "vendorclass_form";
 my $internalfield = "dhcp_vendorclass";
 my $configfield = &internal_to_config($internalfield);
+my $formid = $internalfield . "_form";
 my @newfields = ( "tag", "vendorclass" );
 my @editfields = ( "idx", "tag", "vendorclass" );
 my @list_link_buttons = &list_links( "sel", 0 );

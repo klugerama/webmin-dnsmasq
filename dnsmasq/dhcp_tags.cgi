@@ -35,9 +35,9 @@ my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_tags"};
 my $apply_cgi = "dhcp_tags_apply.cgi";
 
 sub show_userclass {
-    my $formid = "userclass_form";
     my $internalfield = "dhcp_userclass";
     my $configfield = &internal_to_config($internalfield);
+    my $formid = $internalfield . "_form";
     my @newfields = ( "tag", "userclass" );
     my @editfields = ( "idx", @newfields );
     my @list_link_buttons = &list_links( "sel", 0 );
@@ -83,9 +83,9 @@ sub show_userclass {
 }
 
 sub show_vendorclass {
-    my $formid = "vendorclass_form";
     my $internalfield = "dhcp_vendorclass";
     my $configfield = &internal_to_config($internalfield);
+    my $formid = $internalfield . "_form";
     my @newfields = ( "tag", "vendorclass" );
     my @editfields = ( "idx", "tag", "vendorclass" );
     my @list_link_buttons = &list_links( "sel", 0 );

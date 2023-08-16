@@ -96,7 +96,7 @@ my $apply_cgi = "dhcp_domain_name_apply.cgi";
 # }
 
 # &show_domain();
-&show_field_table("domain", $apply_cgi, $text{"_domain"}, \%dnsmconfig);
+&show_field_table("domain", $apply_cgi, $text{"_domain"}, \%dnsmconfig, 1);
 
 print &add_js();
 

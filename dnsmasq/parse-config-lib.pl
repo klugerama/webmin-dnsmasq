@@ -262,6 +262,7 @@ sub init_configfield_fields {
                 "valtype" => "path",
                 "default" => "",
                 "required" => 1,
+                "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
             }
         }, # =<path>
@@ -479,7 +480,7 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "interface",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_interface"},
@@ -490,7 +491,7 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "interface",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_interface"},
@@ -527,7 +528,7 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "interface",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_interface"},
