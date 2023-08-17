@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_sec_settings"} );
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dns_sec.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_sec_settings"};

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dhcp_basic.cgi; DHCP config
+#    DNSMasq Webmin Module - dhcp_basic.cgi; DHCP config
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_settings_basic"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dhcp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
@@ -41,6 +42,8 @@ foreach my $configfield ( @confdhcp ) {
 &show_basic_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi, $text{"index_dhcp_settings_basic"} );
 
 &show_other_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi, " " );
+
+print &add_js();
 
 &ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
 

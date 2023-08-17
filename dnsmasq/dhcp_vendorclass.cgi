@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_vendorclass"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dhcp_vendorclass.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_vendorclass"};
@@ -38,7 +39,7 @@ my $formid = $internalfield . "_form";
 my @newfields = ( "tag", "vendorclass" );
 my @editfields = ( "idx", "tag", "vendorclass" );
 my @list_link_buttons = &list_links( "sel", 0 );
-my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"vendorclass"}), $internalfield, $text{"vendorclass"}, 500, 465, $formid, \@newfields );
+my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"vendorclass"}), $internalfield, $text{"vendorclass"}, $formid, \@newfields );
 push(@list_link_buttons, $add_new_button);
 
 my $count;
@@ -59,9 +60,9 @@ print &ui_columns_start( [
 foreach my $class ( @{$dnsmconfig{"dhcp-vendorclass"}} ) {
     local %val = %{ $class->{"val"} };
     local @cols;
-    # first call to &edit_item_link should capture link, fields, and script; subsequent calls (1 for each field) only need the link
-    ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"tag"}, $internalfield, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
-    ($edit_link[1]) = &edit_item_link($val{"vendorclass"}, $internalfield, $text{"vendorclass"}, $count, $formid, 500, 465, \@editfields);
+        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+    ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"tag"}, $internalfield, $text{"vendorclass"}, $count, $formid, \@editfields);
+    ($edit_link[1]) = &edit_item_link($val{"vendorclass"}, $internalfield, $text{"vendorclass"}, $count, $formid, \@editfields);
     push ( @cols, &ui_checkbox("enabled", "1", "", $class->{"used"}?1:0, undef, 1) );
     push ( @cols, $edit_link[0] );
     push ( @cols, $edit_link[1] );

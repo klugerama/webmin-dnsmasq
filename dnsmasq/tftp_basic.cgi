@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_tftp_settings_basic"});
+print &header_style();
 
 my $apply_cgi = "tftp_basic_apply.cgi";
 
@@ -39,6 +40,8 @@ foreach my $configfield ( @conft_b_p ) {
 &show_basic_fields( \%dnsmconfig, "tftp_basic", \@page_fields, $apply_cgi, $text{"index_tftp_settings_basic"} );
 
 &show_other_fields( \%dnsmconfig, "tftp_basic", \@page_fields, $apply_cgi, " " );
+
+print &add_js();
 
 &ui_print_footer("index.cgi?mode=tftp", $text{"index_tftp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
 

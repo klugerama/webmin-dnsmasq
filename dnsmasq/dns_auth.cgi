@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_auth_settings"} );
+print &header_style();
 
 # print "<h2>";
 # print $text{"index_dns_auth_settings"};

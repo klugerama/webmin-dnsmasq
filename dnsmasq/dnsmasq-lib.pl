@@ -888,16 +888,13 @@ sub edit_interface_chooser_link {
     return ($iface_edit_link, $hidden_input_fields, $submit_script);
 }
 
-=head2 edit_item_popup_modal_link(url, internalfield, formid, link_text, width, height[, scrollbars])
+=head2 edit_item_popup_modal_link(url, internalfield, formid, link_text)
     Returns HTML for a link that will popup, hidden fields, and some JS to handle it 
     for a simple edit window of some kind.
         url - Base URL of the popup window's contents
         internalfield - Keyword that identifies what to edit
         formid - Id of the form on the source page to submit
         link_text - Text to appear in link
-        width - Width of the window in pixels
-        height - Height in pixels
-        scrollbars - Set to 1 if the window should have scrollbars
 =cut
 sub edit_item_popup_modal_link {
     my ($url, $internalfield, $formid, $link_text) = @_;
@@ -916,7 +913,7 @@ sub edit_item_popup_modal_link {
     return $link;
 }
 
-=head2 edit_item_link(link_text, internalfield, title, idx, formid, width, height, field-mappings[, extra-url-params])
+=head2 edit_item_link(link_text, internalfield, title, idx, formid, field-mappings[, extra-url-params])
     Returns HTML for a link that will popup, hidden fields, and some JS to handle it 
     for a simple edit window of some kind.
         link_text - Text to appear in link
@@ -924,14 +921,12 @@ sub edit_item_popup_modal_link {
         title - Text to appear in the popup window title
         idx - Index of the item to edit
         formid - Id of the form on the source page to submit
-        width - Width of the window in pixels
-        height - Height in pixels
         field-mappings - Array of fields to include in form
         [extra-url-params] - URL-formatted string of any extra param=value pairs (if multiple, delimited with "&")
 =cut
 sub edit_item_link {
-    my ($link_text, $internalfield, $title, $idx, $formid, $w, $h, $fields) = @_;
-    my $extra_url_params = @_[8] || "";
+    my ($link_text, $internalfield, $title, $idx, $formid, $fields) = @_;
+    my $extra_url_params = @_[6] || "";
     if ($extra_url_params) {
         $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
     }
@@ -959,20 +954,12 @@ sub edit_item_link {
     return ($link, $hidden_input_fields);
 }
 
-=head2 add_item_popup_modal_button(url, internalfield, formid, button_content, width, height, [scrollbars], field-mappings)
+=head2 add_item_popup_modal_button(url, internalfield, formid, button_content)
     Returns HTML for a button that will popup a simple list item add window of some kind.
     url - Base URL of the popup window's contents
     internalfield - Keyword that identifies what to add; handling must be defined in list_item_add_popup.cgi
     formid - Id of the form on the source page to submit
     button_content - Text to appear in button
-    width - Width of the window in pixels
-    height - Height in pixels
-    scrollbars - Set to 1 if the window should have scrollbars
-    field-mappings - See below
-        The field-mappings parameter is an array ref of array refs containing
-        - Attribute to assign field to in the popup window
-        - Form field name
-        - CGI parameter to URL for value, if any
 =cut
 sub add_item_popup_modal_button {
     my ($url, $internalfield, $formid, $button_content) = @_;
@@ -980,27 +967,25 @@ sub add_item_popup_modal_button {
     my $sep = $url =~ /\?/ ? "&" : "?";
     $url .= $sep . "internalfield=$internalfield";
     $url .= "&formid=$formid";
-    my $rv = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" class='btn btn-inverse btn-tiny add-item-button' ";
+    my $rv = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" class='btn btn-inverse btn-tiny add-item-button new-dnsm-button-container' ";
     $rv .= ">";
     $rv .= "$button_content";
     $rv .= "</a>";
     return $rv;
 }
 
-=head2 add_item_button(buttontext, internalfield, title, width, height, formid, field-mappings[, extra-url-params])
+=head2 add_item_button(buttontext, internalfield, title, formid, field-mappings[, extra-url-params])
     Returns HTML for a button that will popup a window, hidden fields, and some JS to handle it 
     for entry of a new item of some kind.
         buttontext - Text to appear in button
         internalfield - Keyword that identifies what to add; handling must be defined in list_item_add_popup.cgi
         title - Text to appear in the popup window title
-        width - Width of the window in pixels
-        height - Height in pixels
         formid - Id of the form on the source page to submit
         fields - Array reference of field names i.e., [ "new_tag", "new_vendorclass" ]; must be handled in form's submit target
 =cut
 sub add_item_button {
-    my ($button_text, $internalfield, $title, $w, $h, $formid, $fields) = @_;
-    my $extra_url_params = @_[7] || "";
+    my ($button_text, $internalfield, $title, $formid, $fields) = @_;
+    my $extra_url_params = @_[5] || "";
     if ($extra_url_params) {
         $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
     }
@@ -1015,21 +1000,7 @@ sub add_item_button {
 
     $title =~ s/ /+/g ;
     my $qparams = "action=add&title=$title" . $extra_url_params;
-    # my $button = &add_item_popup_window_button("list_item_edit_popup.cgi?" . $qparams, $internalfield, $formid, $button_text, $w, $h, 0, \@fieldmapping );
-    # my $button = &add_item_popup_modal_button("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $button_text, $w, $h, 0, \@fieldmapping );
     my $button = &add_item_popup_modal_button("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $button_text );
-
-    # my $add_new_script = "<script>\n";
-    # $add_new_script .= "function submit_new_" . $formid . "(vals) {";
-    # $add_new_script .= "  vals.forEach((o) => {";
-    # $add_new_script .= "    let f=o.f;let v=o.v;";
-    # $add_new_script .= "    if (f==\"submit\") return;";
-    # $add_new_script .= "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);";
-    # $add_new_script .= "  });";
-    # $add_new_script .= "  \$(\"#" . $formid . "\").submit();";
-    # $add_new_script .= "}\n";
-    # $add_new_script .= "</script>\n";
-    # return ($button, $hidden_input_fields, $add_new_script);
     return ($button, $hidden_input_fields);
 }
 
@@ -1140,29 +1111,30 @@ sub show_basic_fields_row {
     elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
         my $definition = %configfield_fields{$internalfield}->{"val"};
         my $tmpl = $definition->{"template"};
+        my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
         if ( $configfield =~ /user$/ ) {
             return &ui_clickable_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help, 
-                    &ui_user_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"} )
-                ], undef, "sel", $configfield, $dnsmconfig->{$configfield}->{"used"} );
+                    &ui_user_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
         }
         elsif ( $configfield =~ /group$/ ) {
             return &ui_clickable_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help,
-                    &ui_group_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"} )
-                ], undef, "sel", $configfield, $dnsmconfig->{$configfield}->{"used"}?1:0 );
+                    &ui_group_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
         }
         elsif ( $configfield =~ /(file|dir|script)$/ ) {
             return &ui_clickable_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help,
-                    &ui_filebox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" )
-                ], undef, "sel", $configfield, $dnsmconfig->{$configfield}->{"used"}?1:0 );
+                    &ui_filebox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
         }
         else {
             return &ui_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help,
-                    &ui_textbox( $internalfield . "val", %{$dnsmconfig}{$configfield}->{"val"}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" )
-                ], \@tds, "sel", $configfield, (%{$dnsmconfig}{$configfield}->{"used"})?1:0
+                    &ui_textbox( $internalfield . "val", %{$dnsmconfig}{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                ], \@tds, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\""
             );
         }
     }
@@ -1203,7 +1175,7 @@ sub show_other_fields {
     print &ui_columns_end();
     print "<span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i>";
     my @form_buttons = ();
-    push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel" ) );
+    # push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel" ) );
     push( @form_buttons, &ui_submit( $text{"save_button"}, "submit" ) );
     print &ui_form_end( \@form_buttons );
 }
@@ -1239,6 +1211,7 @@ sub get_field_auto_columns {
     my $count = 0;
     foreach my $key ( @{ %configfield_fields{$internalfield}->{"param_order"} }) {
         my $definition = %configfield_fields{$internalfield}->{$key};
+        my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
         if ($count == 0) {
             push ( @cols, "<nobr>" . &ui_opt_textbox( $internalfield, $item->{"used"}?1:undef, 1, $text{"disabled"}, undef, undef, \@otherfields, undef, "dummy_field" ) . "</nobr>");
         }
@@ -1259,10 +1232,10 @@ sub get_field_auto_columns {
         else {
             my $input;
             if ($definition->{"valtype"} eq "file") {
-                $input = "<nobr>" . &ui_filebox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" ) . "</nobr>";
+                $input = "<nobr>" . &ui_filebox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") ) . "</nobr>";
             }
             else {
-                $input = &ui_textbox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" );
+                $input = &ui_textbox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") );
             }
             push ( @cols, $label . "<br>" . $input );
         }
@@ -1286,12 +1259,8 @@ sub show_field_table {
     my @newfields = @{$definition->{"param_order"}};
     my @editfields = ( "idx", @newfields );
     my $formid = $internalfield . "_form";
-    my $w = 520;
-    my $h = 340; # base value
-    my $extralines = length($text{"p_man_desc_$internalfield"}) / 75;
-    $extralines = ceil($extralines) * 15;
-    $h += $extralines;
     my @tds = ( $td_label, $td_left );
+    my @pathtypes = ( "file", "path", "dir" );
     my @column_headers = ( 
         "",
         $text{"enabled"}
@@ -1299,13 +1268,11 @@ sub show_field_table {
     if ( @newfields == 1 ) {
         push(@column_headers, $definition->{"@newfields[0]"}->{"label"} );
         push( @tds, $td_left );
-        $h = $h + 31;
     }
     else {
         foreach my $param ( @newfields ) {
             push(@column_headers, $definition->{"$param"}->{"label"} );
             push( @tds, $td_left );
-            $h = $h + 31;
         }
     }
     my @list_link_buttons = &list_links( "sel", $formidx );
@@ -1313,7 +1280,7 @@ sub show_field_table {
         ($add_button, $hidden_add_input_fields) = &add_interface_chooser_button( &text("add_", $text{"_iface"}), "new_" . $internalfield, $formid );
     }
     else {
-        ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $addtext), $internalfield, $text{"p_label_$internalfield"}, $w, $h, $formid, \@newfields );
+        ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $addtext), $internalfield, $text{"p_label_$internalfield"}, $formid, \@newfields );
         push(@list_link_buttons, $add_button);
     }
 
@@ -1331,28 +1298,36 @@ sub show_field_table {
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         foreach my $param ( @newfields ) {
             my $edit_link;
+            my $valtype = $definition->{"$param"}->{"valtype"};
             my $val = ($param eq "val") ? $item->{"$param"} : $item->{"val"}->{"$param"};
-            if ($definition->{"$param"}->{"arr"} == 1) {
+            if ($definition->{"$param"}->{"arr"} == 1 && ref($val) eq "ARRAY") {
                 $val = join($definition->{"$param"}->{"sep"}, @{$val})
             }
-            elsif ($definition->{"$param"}->{"valtype"} eq "bool") {
+            elsif ($valtype eq "bool") {
                 $val = &ui_checkbox("boolval", "1", "", $val, undef, 1)
             }
             if ($count == 0) {
-                if ($definition->{"$param"}->{"valtype"} eq "interface") {
+                if ($valtype eq "interface") {
                     # edit_interface_chooser_link(text, input, current_value, idx, formid, [addmode])
                     ($edit_link, $hidden_edit_input_fields, $edit_submit_script) = &edit_interface_chooser_link($val, $internalfield, $val, $count, $formid);
                 }
+                elsif (grep { /^$valtype$/ } ( @pathtypes )) {
+                    ($edit_link, $hidden_edit_input_fields, $edit_submit_script) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "file" ? 0 : 1), $val, $count, $formid);
+                }
                 else {
-                    ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+                    # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+                    ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
                 }
             }
             else {
-                if ($definition->{"$param"}->{"valtype"} eq "interface") {
+                if ($valtype eq "interface") {
                     ($edit_link) = &edit_interface_chooser_link($val, $internalfield, $val, $count, $formid);
                 }
+                elsif (grep { /^$valtype$/ } ( @pathtypes )) {
+                    ($edit_link) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "file" ? 0 : 1), $val, $count, $formid);
+                }
                 else {
-                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
                 }
             }
             push ( @cols, $edit_link );
@@ -1378,6 +1353,50 @@ sub show_field_table {
     print &ui_hr();
 }
 
+sub show_path_list {
+    my ($internalfield, $apply_cgi, $add_button_text, $val_label, $chooser_mode, $formidx) = @_;
+    my $configfield = &internal_to_config($internalfield);
+    my $count=0;
+    my $edit_link;
+    my $hidden_edit_input_fields;
+    my $edit_submit_script;
+    my $formid = $internalfield . "_form";
+    print &ui_form_start( $apply_cgi . "?mode=$internalfield", "post", undef, "id='$formid'" );
+    my @list_link_buttons = &list_links( "sel", $formidx );
+    my ($file_chooser_button, $hidden_add_input_fields) = &add_file_chooser_button( &text("add_", $add_button_text), "new_" . $internalfield, $chooser_mode, $formid );
+    print &ui_links_row(\@list_link_buttons);
+    print $hidden_add_input_fields;
+    print $file_chooser_button;
+    print &ui_columns_start( [ 
+        "",
+        $text{"enabled"}, 
+        $val_label, 
+        # "full" 
+    ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=3' ] ), 1 );
+
+    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
+        local @cols;
+        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
+        # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
+        ($edit_link, $hidden_edit_input_fields, $edit_submit_script) = &edit_file_chooser_link($item->{"val"}, $internalfield, $chooser_mode, $item->{"val"}, $count, $formid);
+        push ( @cols, $edit_link );
+        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
+        $count++;
+    }
+    print &ui_columns_end();
+    print &ui_links_row(\@list_link_buttons);
+    print $hidden_add_input_fields;
+    print $file_chooser_button;
+    print "<p>" . $text{"with_selected"} . "</p>";
+    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print $hidden_edit_input_fields;
+    print $edit_submit_script;
+    print &ui_form_end( );
+    print $g;
+}
+
 sub do_selected_action {
     my ($internalfields, $sel, $dnsmconfig) = @_;
 
@@ -1400,13 +1419,13 @@ sub ui_clickable_checked_columns_row {
 
     $checkname = $checkname || "sel";
 
-    my $customcbtd = 'class="ui_checked_checkbox flexed" style="width: 15px; height: 29px;"';
+    my $customcbtd = "class=\"ui_checked_checkbox flexed clickable_tr" . ($checked ? " clickable_tr_selected" : "") . "\" style=\"width: 15px; height: 29px;\"";
     my $td = 'class="cursor-pointer" style="height: 29px; white-space: normal !important; word-break: normal;"';
     my @cbtds = ( $customcbtd );
 
     my @cols = (
         # ui_checkbox(name, value, label, selected?, [tags], [disabled?])
-        '<div class="wh-100p flex-wrapper flex-centered flex-start">' . &ui_checkbox($checkname, $checkvalue, undef, ($checked)?1:0, $tags, $disabled ) . '</div>',
+        '<div class="wh-100p flex-wrapper flex-centered flex-start">' . &ui_checkbox($checkname, $checkvalue, undef, ($checked)?1:0, $tags, $disabled, ' thick' ) . '</div>',
         @{ $columns }
     );
     if ($tdtags) {
@@ -1418,7 +1437,8 @@ sub ui_clickable_checked_columns_row {
         }
     }
 
-    return &ui_columns_row( \@cols, ($tdtags ? $tdtags : \@cbtds) );
+    # return &ui_columns_row( \@cols, ($tdtags ? $tdtags : \@cbtds) );
+    return &ui_columns_row( \@cols, \@cbtds );
 }
 
 sub show_title_with_help {
@@ -1474,6 +1494,14 @@ sub custom_theme_ui_links_row {
     }
 }
 
+sub check_for_file_errors {
+if( $dnsmconfig{"errors"} > 0 ) {
+    my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
+    &redirect( $line );
+    exit;
+}
+}
+
 sub header_js {
     my ($formid, $internalfield) = @_;
     my $script = "";
@@ -1496,24 +1524,39 @@ sub header_js {
              . "        });\n"
              . "    });\n"
              . "}\n"
-             . "</script>\n"
-            . "<style type='text/css'>\n"
-            # . "\n"
-            # . ".modal-content {\n"
-            # . "  margin: 10px;\n"
-            # . "}\n"
-            # . ".modal-button {\n"
-            # . "  float: right;\n"
-            # . "}\n"
-            # . ".modal-button-cancel {\n"
-            # . "  display: inline;\n"
-            # . "}\n"
-            # . ".modal-button-save {\n"
-            # . "  display: inline !important;\n"
-            # . "}\n"
-            # . "\n"
-            . "</style>\n";
+             . "</script>\n";
     return $script;
+}
+
+sub header_style {
+    my $style = "<style type='text/css'>\n"
+            . ".select_invert {\n"
+            . "  margin-right: unset !important;\n"
+            . "}\n"
+            . ".new-dnsm-button-container {\n"
+            . "  margin-top: -1px;\n"
+            . "  position: absolute;\n"
+            . "}\n"
+            . ".add-item-button-small {\n"
+            . "  height: 28px !important;\n"
+            . "  margin-left: -4px;\n"
+            . "  display: inline-block;\n"
+            . "}\n"
+            . ".remove-item-button-small {\n"
+            . "  height: 28px !important;\n"
+            . "  margin-right: 4px;\n"
+            . "  display: inline-block;\n"
+            . "}\n"
+            . "select[multiple] {\n"
+            . "  min-height: unset !important;\n"
+            . "  max-height: unset !important;\n"
+            . "}\n"
+            . "html[data-bgs='nightRider'] .hl-aw, .hl-aw {\n"
+            . "  background-color: unset !important;\n"
+            . "}\n"
+            . "\n"
+            . "</style>\n";
+    return $style;
 }
 =head2 add_js()
 =cut
@@ -1524,19 +1567,16 @@ sub add_js {
              . "  setTimeout(function() {\n"
              . "    \$(\"<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".select-none\");\n" # adds icon to "select none" link/button
              . "    \$(\"<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".file-chooser-button\");\n" # adds icon to "new file" link/button
-             . "    \$(\".new-file-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());});\n" # adds "new file" link to button list
-             . "    \$(\".new-file-input\").each(function(){replaceWithWrapper(\$(this), \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new interface" button's form when one is selected
+             . "    \$(\".new-file-input, .new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());\$(this).parent().prev().css(\"margin-right\", \"0px !important\");\$(this).parent().addClass(\"new-dnsm-button-container\");});\n" # adds "new file/interface" link to button list
+             . "    \$(\".new-file-input, .new-iface-input\").each(function(){replaceWithWrapper(\$(this), \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
              . "    \$(\"<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".iface-chooser-button\");\n" # adds icon to "new interface" link/button
-             . "    \$(\".new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());});\n" # adds "new interface" link to button list
-             . "    \$(\".new-iface-input\").each(function(){replaceWithWrapper(\$(this), \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new interface" button's form when one is selected
-             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 5px;'></i>\").prependTo(\".add-item-button\");\n" # adds icon to "new <item>" link/button
+             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 0px;'></i>\").prependTo(\".add-item-button\");\n" # adds icon to "new <item>" link/button
              . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".remove-item-button\");\n" # adds icon to "remove <item>" link/button
              . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".add-item-button-small\");\n" # adds icon to mini "new <item>" button for select box
              . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".remove-item-button-small\");\n" # adds icon to mini "remove <item>" button for select box
-             . "    \$(\".add-item-button-small\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"height: 28px !important; margin-left: -4px; display: inline-block;\";});\n"
-             . "    \$(\".remove-item-button-small\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"height: 28px !important; margin-right: 4px; display: inline-block;\";});\n"
+             . "    \$(\".clickable_tr\").each(function(){\$(this).parent().addClass(\"ui_checked_columns\");});\n" # fixes styling for clickable table row checkboxes
+             . "    \$(\".clickable_tr_selected\").each(function(){\$(this).removeClass(\"clickable_tr_selected\");\$(this).parent().addClass(\"hl-aw\");});\n" # fixes styling for clickable table row checkboxes
              . "    \$(\"input[dummy_field]\").hide();"
-             . "    \$(\"select[multiple]\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"min-height: unset !important; max-height: unset !important;\";});\n" # TODO fixed upstream in theme; remove when released/supported
              . "  }, 0);\n";
     $script .= "  if (!\$('#list-item-edit-modal').length) {\n"
              . "    var g='<div class=\"modal fade fade5 in\" id=\"list-item-edit-modal\" tabindex=\"-1\" role=\"dialog\" aria-hidden=\"true\">"

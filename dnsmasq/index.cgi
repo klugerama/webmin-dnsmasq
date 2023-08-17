@@ -41,6 +41,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 # &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>");
 &header($text{"index_title"}, "", "intro", 1, 0, 0, "<!-- test rightside -->", "<script type='text/javascript'>//test</script>");
+print &header_style();
 
 my $mode = "dns";
 if ( defined ($in{mode}) ) {

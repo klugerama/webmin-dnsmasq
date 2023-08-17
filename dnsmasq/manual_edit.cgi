@@ -33,6 +33,7 @@ my %dnsmconfig = ();
 # 	&error($text{'manual_ecannot'});
 # &ui_print_header(undef, $text{'index_dns_manual_edit'}, "");
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_manual_edit"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "manual_edit.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_manual_edit"};

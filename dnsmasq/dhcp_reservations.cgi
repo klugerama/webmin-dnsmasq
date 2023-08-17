@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_host_reservations"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dhcp_reservations.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_host_reservations"};
@@ -46,11 +47,6 @@ sub show_reservations() {
     }
     my @editfields = ( "idx", @newfields );
     my $formid = $internalfield . "_form";
-    my $w = 520;
-    my $h = 340; # base value
-    my $extralines = length($text{"p_man_desc_$internalfield"}) / 75;
-    $extralines = ceil($extralines) * 15;
-    $h += $extralines;
     my @tds = ( $td_label, $td_left );
     my @column_headers = ( "",
         $text{"enabled"},
@@ -63,11 +59,10 @@ sub show_reservations() {
         $text{"p_label_val_leasetime"}, );
     foreach my $param ( @newfields ) {
         push( @tds, $td_left );
-        $h = $h + 31;
     }
     # my @list_link_buttons = &list_links( "sel", 0, "dhcp_res_apply.cgi", "dhcp-host=new,0.0.0.0", "dhcp_reservations.cgi", &text("add_", $text{"_host"}) );
     my @list_link_buttons = &list_links( "sel", 3 );
-    my ($add_button, $hidden_add_input_fields) = &add_item_button( &text("add_", $text{"_host"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button( &text("add_", $text{"_host"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields );
     push(@list_link_buttons, $add_button);
 
     my $count = 0;
@@ -86,11 +81,12 @@ sub show_reservations() {
             $item->{"val"}->{"tag"}, 
             $item->{"val"}->{"leasetime"});
         foreach my $val ( @vals ) {
+            # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields );
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields );
             }
             else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields );
+                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields );
             }
             push( @cols, $edit_link );
         }

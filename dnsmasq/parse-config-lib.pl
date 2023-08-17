@@ -2833,7 +2833,7 @@ sub init_configfield_fields {
             "param_order" => [ "filename" ],
             "filename" => {
                 "length" => 75,
-                "valtype" => "path",
+                "valtype" => "file",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2844,7 +2844,7 @@ sub init_configfield_fields {
             "param_order" => [ "dirname", "filter", "exceptions" ],
             "dirname" => {
                 "length" => 75,
-                "valtype" => "path",
+                "valtype" => "dir",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_dirname"},
@@ -2871,7 +2871,7 @@ sub init_configfield_fields {
             "param_order" => [ "filename" ],
             "filename" => {
                 "length" => 75,
-                "valtype" => "path",
+                "valtype" => "file",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},

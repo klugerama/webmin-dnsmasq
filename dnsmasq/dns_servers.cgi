@@ -28,8 +28,8 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-# &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), &header_js(), "body-stuff-test", $text{"index_dns_servers"});
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>", "body-stuff-test", $text{"index_dns_servers"});
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), &header_js(), "body-stuff-test", $text{"index_dns_servers"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dns_servers.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_servers"};
@@ -42,15 +42,13 @@ sub show_server {
     my @editfields = ( "idx", @newfields );
     my $formid = $internalfield . "_form";
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_upstream_srv"}), $internalfield, $text{"index_dns_servers"}, 700, 505, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_upstream_srv"}), $internalfield, $text{"index_dns_servers"}, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
 
     my $count=0;
     print &ui_form_start( $apply_cgi . "?mode=server", "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
     my @edit_link = ( "", "", "" );
-    my $w = 700;
-    my $h = 505;
     my $hidden_edit_input_fields;
     my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
     print &ui_columns_start( [
@@ -65,9 +63,10 @@ sub show_server {
         local %val = %{ $item->{"val"} };
         local @cols;
         local $mover = &get_mover_buttons("item_move.cgi?internalfield=$internalfield&returnto=$returnto&returnlabel=$returnlabel", $count, int(@{$dnsmconfig{"server"}}) );
-        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link(join(",", @{$val{"domain"}}), $internalfield, $text{"index_dns_servers"}, $count, $formid, $w, $h, \@editfields);
-        ($edit_link[1]) = &edit_item_link($val{"ip"}, $internalfield, $text{"index_dns_servers"}, $count, $formid, $w, $h, \@editfields);
-        ($edit_link[2]) = &edit_item_link($val{"source"}, $internalfield, $text{"index_dns_servers"}, $count, $formid, $w, $h, \@editfields);
+        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link(join(",", @{$val{"domain"}}), $internalfield, $text{"index_dns_servers"}, $count, $formid, \@editfields);
+        ($edit_link[1]) = &edit_item_link($val{"ip"}, $internalfield, $text{"index_dns_servers"}, $count, $formid, \@editfields);
+        ($edit_link[2]) = &edit_item_link($val{"source"}, $internalfield, $text{"index_dns_servers"}, $count, $formid, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );
@@ -95,15 +94,13 @@ sub show_rev_server {
     my @newfields = ( "domain", "ip", "source" );
     my @editfields = ( "idx", @newfields );
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_upstream_srv"}), $internalfield, $text{"table_upstream_dns_rev_servers"}, 700, 505, $formid, \@newfields );
+    my ($button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_upstream_srv"}), $internalfield, $text{"table_upstream_dns_rev_servers"}, $formid, \@newfields );
     push(@list_link_buttons, $button);
 
     my $count=0;
     print &ui_form_start( $apply_cgi . "?mode=rev_server", "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
     my $edit_link = ( "", "", "" );
-    my $w = 700;
-    my $h = 505;
     my $hidden_edit_input_fields;
     # my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
     print &ui_columns_start( [
@@ -119,9 +116,10 @@ sub show_rev_server {
         local @cols;
         local $mover;
         $mover = &get_mover_buttons("item_move.cgi?internalfield=$internalfield&returnto=$returnto&returnlabel=$returnlabel", $count, int(@{$dnsmconfig{$configfield}}) );
-        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link(join(",", @{$val{"domain"}}), $internalfield, $text{"table_upstream_dns_rev_servers"}, $count, $formid, $w, $h, \@editfields);
-        ($edit_link[1]) = &edit_item_link($val{"ip"}, $internalfield, $text{"table_upstream_dns_rev_servers"}, $count, $formid, $w, $h, \@editfields);
-        ($edit_link[2]) = &edit_item_link($val{"source"}, $internalfield, $text{"table_upstream_dns_rev_servers"}, $count, $formid, $w, $h, \@editfields);
+        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link(join(",", @{$val{"domain"}}), $internalfield, $text{"table_upstream_dns_rev_servers"}, $count, $formid, \@editfields);
+        ($edit_link[1]) = &edit_item_link($val{"ip"}, $internalfield, $text{"table_upstream_dns_rev_servers"}, $count, $formid, \@editfields);
+        ($edit_link[2]) = &edit_item_link($val{"source"}, $internalfield, $text{"table_upstream_dns_rev_servers"}, $count, $formid, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );

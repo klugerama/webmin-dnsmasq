@@ -29,6 +29,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_settings_basic"});
+print &header_style();
 
 my $mode = $in{mode} || "basic";
 my $returnto = $in{"returnto"} || "dns_basic.cgi";
@@ -58,50 +59,6 @@ my @vals = (
     },
 );
 
-sub show_path_list {
-    my ($internalfield, $add_button_text, $val_label, $chooser_mode) = @_;
-    my $configfield = &internal_to_config($internalfield);
-    my $count=0;
-    my $edit_link;
-    my $hidden_edit_input_fields;
-    my $edit_submit_script;
-    my $formid = $internalfield . "_form";
-    my $g = &ui_form_start( $apply_cgi . "?mode=$internalfield", "post", undef, "id='$formid'" );
-    my @list_link_buttons = &list_links( "sel", $formidx++ );
-    my ($file_chooser_button, $hidden_add_input_fields) = &add_file_chooser_button( &text("add_", $add_button_text), "new_" . $internalfield, $chooser_mode, $formid );
-    $g .= &ui_links_row(\@list_link_buttons);
-    $g .= $hidden_add_input_fields;
-    $g .= $file_chooser_button;
-    $g.= &ui_columns_start( [ 
-        "",
-        $text{"enabled"}, 
-        $val_label, 
-        # "full" 
-    ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=3' ] ), 1 );
-
-    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
-        local @cols;
-        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
-        # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
-        ($edit_link, $hidden_edit_input_fields, $edit_submit_script) = &edit_file_chooser_link($item->{"val"}, $internalfield, $chooser_mode, $item->{"val"}, $count, $formid);
-        push ( @cols, $edit_link );
-        $g .= &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
-        $count++;
-    }
-    $g .= &ui_columns_end();
-    $g .= &ui_links_row(\@list_link_buttons);
-    $g .= $hidden_add_input_fields;
-    $g .= $file_chooser_button;
-    $g .= "<p>" . $text{"with_selected"} . "</p>";
-    $g .= &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    $g .= &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    $g .= &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    $g .= $hidden_edit_input_fields;
-    $g .= $edit_submit_script;
-    $g .= &ui_form_end( );
-    print $g;
-}
-
 my @page_fields = ();
 foreach my $configfield ( @confdns ) {
     next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "1" );
@@ -119,7 +76,7 @@ print ui_tabs_end_tab('mode', 'basic');
 
 foreach my $v ( @vals ) {
     print ui_tabs_start_tab('mode', $v->{"internalfield"});
-    &show_path_list($v->{"internalfield"}, $v->{"add_button_text"}, $v->{"val_label"}, $v->{"chooser_mode"});
+    &show_path_list($v->{"internalfield"}, $apply_cgi, $v->{"add_button_text"}, $v->{"val_label"}, $v->{"chooser_mode"}, $formidx++);
     print ui_tabs_end_tab('mode', $v->{"internalfield"});
 }
 

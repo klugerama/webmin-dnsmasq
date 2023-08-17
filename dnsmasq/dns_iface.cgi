@@ -28,8 +28,8 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-# &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_iface_settings"});
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>", "body-stuff-test", $text{"index_dns_iface_settings"});
+&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_iface_settings"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dns_iface.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_iface_settings"};

@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_tftp_boot_pxe_settings"});
+print &header_style();
 
 my $apply_cgi = "tftp_bootp_apply.cgi";
 
@@ -37,15 +38,13 @@ my $apply_cgi = "tftp_bootp_apply.cgi";
 #     my @newfields = ( "val" );
 #     my @editfields = ( "idx", @newfields );
 #     my @list_link_buttons = &list_links( "sel", 0 );
-#     my ($button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_networkid"}), $internalfield, $text{"p_desc_$internalfield"}, 700, 505, $formid, \@newfields );
+#     my ($button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_networkid"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields );
 #     push(@list_link_buttons, $button);
 
 #     my $count=0;
 #     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
 #     print &ui_links_row(\@list_link_buttons);
 #     my @edit_link = ( "" );
-#     my $w = 700;
-#     my $h = 505;
 #     my $hidden_edit_input_fields;
 #     my @tds = ( $td_left, $td_left, $td_left );
 #     print &ui_columns_start( [
@@ -56,7 +55,8 @@ my $apply_cgi = "tftp_bootp_apply.cgi";
 #     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
 #         local %val = %{ $item->{"val"} };
 #         local @cols;
-#         ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+#         # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+#         ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
 #         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
 #         push ( @cols, $edit_link[0] );
 #         # print &ui_checked_columns_row( \@cols, \@tds, "sel", $count );

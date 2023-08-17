@@ -27,6 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_client_options"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_client_options"};

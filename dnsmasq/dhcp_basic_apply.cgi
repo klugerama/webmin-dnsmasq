@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dhcp_basic_apply.cgi; update misc DHCP info     
+#    DNSMasq Webmin Module - dhcp_basic_apply.cgi; update misc DHCP info     
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@ my $config_file = &read_file_lines( $config_filename );
 my $returnto = $in{"returnto"} || "dhcp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 # check for errors in read config
+
 if( $dnsmconfig{"errors"} > 0 ) {
     my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
     &redirect( $line );
@@ -54,36 +55,6 @@ foreach my $configfield ( @confdhcp ) {
 }
 
 # check for input data errors
-# if( $in{"bootp_addr"} !~ /^$IPADDR$/ ) {
-#     my $line="error.cgi?line=".$text{"bootp_address"};
-#     $line .= "&type=" . &urlize($text{"err_notip"});
-#     &redirect( $line );
-#     exit;
-# }	
-# if( $in{"bootp_file"} !~ /^$FILE$/ ) {
-#     my $line="error.cgi?line=".$text{"bootp_file"};
-#     $line .= "&type=" . &urlize($text{"err_filebad"});
-#     &redirect( $line );
-#     exit;
-# }	
-# if( $in{"bootp_host"} !~ /^$NAME$/ ) {
-#     my $line="error.cgi?line=".$text{"bootp_host"};
-#     $line .= "&type=" . &urlize($text{"err_hostbad"});
-#     &redirect( $line );
-#     exit;
-# }	
-# if( $in{"max_leases"} !~ /^$NUMBER$/ ) {
-#     my $line="error.cgi?line=".$text{"dhcp_lease_max"};
-#     $line .= "&type=" . &urlize($text{"err_numbbad"});
-#     &redirect( $line );
-#     exit;
-# }	
-# if( $in{"dhcp_leasefile"} !~ /^$FILE$/ ) {
-#     my $line="error.cgi?line=".$text{"dhcp_leasefile"};
-#     $line .= "&type=" . &urlize($text{"err_filebad"});
-#     &redirect( $line );
-#     exit;
-# }	
 # adjust everything to what we got
 
 # @sel || &error($text{'selected_none'});

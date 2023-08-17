@@ -29,6 +29,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>", "body-stuff-test", $text{"index_dns_alias_settings"});
+print &header_style();
 
 my $returnto = $in{"returnto"} || "dns_alias.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_alias_settings"};
@@ -41,15 +42,14 @@ sub show_alias {
     my @newfields = ( "from", "to", "netmask" );
     my @editfields = ( "idx", @newfields );
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_alias"}), $internalfield, $text{"alias"}, $w, $h, $formid, \@newfields );
+        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_alias"}), $internalfield, $text{"alias"}, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
 
     my $count=0;
     print &ui_form_start( $apply_cgi . "?mode=alias", "post", undef, "id=\"$formid\"" );
     print &ui_links_row(\@list_link_buttons);
     my @edit_link = ( "", "", "" );
-    my $w = 500;
-    my $h = 505;
     my $hidden_edit_input_fields;
     my @tds = ( $td_left, $td_left, $td_left, $td_left, $td_left, $td_left );
     print &ui_columns_start( [ 
@@ -62,9 +62,9 @@ sub show_alias {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"from"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
-        ($edit_link[1]) = &edit_item_link($val{"to"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
-        ($edit_link[2]) = &edit_item_link($val{"netmask-used"} ? $val{"netmask"} : "(255.255.255.255)", $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"from"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
+        ($edit_link[1]) = &edit_item_link($val{"to"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
+        ($edit_link[2]) = &edit_item_link($val{"netmask-used"} ? $val{"netmask"} : "(255.255.255.255)", $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );
@@ -92,10 +92,8 @@ sub show_nx {
     my $formid = $internalfield . "_form";
     my @newfields = ( "ip" );
     my @editfields = ( "idx", @newfields );
-    my $w = 500;
-    my $h = 375;
     my @list_link_buttons = &list_links( "sel", 1 );
-    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_nx"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_nx"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
     my @tds = ( $td_left, $td_left, $td_left );
 
@@ -111,7 +109,8 @@ sub show_nx {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"addr"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"addr"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
@@ -136,10 +135,8 @@ sub show_address {
     my $formid = $internalfield . "_form";
     my @newfields = ( "domain", "addr" );
     my @editfields = ( "idx", @newfields );
-    my $w = 500;
-    my $h = 565;
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
     my @tds = ( $td_left, $td_left, $td_left, $td_left );
 
@@ -156,8 +153,9 @@ sub show_address {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"domain"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
-        ($edit_link[1]) = &edit_item_link($val{"addr"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"domain"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
+        ($edit_link[1]) = &edit_item_link($val{"addr"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         push ( @cols, $edit_link[1] );
@@ -183,10 +181,8 @@ sub show_ignore_address {
     my $formid = $internalfield . "_form";
     my @newfields = ( "ip" );
     my @editfields = ( "idx", @newfields );
-    my $w = 500;
-    my $h = 565;
     my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $w, $h, $formid, \@newfields );
+    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_addr"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields );
     push(@list_link_buttons, $add_new_button);
     my @tds = ( $td_left, $td_left, $td_left, $td_left );
 
@@ -201,7 +197,8 @@ sub show_ignore_address {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local %val = %{ $item->{"val"} };
         local @cols;
-        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"ip"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, $w, $h, \@editfields);
+        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
+        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"ip"}, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         push ( @cols, $edit_link[0] );
         print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );

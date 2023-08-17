@@ -107,11 +107,11 @@ sub generate_param_rows {
         }
         else {
             if ( $paramdefinition->{"arr"} == 1 ) {
-                $input = &ui_textbox($fieldname_prefix . $param, join($paramdefinition->{"sep"}, @{$val{$param}}), $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"");
+                $input = &ui_textbox($fieldname_prefix . $param, join($paramdefinition->{"sep"}, @{$val{$param}}), $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($paramdefinition->{"required"} ? " required" : " optional"));
             }
             else {
                 # $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}) ];
-                $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"");
+                $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($paramdefinition->{"required"} ? " required" : " optional"));
             }
         }
         $rows .= &ui_columns_row( [ $label, $input ], \@tds );
@@ -147,9 +147,10 @@ my $headstuff = "<script type='text/javascript'>\n"
 &popup_header(undef, $headstuff);
 # &header(title, image, [help], [config], [nomodule], [nowebmin], [rightside], [head-stuff], [body-stuff], [below])
 # &header($title, undef, undef, 0, 1, 1, undef, $headstuff);
+print &header_style();
 
 my $title_header = "<div class=\"modal-title\" style=\"display: flex; width: 100%;\"><span style=\"width: 100%;\"><h4>" . $title . "</h4></span>"
-    . "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" style=\"height: 24px; width: 24px; float: right; border: 1px solid #686b6f; padding: 1px 5px; margin: 2px; \">"
+    . "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" style=\"height: 24px; width: 24px; float: right; padding: 1px 5px; margin: 2px; \">"
     . "<span aria-hidden=\"true\">&times;</span>"
     . "</button></div>";
 if ($internalfield eq "dhcp_range") {
