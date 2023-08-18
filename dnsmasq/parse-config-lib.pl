@@ -281,7 +281,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<time>
         "dhcp_ttl" => { 
@@ -292,7 +293,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<time>
         "neg_ttl" => { 
@@ -303,7 +305,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<time>
         "max_ttl" => { 
@@ -314,7 +317,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<time>
         "max_cache_ttl" => { 
@@ -325,7 +329,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<time>
         "min_cache_ttl" => { 
@@ -336,7 +341,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<time>
         "auth_ttl" => { 
@@ -347,7 +353,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<time>
         "log_queries" => { 
@@ -356,10 +363,11 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "string",
                 "default" => "",
-                "required" => 1,
-                "template" => "extra" # literal value
+                "required" => 0,
+                "template" => "extra", # literal value
+                "pattern" => "extra" # literal value
             }
-        },
+        }, # [=extra]
         "log_facility" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -384,8 +392,9 @@ sub init_configfield_fields {
                 "valtype" => "int",
                 "default" => 5,
                 "required" => 0,
-                "label" => $text{"p_label_val_ttl"},
+                "label" => $text{"p_label_val_lines"},
                 "template" => "<" . $text{"tmpl_log_async"} . ">",
+                "pattern" => "\\d{1,10}",
             }
         }, # [=<lines>] 
         "pid_file" => {
@@ -403,7 +412,7 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "user",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_username"},
@@ -414,7 +423,7 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "group",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_groupname"},
@@ -429,7 +438,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_port"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             }
         }, # =<port>
         "edns_packet_max" => { 
@@ -440,7 +452,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_size"},
-                "template" => "<" . $text{"tmpl_size"} . ">"
+                "template" => "<" . $text{"tmpl_size"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<size>
         "query_port" => { 
@@ -451,7 +464,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_port"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             }
         }, # =<query_port>
         "min_port" => { 
@@ -462,7 +478,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_port"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             }
         }, # =<port>
         "max_port" => { 
@@ -473,7 +492,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_port"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             }
         }, # =<port>
         "interface" => { 
@@ -995,7 +1017,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_port"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
             "priority" => {
                 "length" => 3,
@@ -1003,7 +1028,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_priority"},
-                "template" => "<" . $text{"tmpl_srv_host_priority"} . ">"
+                "template" => "<" . $text{"tmpl_srv_host_priority"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
             "weight" => {
                 "length" => 3,
@@ -1011,7 +1039,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_weight"},
-                "template" => "<" . $text{"tmpl_weight"} . ">"
+                "template" => "<" . $text{"tmpl_weight"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
         }, # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
         "host_record" => { 
@@ -1046,7 +1077,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "template" => "<" . $text{"tmpl_TTL"} . ">",,
+                "pattern" => "\\d{1,5}"
             },
         }, # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
         "dynamic_host" => { 
@@ -1138,7 +1170,10 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_order"},
-                "template" => "<" . $text{"tmpl_order"} . ">",
+                "template" => "<" . $text{"tmpl_order"} . ">",,
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
             "preference" => {
                 "length" => 10,
@@ -1146,7 +1181,10 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_preference"},
-                "template" => "<" . $text{"tmpl_preference"} . ">",
+                "template" => "<" . $text{"tmpl_preference"} . ">",,
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
             "flags" => {
                 "length" => 10,
@@ -1155,6 +1193,7 @@ sub init_configfield_fields {
                 "required" => 1,
                 "label" => $text{"p_label_val_flags"},
                 "template" => "<" . $text{"tmpl_flags"} . ">",
+                "pattern" => "[a-zA-Z0-9]*",
             },
             "service" => {
                 "length" => 10,
@@ -1197,7 +1236,10 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_flags"},
-                "template" => "<" . $text{"tmpl_flags"} . ">"
+                "template" => "<" . $text{"tmpl_caa_flags"} . ">",
+                "pattern" => "\\d{1,3}",
+                "min" => 0,
+                "max" => 255,
             },
             "tag" => {
                 "length" => 10,
@@ -1205,7 +1247,8 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_tag"},
-                "template" => "<" . $text{"tmpl_tag"} . ">"
+                "template" => "<" . $text{"tmpl_caa_tag"} . ">",
+                "pattern" => "[a-zA-Z0-9]*"
             },
             "value" => {
                 "length" => 10,
@@ -1224,7 +1267,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_cnames"},
-                "template" => "<" . $text{"tmpl_cname"} . ">[,<" . $text{"tmpl_cname"} . ">]"
+                "template" => "<" . $text{"tmpl_cname"} . ">[,<" . $text{"tmpl_cname"} . ">]",
+                "arr" => 1,
+                "sep" => ","
             },
             "target" => {
                 "length" => 10,
@@ -1240,7 +1285,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_ttl"},
-                "template" => "<" . $text{"tmpl_TTL"} . ">"
+                "template" => "<" . $text{"tmpl_TTL"} . ">",
+                "pattern" => "\\d{1,5}"
             },
         }, # =<cname>,[<cname>,]<target>[,<TTL>]
         "dns_rr" => { 
@@ -1255,19 +1301,23 @@ sub init_configfield_fields {
             },
             "rrnumber" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "int",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_rrnumber"},
-                "template" => "<" . $text{"tmpl_rrnumber"} . ">"
+                "template" => "<" . $text{"tmpl_rrnumber"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535,
             },
             "hexdata" => {
                 "length" => 10,
                 "valtype" => "string",
                 "default" => "",
-                "required" => 1,
+                "required" => 0,
                 "label" => $text{"p_label_val_hexdata"},
-                "template" => "<" . $text{"tmpl_hexdata"} . ">"
+                "template" => "<" . $text{"tmpl_hexdata"} . ">",
+                "pattern" => "[a-fA-F0-9\ :]*"
             },
         }, # =<name>,<RR-number>,[<hex data>]
         "interface_name" => { 
@@ -1345,7 +1395,8 @@ sub init_configfield_fields {
                 "valtype" => "string",
                 "default" => "",
                 "required" => 0,
-                "template" => "base64|text"
+                "template" => "base64|text", # literal value
+                "pattern" => "base64|text" # literal value
             }
         }, # [=base64|text]
         "add_cpe_id" => { 
@@ -1403,7 +1454,8 @@ sub init_configfield_fields {
                 "valtype" => "int",
                 "default" => 0,
                 "required" => 1,
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<cachesize>
         "no_negcache" => { 
@@ -1420,7 +1472,8 @@ sub init_configfield_fields {
                 "valtype" => "int",
                 "default" => 0,
                 "required" => 1,
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<queries>
         "dnssec" => { 
@@ -1488,7 +1541,8 @@ sub init_configfield_fields {
                 "valtype" => "string",
                 "default" => "no",
                 "required" => 0,
-                "template" => "[no]" # literal value
+                "template" => "[no]", # literal value
+                "pattern" => "no" # literal value
             }
         }, # [=no]
         "dnssec_no_timecheck" => { 
@@ -1578,7 +1632,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_refresh"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             },
             "retry" => {
                 "length" => 2,
@@ -1586,7 +1641,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_retry"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             },
             "expiry" => {
                 "length" => 2,
@@ -1594,7 +1650,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_expiry"},
-                "template" => "<" . $text{"tmpl_expiry"} . ">"
+                "template" => "<" . $text{"tmpl_expiry"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
         "auth_sec_servers" => { 
@@ -1631,7 +1688,7 @@ sub init_configfield_fields {
             }
         },
         "dhcp_range" => { 
-            "param_order" => [ "tag", "settag", "start", "end", "static", "proxy", "ra-only", "ra-names", "ra-stateless", "slaac", "ra-advrouter", "off-link", "mask", "broadcast", "prefix-length", "leasetime" ],
+            "param_order" => [ "tag", "settag", "start", "end", "mask", "broadcast", "prefix-length", "leasetime", "static", "proxy", "ra-only", "ra-names", "ra-stateless", "slaac", "ra-advrouter", "off-link" ],
             "tag" => {
                 "length" => 15,
                 "valtype" => "string",
@@ -1667,6 +1724,42 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_end_ip_address"},
                 "template" => $text{"tmpl_ip"},
                 "template6" => $text{"tmpl_ip6"},
+            },
+            "mask" => {
+                "ipversion" => 4,
+                "length" => 12,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_netmask"},
+                "template" => $text{"tmpl_netmask"}
+            },
+            "broadcast" => {
+                "ipversion" => 4,
+                "length" => 12,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 0,
+                "label" => $text{"p_label_val_broadcast"},
+                "template" => $text{"tmpl_netmask"}
+            },
+            "prefix-length" => {
+                "ipversion" => 6,
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_prefix_length"},
+                "template" => "<" . $text{"tmpl_prefix_length"} . ">",
+                "pattern" => "\\d{1,5}"
+            },
+            "leasetime" => {
+                "length" => 3,
+                "valtype" => "int",
+                "default" => 0,
+                "required" => 0,
+                "label" => $text{"p_label_val_leasetime"},
+                "template" => "<" . $text{"tmpl_leasetime"} . ">",
             },
             "static" => {
                 "valtype" => "bool",
@@ -1714,41 +1807,6 @@ sub init_configfield_fields {
                 "valtype" => "bool",
                 "default" => 0,
                 "label" => $text{"p_label_val_off-link"},
-            },
-            "mask" => {
-                "ipversion" => 4,
-                "length" => 12,
-                "valtype" => "string",
-                "default" => "",
-                "required" => 0,
-                "label" => $text{"p_label_val_netmask"},
-                "template" => $text{"tmpl_netmask"}
-            },
-            "broadcast" => {
-                "ipversion" => 4,
-                "length" => 12,
-                "valtype" => "string",
-                "default" => "",
-                "required" => 0,
-                "label" => $text{"p_label_val_broadcast"},
-                "template" => $text{"tmpl_netmask"}
-            },
-            "prefix-length" => {
-                "ipversion" => 6,
-                "length" => 3,
-                "valtype" => "int",
-                "default" => 0,
-                "required" => 0,
-                "label" => $text{"p_label_val_prefix_length"},
-                "template" => "<" . $text{"tmpl_prefix_length"} . ">"
-            },
-            "leasetime" => {
-                "length" => 3,
-                "valtype" => "int",
-                "default" => 0,
-                "required" => 0,
-                "label" => $text{"p_label_val_leasetime"},
-                "template" => "<" . $text{"tmpl_leasetime"} . ">"
             },
         }, # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
         "dhcp_host" => { 
@@ -2377,7 +2435,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_timeout"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             },
         }, # =[tag:<tag>,]<prompt>[,<timeout>]
         "dhcp_pxe_vendor" => { 
@@ -2399,7 +2458,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_leasetime"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,10}"
             }
         }, # =<number>
         "dhcp_authoritative" => { 
@@ -2424,7 +2484,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_serverport"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
             "clientport" => {
                 "length" => 3,
@@ -2432,7 +2495,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_clientport"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
         }, # [=<server port>[,<client port>]]
         "bootp_dynamic" => { 
@@ -2539,7 +2605,7 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "user",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_username"},
@@ -2674,23 +2740,26 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_priority"},
-                "template" => "<high|low>" # literal value
+                "template" => "<high|low>", # literal value
+                "pattern" => "high|low" # literal value
             },
             "interval" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "int",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_interval"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             },
             "lifetime" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "int",
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_lifetime"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             },
         }, # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
         "dhcp_reply_delay" => { 
@@ -2709,7 +2778,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_delay"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             },
         }, # =[tag:<tag>,]<integer>
         "enable_tftp" => { 
@@ -2757,7 +2827,8 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 0,
                 "label" => "ip|mac",
-                "template" => "ip|mac" # literal value
+                "template" => "ip|mac", # literal value
+                "pattern" => "ip|mac" # literal value
             },
         }, # [=ip|mac]
         "tftp_secure" => { 
@@ -2782,7 +2853,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_max_connections"},
-                "template" => "<" . $text{"tmpl_integer"} . ">"
+                "template" => "<" . $text{"tmpl_integer"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<connections>
         "tftp_mtu" => { 
@@ -2793,7 +2865,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_mtu"},
-                "template" => "<" . $text{"tmpl_mtu"} . ">"
+                "template" => "<" . $text{"tmpl_mtu"} . ">",
+                "pattern" => "\\d{1,5}"
             }
         }, # =<mtu size>
         "tftp_no_blocksize" => { 
@@ -2811,7 +2884,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_start_port"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
             "end" => {
                 "length" => 3,
@@ -2819,7 +2895,10 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 1,
                 "label" => $text{"p_label_val_end_port"},
-                "template" => "<" . $text{"tmpl_port"} . ">"
+                "template" => "<" . $text{"tmpl_port"} . ">",
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
+                "max" => 65535
             },
         }, # =<start>,<end>
         "tftp_single_port" => { 
@@ -3100,13 +3179,13 @@ sub parse_config_file {
                             if ( $remainder =~ /^\/(.*)\/($IPADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
                                 if ( defined ($2) ) {
-                                    $valtemp{"addr"} = $2;
+                                    $valtemp{"ip"} = $2;
                                 }
                             }
                             elsif ( $remainder =~ /^\/(.*)\/($IPV6ADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
                                 if ( defined ($2) ) {
-                                    $valtemp{"addr"} = $2;
+                                    $valtemp{"ip"} = $2;
                                 }
                             }
                             else

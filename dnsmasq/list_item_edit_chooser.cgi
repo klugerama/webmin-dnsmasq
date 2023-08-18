@@ -121,12 +121,6 @@ sub generate_param_rows {
 
 # my $headstuff = $base_headstuff;
 my $headstuff = "<script type='text/javascript'>\n"
-    # . "  document.addEventListener(\"DOMContentLoaded\", function(event) { \n"
-    # . "    setTimeout(function() {\n"
-    # # . "      \$( \".opener_table_cell_style_small\" ).removeClass(\"opener_table_cell_style_small\");\n"
-    # # . "      \$( \".opener_hidden\" ).prop(\"style\", \"display: none;\");\n"
-    # . "    },10);\n"
-    # . "  });\n"
     . "  \$( \".opener_hidden\" ).prop(\"style\", \"display: none;\");\n"
     . "  function save_" . $internalfield . "(formname) {\n"
     . "    event.preventDefault();\n"
@@ -143,11 +137,11 @@ my $headstuff = "<script type='text/javascript'>\n"
     . "    event.stopPropagation();\n"
     . "  }\n"
     . "</script>\n";
+$headstuff .= &header_style();
 
 &popup_header(undef, $headstuff);
 # &header(title, image, [help], [config], [nomodule], [nowebmin], [rightside], [head-stuff], [body-stuff], [below])
 # &header($title, undef, undef, 0, 1, 1, undef, $headstuff);
-print &header_style();
 
 my $title_header = "<div class=\"modal-title\" style=\"display: flex; width: 100%;\"><span style=\"width: 100%;\"><h4>" . $title . "</h4></span>"
     . "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" style=\"height: 24px; width: 24px; float: right; padding: 1px 5px; margin: 2px; \">"
@@ -162,7 +156,7 @@ if ($internalfield eq "dhcp_range") {
     $desc .= &ui_hidden_end("mandesc");
     print &ui_columns_row( [ $desc ], \@doctd );
     if ($action eq "edit") {
-        if ($ipversion eq "ip4") {
+        if ($ipversion eq "modal_ip4") {
             print &ui_columns_row( [ &formtable_ip4($fieldname_prefix) ], [ "colspan=2 style=\"text-align: left; width: auto;\"" ] );
         }
         else {
@@ -212,8 +206,6 @@ else {
     print &ui_table_end();
     print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
-    # push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel", undef, "style='display:inline; float:right;' onClick='top.close(); return false;'" ) );
-    # push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='display:inline !important; float:right;' onClick='\$(\"#".$internalfield."_input_form\").submit(); return false;'" ) );
     push( @form_buttons, &ui_button( $text{"cancel_button"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
     push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='height: 33px; display:inline !important; float:right;'" ) );
     print &ui_form_end( \@form_buttons );

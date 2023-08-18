@@ -38,148 +38,68 @@ my $apply_cgi = "dhcp_range_apply.cgi";
 our $internalfield = "dhcp_range";
 my $configfield = &internal_to_config($internalfield);
 my $definition = %configfield_fields{$internalfield};
+my $formidx = 0;
 
-sub show_ip4 {
+sub show_ip_range_list {
+    my ($ipver, $formidx) = @_;
+    my $version_excluded = ($ipver == 4 ? 6 : 4);
     my $edit_link;
     my $hidden_edit_input_fields;
-    my @modes = ();
+    my @column_headers = ( "", $text{"enabled"}, );
     my @newfields = ( "ipversion" );
     foreach my $param ( @{$definition->{"param_order"}} ) {
-        next if ($definition->{$param}->{"ipversion"} == 6);
-        if ($definition->{$param}->{"valtype"} eq "bool") {
-            push( @modes, $param );
-        }
+        next if ($definition->{$param}->{"ipversion"} == $version_excluded);
         push( @newfields, $param );
+        if ($definition->{$param}->{"valtype"} eq "bool") {
+            push( @column_headers, $text{"p_label_val_short_" . $param} . &ui_help($text{"p_label_val_" . $param}) );
+        }
+        else {
+            push( @column_headers, $definition->{$param}->{"label"} );
+        }
     }
     my @editfields = ( "idx", @newfields );
-    my $formid = $internalfield . "_4_form";
+    my $formid = $internalfield . "_" . $ipver . "_form";
     my @tds = ( $td_label, $td_left, $td_left ); # extra column for set-tags
-    my @column_headers = ( "",
-        $text{"enabled"},
-        $text{"p_label_val_start_ip_address"},
-        $text{"p_label_val_end_ip_address"},
-        $text{"p_label_val_netmask"},
-        $text{"p_label_val_broadcast"},
-        $text{"p_label_val_leasetime"},
-        $text{"p_label_val_tags"}, 
-        $text{"p_label_val_set_tag"} );
-    foreach my $bool ( @modes ) {
-        push( @column_headers, $text{"p_label_val_short_" . $bool} . &ui_help($text{"p_label_val_" . $bool}) );
-    }
     foreach my $param ( @newfields ) {
         push( @tds, $td_left );
     }
-    # my @list_link_buttons = &list_links( "sel", 0, $apply_cgi, "dhcp-range=0.0.0.0,0.0.0.0", $returnto, &text("add_", $text{"_range"}) );
-    my @list_link_buttons = &list_links( "sel", 3 );
-    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields, "ipversion=ip4" );
+    my @list_link_buttons = &list_links( "sel", $formidx );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields, "ipversion=ip" . $ipver );
     push(@list_link_buttons, $add_button);
 
     my $count = -1;
-    print &ui_form_start( $apply_cgi . "?mode=modal_ip4", "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi . "?ipversion=ip" . $ipver, "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
     print &ui_columns_start( \@column_headers, 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         $count++;
-        next if ($item->{"val"}->{"ipversion"} == 6);
+        next if ($item->{"val"}->{"ipversion"} == $version_excluded);
         local @cols;
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
-        my @vals = ( 
-            $item->{"val"}->{"start"}, 
-            $item->{"val"}->{"end"}, 
-            $item->{"val"}->{"mask"}, 
-            $item->{"val"}->{"broadcast"}, 
-            $item->{"val"}->{"leasetime"}, 
-            join(",", @{$item->{"val"}->{"tag"}}), 
-            $item->{"val"}->{"settag"} );
-        foreach my $bool ( @modes ) {
-            push( @vals, &ui_checkbox(undef, "1", "", $item->{"val"}->{$bool} ));
+        my @vals = ( );
+        foreach my $param ( @{$definition->{"param_order"}} ) {
+            next if ($definition->{$param}->{"ipversion"} == $version_excluded);
+            if ($definition->{$param}->{"arr"} == 1) {
+                push( @vals, join($definition->{$param}->{"sep"}, @{$item->{"val"}->{$param}}) );
+            }
+            elsif ($definition->{$param}->{"valtype"} eq "bool") {
+                push( @vals, &ui_checkbox(undef, "1", "", $item->{"val"}->{$param} ));
+            }
+            else {
+                push( @vals, $item->{"val"}->{$param} );
+            }
         }
         foreach my $val ( @vals ) {
             # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip4");
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip" . $ipver);
             }
             else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip4");
+                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip" . $ipver);
             }
             push( @cols, $edit_link );
         }
         print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
-    }
-    print &ui_columns_end();
-    print &ui_links_row(\@list_link_buttons);
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print $hidden_add_input_fields;
-    print $hidden_edit_input_fields;
-    print &ui_form_end();
-}
-
-sub show_ip6 {
-    my $edit_link;
-    my $hidden_edit_input_fields;
-    my @modes = ();
-    my @newfields = ( "ipversion" );
-    foreach my $param ( @{$definition->{"param_order"}} ) {
-        next if ($definition->{$param}->{"ipversion"} == 4);
-        if ($definition->{$param}->{"valtype"} eq "bool") {
-            push( @modes, $param );
-        }
-        push( @newfields, $param );
-    }
-    my @editfields = ( "idx", @newfields );
-    my $formid = $internalfield . "_6_form";
-    my @tds = ( $td_label, $td_left, $td_left ); # extra column for set-tags
-    my @column_headers = ( "",
-        $text{"enabled"},
-        $text{"p_label_val_start_ip_address"},
-        $text{"p_label_val_end_ip_address"},
-        $text{"p_label_val_prefix_length"},
-        $text{"p_label_val_leasetime"},
-        $text{"p_label_val_tags"}, 
-        $text{"p_label_val_set_tag"} );
-    foreach my $bool ( @modes ) {
-        push( @column_headers, $text{"p_label_val_short_" . $bool} . &ui_help($text{"p_label_val_" . $bool}) );
-    }
-    foreach my $param ( @newfields ) {
-        push( @tds, $td_left );
-    }
-    my @list_link_buttons = &list_links( "sel", 3 );
-    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields, "ipversion=ip6" );
-    push(@list_link_buttons, $add_button);
-
-    my $count = -1;
-    print &ui_form_start( $apply_cgi . "?mode=modal_ip4", "post", undef, "id='$formid'" );
-    print &ui_links_row(\@list_link_buttons);
-    print &ui_columns_start( \@column_headers, 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=' . @column_headers ] ), 1 );
-    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
-        $count++;
-        next if ($item->{"val"}->{"ipversion"} == 4);
-        local @cols;
-        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
-        my @vals = ( 
-            $item->{"val"}->{"start"}, 
-            $item->{"val"}->{"end"}, 
-            $item->{"val"}->{"prefix-length"}, 
-            $item->{"val"}->{"leasetime"}, 
-            join(",", @{$item->{"val"}->{"tag"}}), 
-            $item->{"val"}->{"settag"} );
-        foreach my $bool ( @modes ) {
-            push( @vals, &ui_checkbox(undef, "1", "", $item->{"val"}->{$bool} ));
-        }
-        foreach my $val ( @vals ) {
-            # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-            if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip6");
-            }
-            else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip6");
-            }
-            push( @cols, $edit_link );
-        }
-        print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $count );
     }
     print &ui_columns_end();
     print &ui_links_row(\@list_link_buttons);
@@ -198,11 +118,11 @@ my $ipversion = $in{"ipversion"} || "ip4";
 print ui_tabs_start(\@tabs, "ipversion", $ipversion);
 
 print ui_tabs_start_tab("ipversion", 'ip4');
-&show_ip4();
+&show_ip_range_list(4, $formidx++);
 print ui_tabs_end_tab("ipversion", 'ip4');
 
 print ui_tabs_start_tab("ipversion", 'ip6');
-&show_ip6();
+&show_ip_range_list(6, $formidx++);
 print ui_tabs_end_tab("ipversion", 'ip6');
 
 print ui_tabs_end();

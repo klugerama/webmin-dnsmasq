@@ -381,7 +381,7 @@ sub find_config {
 =head2 update(lineno, text, file_arr_ref, action)
     update the config file array
         lineno       - the line number (array index) to update; -1 to add
-        text         - the new contents of the line
+        text         - the new contents of the line, or undef to leave unchanged
         file_arr_ref - reference to the array to change
         action       - 0 = normal
                        1 = put a comment marker ('#') at start of line
@@ -494,7 +494,7 @@ sub update_simple_vals {
     my $result;
     my ( $all, $enabled, $dnsmconfig ) = @_;
     my @conf_filenames = ();
-    foreach my $configfield ( @$all ) {
+    foreach my $configfield ( @{$all} ) {
         my $sourcefile = $dnsmconfig{"$configfield"}->{"file"};
         if ( ! grep { /^$sourcefile$/ } ( @conf_filenames ) ) {
             push @conf_filenames, $sourcefile;
@@ -502,12 +502,18 @@ sub update_simple_vals {
     }
     foreach my $conf_filename ( @conf_filenames ) {
         my $file_arr = &read_file_lines($conf_filename);
-        foreach my $configfield ( @$all ) {
+        foreach my $configfield ( @{$all} ) {
             my $internalfield = &config_to_internal($configfield);
             my $item = $dnsmconfig{"$configfield"};
-            if ($item->{"file"} eq $conf_filename && ($item->{"val_optional"} || $in{$internalfield . "val"}  ) ) {
-                &update( $item->{"line"}, "$configfield" . ( $in{$internalfield . "val"} eq "" ? "" : "=" . $in{$internalfield . "val"}),
-                    \@$file_arr, ( ( grep { /^$configfield$/ } ( @$enabled ) ) ? 0 : 1 ) );
+            if ($item->{"file"} eq $conf_filename) {
+                if ($item->{"val_optional"} || $in{$internalfield . "val"}) {
+                    &update( $item->{"line"}, "$configfield" . ( $in{$internalfield . "val"} eq "" ? "" : "=" . $in{$internalfield . "val"}),
+                        \@$file_arr, ( ( grep { /^$configfield$/ } ( @{$enabled} ) ) ? 0 : 1 ) );
+                }
+                elsif ($dnsmconfig->{$configfield} && $in{$internalfield} eq "") {
+                    &update( $item->{"line"}, undef,
+                        \@$file_arr, ( ( grep { /^$configfield$/ } ( @{$enabled} ) ) ? 0 : 1 ) );
+                }
             }
         }
         &flush_file_lines();
@@ -1111,29 +1117,35 @@ sub show_basic_fields_row {
     elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
         my $definition = %configfield_fields{$internalfield}->{"val"};
         my $tmpl = $definition->{"template"};
+        my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
+        my $validation = "";
+        $validation .= $definition->{"pattern"} ne "" ? " pattern='" . $definition->{"pattern"} . "'" : "";
+        $validation .= $definition->{"min"} ne "" ? " min='" . $definition->{"min"} . "'" : "";
+        $validation .= $definition->{"max"} ne "" ? " max='" . $definition->{"max"} . "'" : "";
+        $validation .= $definition->{"required"} == 1 ? " required" : " optional";
         my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
-        if ( $configfield =~ /user$/ ) {
+        if ( $definition->{"valtype"} eq "user" ) {
             return &ui_clickable_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help, 
-                    &ui_user_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                    &ui_user_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, $input_guidance . $validation )
                 ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
         }
-        elsif ( $configfield =~ /group$/ ) {
+        elsif ( $definition->{"valtype"} eq "group" ) {
             return &ui_clickable_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help,
-                    &ui_group_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                    &ui_group_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, $input_guidance . $validation )
                 ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
         }
-        elsif ( $configfield =~ /(file|dir|script)$/ ) {
+        elsif ( $definition->{"valtype"} =~ /(file|dir|path)$/ ) {
             return &ui_clickable_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help,
-                    &ui_filebox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                    &ui_filebox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation, $definition->{"valtype"} eq "dir" ? 1 : undef )
                 ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
         }
         else {
             return &ui_checked_columns_row( [
                     $text{"p_label_$internalfield"} . $help,
-                    &ui_textbox( $internalfield . "val", %{$dnsmconfig}{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") )
+                    &ui_textbox( $internalfield . "val", %{$dnsmconfig}{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation . " dnsmclass=\"dnsm-type-" . $definition->{"valtype"} . "\"" )
                 ], \@tds, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\""
             );
         }
@@ -1143,10 +1155,12 @@ sub show_basic_fields_row {
 sub get_other_fields {
     my ($page_fields) = @_;
     my @var_fields = ();
+    my @basic_fields = &get_basic_fields($page_fields);
     foreach my $configfield ( @{ $page_fields } ) {
         next if ( grep { /^$configfield$/ } ( @confarrs ) );
         next if ( grep { /^$configfield$/ } ( @confbools ) );
         next if ( ( grep { /^$configfield$/ } ( @confsingles ) ) && %dnsmconfigvals{"$configfield"}->{"mult"} eq "" );
+        next if ( grep { /^$configfield$/ } ( @basic_fields ) );
         push( @var_fields, $configfield );
     }
     return @var_fields;
@@ -1184,13 +1198,7 @@ sub get_field_auto_columns {
     my ($dnsmconfig, $internalfield, $columns) = @_;
     my $configfield = &internal_to_config($internalfield);
     my $item = $dnsmconfig{"$configfield"};
-    my $val;
-    if (@{ %configfield_fields{$internalfield}->{"param_order"} }[0] eq "val") {
-        $val = $item->{"val"};
-    }
-    else {
-        $val = $item->{"val"};
-    }
+    my $val = $item->{"val"};
     my @cols = ();
     push ( @cols, &show_label_with_help($internalfield, $configfield) );
     # first get a list of all parameters for this field, for the radio button (ui_opt_textbox)
@@ -1217,6 +1225,12 @@ sub get_field_auto_columns {
         }
         my $tmpl = $definition->{"template"};
         my $label = $definition->{"label"} || $text{"p_label_" . $internalfield . "_" . $key};
+        my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
+        my $validation = "";
+        $validation .= $definition->{"pattern"} ? " pattern='" . $definition->{"pattern"} . "'" : "";
+        $validation .= $definition->{"min"} ? " min='" . $definition->{"min"} . "'" : "";
+        $validation .= $definition->{"max"} ? " max='" . $definition->{"max"} . "'" : "";
+        $validation .= $definition->{"required"} == 1 ? " required" : " optional";
         if ($definition->{"required"}) {
             $label .= "&nbsp;<span color='red'>*</span>&nbsp;";
         }
@@ -1232,10 +1246,10 @@ sub get_field_auto_columns {
         else {
             my $input;
             if ($definition->{"valtype"} eq "file") {
-                $input = "<nobr>" . &ui_filebox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") ) . "</nobr>";
+                $input = "<nobr>" . &ui_filebox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation ) . "</nobr>";
             }
             else {
-                $input = &ui_textbox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($definition->{"required"} == 1 ? " required" : " optional") );
+                $input = &ui_textbox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation );
             }
             push ( @cols, $label . "<br>" . $input );
         }
@@ -1576,6 +1590,7 @@ sub add_js {
              . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".remove-item-button-small\");\n" # adds icon to mini "remove <item>" button for select box
              . "    \$(\".clickable_tr\").each(function(){\$(this).parent().addClass(\"ui_checked_columns\");});\n" # fixes styling for clickable table row checkboxes
              . "    \$(\".clickable_tr_selected\").each(function(){\$(this).removeClass(\"clickable_tr_selected\");\$(this).parent().addClass(\"hl-aw\");});\n" # fixes styling for clickable table row checkboxes
+             . "    \$(\"input[dnsmclass=dnsm-type-int]\").each(function(){\$(this).prop(\"type\", \"number\");});\n" # fixes styling for clickable table row checkboxes
              . "    \$(\"input[dummy_field]\").hide();"
              . "  }, 0);\n";
     $script .= "  if (!\$('#list-item-edit-modal').length) {\n"

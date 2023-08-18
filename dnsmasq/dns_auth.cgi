@@ -29,10 +29,6 @@ my $config_file = &read_file_lines( $config_filename );
 &header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_auth_settings"} );
 print &header_style();
 
-# print "<h2>";
-# print $text{"index_dns_auth_settings"};
-# print "</h2>";
-
 my $returnto = $in{"returnto"} || "dns_auth.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
 my $apply_cgi = "dns_auth_apply.cgi";

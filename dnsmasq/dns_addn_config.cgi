@@ -41,98 +41,12 @@ my @vals = (
     {
         "internalfield" => "conf_file",
         "add_button_text" => $text{"_filename"},
-        "val_label" => $text{"p_label_val_filename"},
-        "chooser_mode" => 0
     },
     {
         "internalfield" => "servers_file",
         "add_button_text" => $text{"_filename"},
-        "val_label" => $text{"p_label_val_filename"},
-        "chooser_mode" => 0
     },
 );
-
-sub show_conf_file {
-    my $count=0;
-    my $internalfield = "conf_file";
-    my $configfield = &internal_to_config($internalfield);
-    my $definition = %configfield_fields{$internalfield};
-    my $formid = $internalfield . "_form";
-    print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
-    # @list_link_buttons = &list_links( "sel", 0, "dns_addn_config_apply.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
-    @list_link_buttons = &list_links( "sel", 0 );
-    my ($file_chooser_button, $hidden_input_fields) = &add_file_chooser_button( &text("add_", $text{"_filename"}), "new_" . $internalfield, 0, $formid );
-    print &ui_links_row(\@list_link_buttons);
-    print $hidden_input_fields;
-    print $file_chooser_button;
-    print &ui_columns_start( [ 
-        # "line", 
-        "",
-        $text{"enabled"}, 
-        $text{"p_label_conf_file"}, 
-        # "full" 
-    ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=3' ] ), 1 );
-
-    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
-        local @cols;
-        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
-        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"filename"}, $definition->{"filename"}->{"length"}, 0, undef, "idx=\"$count\"") );
-        print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $configfield, 0 );
-        $count++;
-
-    }
-    print &ui_columns_end();
-    print &ui_links_row(\@list_link_buttons);
-    print $hidden_input_fields;
-    print $file_chooser_button;
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print &ui_form_end( );
-    print &ui_hr();
-}
-
-sub show_servers_file {
-    my $count=0;
-    my $internalfield = "servers_file";
-    my $configfield = &internal_to_config($internalfield);
-    my $definition = %configfield_fields{$internalfield};
-    my $formid = "addnconf_" . $internalfield . "_form";
-    print &ui_form_start( $apply_cgi, "post", undef, "id=\"$formid\"" );
-    # @list_link_buttons = &list_links( "sel", 1, "dns_addn_config_apply.cgi", "$configfield=new", "dns_addn_config.cgi", &text("add_", $text{"p_label_$internalfield"}) );
-    @list_link_buttons = &list_links( "sel", 1 );
-    my ($file_chooser_button, $hidden_input_fields) = &add_file_chooser_button( &text("add_", $text{"_filename"}), "new_" . $internalfield, 0, $formid );
-    print &ui_links_row(\@list_link_buttons);
-    print $hidden_input_fields;
-    print $file_chooser_button;
-    print &ui_columns_start( [ 
-        # "line", 
-        "",
-        $text{"enabled"}, 
-        $text{"p_label_$internalfield"}, 
-        # "full" 
-    ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=3' ] ), 1 );
-
-    foreach my $item ( @{$dnsmconfig{$configfield}} ) {
-        local @cols;
-        push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
-        push ( @cols, &ui_filebox($formid."_fn", $item->{"val"}->{"filename"}, $definition->{"filename"}->{"length"}, 0, undef, "idx=\"$count\"") );
-        print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $configfield, 0 );
-        $count++;
-
-    }
-    print &ui_columns_end();
-    print &ui_links_row(\@list_link_buttons);
-    print $hidden_input_fields;
-    print $file_chooser_button;
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print &ui_form_end( );
-    print &ui_hr();
-}
 
 sub show_conf_dir {
     my @edit_link = ( "", "" );
@@ -187,10 +101,6 @@ sub show_conf_dir {
     print &ui_form_end( );
 }
 
-# my @tabs = (   [ 'conf_file', $text{'p_desc_conf_file'} ],
-#             [ 'servers_file', $text{"p_desc_servers_file"} ],
-#             [ 'conf_dir', $text{"p_desc_conf_dir"} ],
-#         );
 my @tabs = ( );
 foreach my $v ( @vals ) {
     push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
@@ -201,7 +111,6 @@ print ui_tabs_start(\@tabs, 'mode', $mode);
 
 foreach my $v ( @vals ) {
     print ui_tabs_start_tab('mode', $v->{"internalfield"});
-    # &show_path_list($v->{"internalfield"}, $apply_cgi, $v->{"add_button_text"}, $v->{"val_label"}, $v->{"chooser_mode"}, $formidx++);
     &show_field_table($v->{"internalfield"}, $apply_cgi, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
     print ui_tabs_end_tab('mode', $v->{"internalfield"});
 }

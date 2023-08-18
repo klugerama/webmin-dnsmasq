@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dns_records.cgi; Upstream Servers config
+#    DNSMasq Webmin Module - dns_records.cgi; Upstream Servers config
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,18 @@ print &header_style();
 my $returnto = $in{"returnto"} || "dns_records.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_records_settings"};
 my $apply_cgi = "dns_records_apply.cgi";
+my $formidx = 2;
+
+my @vals = (
+    {
+        "internalfield" => "ipset",
+        "add_button_text" => $text{"_listen"},
+    },
+    {
+        "internalfield" => "connmark_allowlist",
+        "add_button_text" => $text{"_connmark"},
+    },
+);
 
 my @page_fields = ();
 foreach my $configfield ( @confdns ) {
@@ -41,11 +53,12 @@ foreach my $configfield ( @confdns ) {
     push( @page_fields, $configfield );
 }
 
-my @tabs = (   [ 'basic', $text{'index_basic'} ],
-            [ 'recs', $text{"index_dns_records"} ],
-            [ 'ipset', $text{"index_dns_ipset"} ],
-            [ 'connmark', $text{"index_dns_connmark"} ],
+my @tabs = ( [ 'basic', $text{'index_basic'} ],
+             [ 'recs', $text{"index_dns_records"} ],
         );
+foreach my $v ( @vals ) {
+    push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
+}
 my $mode = $in{"mode"} || "basic";
 print ui_tabs_start(\@tabs, 'mode', $mode);
 
@@ -57,13 +70,11 @@ print ui_tabs_start_tab('mode', 'recs');
 &show_other_fields( \%dnsmconfig, "dns_records", \@page_fields, $apply_cgi . "?mode=recs", $text{"index_dns_records"} );
 print ui_tabs_end_tab('mode', 'recs');
 
-print ui_tabs_start_tab('mode', 'ipset');
-&show_field_table("ipset", $apply_cgi . "?mode=ipset", $text{"_listen"}, \%dnsmconfig, 1);
-print ui_tabs_end_tab('mode', 'ipset');
-
-print ui_tabs_start_tab('mode', 'connmark');
-&show_field_table("connmark_allowlist", $apply_cgi . "?mode=connmark", $text{"_connmark"}, \%dnsmconfig, 2);
-print ui_tabs_end_tab('mode', 'connmark');
+foreach my $v ( @vals ) {
+    print ui_tabs_start_tab('mode', $v->{"internalfield"});
+    &show_field_table($v->{"internalfield"}, $apply_cgi . "?mode=" . $v->{"internalfield"}, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
+    print ui_tabs_end_tab('mode', $v->{"internalfield"});
+}
 
 print ui_tabs_end();
 

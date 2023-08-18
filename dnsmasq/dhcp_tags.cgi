@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dhcp_tags.cgi; DHCP tag matching
+#    DNSMasq Webmin Module - dhcp_tags.cgi; DHCP tag matching
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -35,103 +35,6 @@ my $returnto = $in{"returnto"} || "dhcp_tags.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_tags"};
 my $apply_cgi = "dhcp_tags_apply.cgi";
 
-sub show_userclass {
-    my $internalfield = "dhcp_userclass";
-    my $configfield = &internal_to_config($internalfield);
-    my $formid = $internalfield . "_form";
-    my @newfields = ( "tag", "userclass" );
-    my @editfields = ( "idx", @newfields );
-    my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"userclass"}), $internalfield, $text{"userclass"}, $formid, \@newfields );
-    push(@list_link_buttons, $add_new_button);
-
-    my $count;
-    $count=0;
-    print &ui_form_start( "dhcp_userclass_apply.cgi", "post", undef, "id=\"$formid\"" );
-    print &ui_links_row(\@list_link_buttons);
-
-    print $hidden_add_input_fields;
-    my $edit_link_tag;
-    my $edit_link_userclass;
-    my $hidden_edit_input_fields;
-    my @tds = ( $td_left, $td_left, $td_left, $td_left );
-    print &ui_columns_start( [ 
-            "",
-            $text{"enabled"}, 
-            $text{"p_label_val_tags"}, 
-            $text{"userclass"},
-        ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=4' ] ), 1 );
-    foreach my $class ( @{$dnsmconfig{"dhcp-userclass"}} ) {
-        local %val = %{ $class->{"val"} };
-        local @cols;
-        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-        ($edit_link_tag, $hidden_edit_input_fields) = &edit_item_link($val{"tag"}, $internalfield, $text{"userclass"}, $count, $formid, \@editfields);
-        ($edit_link_userclass) = &edit_item_link($val{"userclass"}, $internalfield, $text{"userclass"}, $count, $formid, \@editfields);
-        push ( @cols, &ui_checkbox("enabled", "1", "", $class->{"used"}?1:0, undef, 1) );
-        push ( @cols, $edit_link_tag );
-        push ( @cols, $edit_link_userclass );
-        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
-        $count++;
-    }
-    print &ui_columns_end();
-    print &ui_links_row(\@list_link_buttons);
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print &ui_hr();
-    print $hidden_edit_input_fields;
-    print &ui_form_end( );
-}
-
-sub show_vendorclass {
-    my $internalfield = "dhcp_vendorclass";
-    my $configfield = &internal_to_config($internalfield);
-    my $formid = $internalfield . "_form";
-    my @newfields = ( "tag", "vendorclass" );
-    my @editfields = ( "idx", "tag", "vendorclass" );
-    my @list_link_buttons = &list_links( "sel", 0 );
-    my ($add_new_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"vendorclass"}), $internalfield, $text{"vendorclass"}, $formid, \@newfields );
-    push(@list_link_buttons, $add_new_button);
-
-    my $count;
-    $count=0;
-    print &ui_form_start( "dhcp_vendorclass_apply.cgi", "post", undef, "id=\"$formid\"" );
-    print &ui_links_row(\@list_link_buttons);
-
-    print $hidden_add_input_fields;
-    my @edit_link = ( "", "" );
-    my $hidden_edit_input_fields;
-    my @tds = ( $td_left, $td_left, $td_left, $td_left );
-    print &ui_columns_start( [
-            "",
-            $text{"enabled"}, 
-            $text{"p_label_val_tags"}, 
-            $text{"vendorclass"}, 
-        ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=4' ] ), 1 );
-    foreach my $class ( @{$dnsmconfig{"dhcp-vendorclass"}} ) {
-        local %val = %{ $class->{"val"} };
-        local @cols;
-        # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-        ($edit_link[0], $hidden_edit_input_fields) = &edit_item_link($val{"tag"}, $internalfield, $text{"vendorclass"}, $count, $formid, \@editfields);
-        ($edit_link[1]) = &edit_item_link($val{"vendorclass"}, $internalfield, $text{"vendorclass"}, $count, $formid, \@editfields);
-        push ( @cols, &ui_checkbox("enabled", "1", "", $class->{"used"}?1:0, undef, 1) );
-        push ( @cols, $edit_link[0] );
-        push ( @cols, $edit_link[1] );
-        print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
-        $count++;
-    }
-    print &ui_columns_end();
-    print &ui_links_row(\@list_link_buttons);
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    print &ui_hr();
-    print $hidden_edit_input_fields;
-    print &ui_form_end( );
-}
-
 my @page_fields = ();
 foreach my $configfield ( @confdhcp ) {
     next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "4" );
@@ -156,11 +59,11 @@ print ui_tabs_start_tab('mode', 'basic_match');
 print ui_tabs_end_tab('mode', 'basic_match');
 
 print ui_tabs_start_tab('mode', 'userclass');
-&show_userclass();
+&show_field_table("dhcp_userclass", $apply_cgi,$text{"userclass"}, \%dnsmconfig, 2);
 print ui_tabs_end_tab('mode', 'userclass');
 
 print ui_tabs_start_tab('mode', 'vendorclass');
-&show_vendorclass();
+&show_field_table("dhcp_vendorclass", $apply_cgi,$text{"vendorclass"}, \%dnsmconfig, 3);
 print ui_tabs_end_tab('mode', 'vendorclass');
 
 print ui_tabs_end();

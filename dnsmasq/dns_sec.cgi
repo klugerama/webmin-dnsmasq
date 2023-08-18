@@ -71,7 +71,10 @@ sub show_dnssec() {
 
 &show_basic_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, $text{"index_dns_sec"} );
 
-&show_dnssec();
+&show_other_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, "" );
+
+# &show_dnssec();
+
 print &add_js();
 
 ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dns_iface.cgi; network interfaces
+#    DNSMasq Webmin Module - dns_iface.cgi; network interfaces
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

@@ -61,7 +61,7 @@ sub show_reservations() {
         push( @tds, $td_left );
     }
     # my @list_link_buttons = &list_links( "sel", 0, "dhcp_res_apply.cgi", "dhcp-host=new,0.0.0.0", "dhcp_reservations.cgi", &text("add_", $text{"_host"}) );
-    my @list_link_buttons = &list_links( "sel", 3 );
+    my @list_link_buttons = &list_links( "sel", 1 );
     my ($add_button, $hidden_add_input_fields) = &add_item_button( &text("add_", $text{"_host"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields );
     push(@list_link_buttons, $add_button);
 

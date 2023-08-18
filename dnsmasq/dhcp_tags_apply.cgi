@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dhcp_tags_apply.cgi; update DHCP tag matching 
+#    DNSMasq Webmin Module - dhcp_tags_apply.cgi; update DHCP tag matching 
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
