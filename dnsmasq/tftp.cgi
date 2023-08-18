@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO tftp.cgi; TFTP, bootp, & pxe config     
+#    DNSMasq Webmin Module - tftp.cgi; TFTP, bootp, & pxe config     
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

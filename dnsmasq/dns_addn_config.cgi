@@ -32,7 +32,7 @@ my $config_file = &read_file_lines( $config_filename );
 print &header_style();
 
 my $mode = $in{mode} || "conf_file";
-my $returnto = $in{"returnto"} || "dns_addn_config.cgi?mode=$mode";
+my $returnto = $in{"returnto"} || "dns_addn_config.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_addn_config"};
 my $apply_cgi = "dns_addn_config_apply.cgi";
 my $formidx = 0;
@@ -111,7 +111,7 @@ print ui_tabs_start(\@tabs, 'mode', $mode);
 
 foreach my $v ( @vals ) {
     print ui_tabs_start_tab('mode', $v->{"internalfield"});
-    &show_field_table($v->{"internalfield"}, $apply_cgi, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
+    &show_field_table($v->{"internalfield"}, $apply_cgi . "?mode=" . $v->{"internalfield"}, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
     print ui_tabs_end_tab('mode', $v->{"internalfield"});
 }
 

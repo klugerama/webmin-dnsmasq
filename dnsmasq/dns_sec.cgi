@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dns_sec.cgi; authoritative DNS settings
+#    DNSMasq Webmin Module - dns_sec.cgi; authoritative DNS settings
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -39,41 +39,9 @@ foreach my $configfield ( @confdns ) {
     push( @page_fields, $configfield );
 }
 
-sub show_dnssec() {
-    my $formid = "dns_sec_form";
-
-    print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
-    my @tds = ( $td_label, $td_left, $td_left, $td_left, $td_left, $td_left );
-    print &ui_columns_start( [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-        ], 100, undef, undef, undef, 1 );
-    local @cols;
-    @cols = &get_field_auto_columns($dnsmconfig, "trust_anchor", 8);
-    print &ui_columns_row( \@cols, \@tds );
-    @cols = &get_field_auto_columns($dnsmconfig, "dnssec_timestamp", 8);
-    print &ui_columns_row( \@cols, \@tds );
-
-    print &ui_columns_end();
-    print &ui_hr();
-    my @form_buttons = ();
-    push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit" ) );
-    print &ui_form_end( \@form_buttons );
-
-}
-
 &show_basic_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, $text{"index_dns_sec"} );
 
 &show_other_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, "" );
-
-# &show_dnssec();
 
 print &add_js();
 

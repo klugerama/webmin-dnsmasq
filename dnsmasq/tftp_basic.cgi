@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO tftp_basic.cgi; TFTP/Bootp config
+#    DNSMasq Webmin Module - tftp_basic.cgi; TFTP/Bootp config
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,8 @@ my $config_file = &read_file_lines( $config_filename );
 &header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_tftp_settings_basic"});
 print &header_style();
 
+my $returnto = $in{"returnto"} || "tftp_basic.cgi";
+my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_settings_basic"};
 my $apply_cgi = "tftp_basic_apply.cgi";
 
 my @page_fields = ();

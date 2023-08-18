@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dhcp_client_option_apply.cgi; update DHCP client options     
+#    DNSMasq Webmin Module - dhcp_client_option_apply.cgi; update DHCP client options     
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

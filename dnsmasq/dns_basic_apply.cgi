@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dns_basic_apply.cgi; update basic DNS info     
+#    DNSMasq Webmin Module - dns_basic_apply.cgi; update basic DNS info     
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

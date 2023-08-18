@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dhcp_range_apply.cgi; update DHCP address ranges
+#    DNSMasq Webmin Module - dhcp_range_apply.cgi; update DHCP address ranges
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

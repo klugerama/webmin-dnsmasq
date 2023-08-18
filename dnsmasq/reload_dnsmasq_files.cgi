@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO reload_dnsmasq_files.cgi; causes DNSmasq to reload certain files
+#    DNSMasq Webmin Module - reload_dnsmasq_files.cgi; causes DNSmasq to reload certain files
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

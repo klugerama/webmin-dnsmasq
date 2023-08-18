@@ -467,9 +467,9 @@ sub config_to_internal {
 
 sub update_booleans {
     my $result;
-    my ( $all, $enabled, $dnsmconfig ) = @_;
+    my ( $page_fields_bools, $sel, $dnsmconfig ) = @_;
     my @conf_filenames = ();
-    foreach my $configfield ( @$all ) {
+    foreach my $configfield ( @{$page_fields_bools} ) {
         # $result .= $configfield . ":" . $dnsmconfig{"$configfield"};
         my $sourcefile = $dnsmconfig{"$configfield"}->{"file"};
         if ( ! grep { /^$sourcefile$/ } ( @conf_filenames ) ) {
@@ -478,11 +478,15 @@ sub update_booleans {
     }
     foreach my $conf_filename ( @conf_filenames ) {
         my $file_arr = &read_file_lines($conf_filename);
-        foreach my $configfield ( @$all ) {
+        foreach my $configfield ( @{$page_fields_bools} ) {
             my $item = $dnsmconfig{"$configfield"};
             if ($item->{"file"} eq $conf_filename) {
+                 # skip this if it:
+                 # 1. wasn't selected and 
+                 # 2. isn't already in the file
+                next if (( ! grep { /^$configfield$/ } ( @{$sel} ) ) && $item->{"line"} == -1);
                 &update( $item->{"line"}, $configfield,
-                    \@$file_arr, ( ( grep { /^$configfield$/ } ( @$enabled ) ) ? 0 : 1 ) );
+                    \@$file_arr, ( ( grep { /^$configfield$/ } ( @{$sel} ) ) ? 0 : 1 ) );
             }
         }
         &flush_file_lines();
@@ -492,27 +496,39 @@ sub update_booleans {
 
 sub update_simple_vals {
     my $result;
-    my ( $all, $enabled, $dnsmconfig ) = @_;
+    my ( $page_fields_singles, $sel, $dnsmconfig ) = @_;
     my @conf_filenames = ();
-    foreach my $configfield ( @{$all} ) {
+    foreach my $configfield ( @{$page_fields_singles} ) {
         my $sourcefile = $dnsmconfig{"$configfield"}->{"file"};
         if ( ! grep { /^$sourcefile$/ } ( @conf_filenames ) ) {
-            push @conf_filenames, $sourcefile;
+            push(@conf_filenames, $sourcefile);
         }
     }
     foreach my $conf_filename ( @conf_filenames ) {
         my $file_arr = &read_file_lines($conf_filename);
-        foreach my $configfield ( @{$all} ) {
+        foreach my $configfield ( @{$page_fields_singles} ) {
             my $internalfield = &config_to_internal($configfield);
             my $item = $dnsmconfig{"$configfield"};
+
             if ($item->{"file"} eq $conf_filename) {
-                if ($item->{"val_optional"} || $in{$internalfield . "val"}) {
-                    &update( $item->{"line"}, "$configfield" . ( $in{$internalfield . "val"} eq "" ? "" : "=" . $in{$internalfield . "val"}),
-                        \@$file_arr, ( ( grep { /^$configfield$/ } ( @{$enabled} ) ) ? 0 : 1 ) );
-                }
-                elsif ($dnsmconfig->{$configfield} && $in{$internalfield} eq "") {
+                my $is_selected = ( grep { /^$configfield$/ } ( @{$sel} ) );
+                 # skip this value if it:
+                 # 1. wasn't selected and 
+                 # 2a. isn't already in the file or
+                 # 2b. is in the file but is disabled
+                next if ( !$is_selected && ($item->{"line"} == -1 || $item->{"used"} == 0));
+                if (!$is_selected && $item->{"used"} == 1) {
+                    # if it wasn't selected but is enabled in the file, disabled this value
                     &update( $item->{"line"}, undef,
-                        \@$file_arr, ( ( grep { /^$configfield$/ } ( @{$enabled} ) ) ? 0 : 1 ) );
+                        \@$file_arr, ( $is_selected ? 0 : 1 ) );
+                }
+                elsif ($item->{"val_optional"} || $in{$internalfield . "val"}) {
+                    &update( $item->{"line"}, "$configfield" . ( $in{$internalfield . "val"} eq "" ? "" : "=" . $in{$internalfield . "val"}),
+                        \@$file_arr, ( $is_selected ? 0 : 1 ) );
+                }
+                else {
+                    &update( $item->{"line"}, "$configfield=" . $in{$internalfield . "val"},
+                        \@$file_arr, ( $is_selected ? 0 : 1 ) );
                 }
             }
         }
@@ -522,23 +538,23 @@ sub update_simple_vals {
 
 sub apply_simple_vals {
     my ($domain, $sel, $page) = @_;
-    my @bools = ();
-    my @singles = ();
-    my @domain_array = $domain eq "dns" ? @confdns : $domain eq "dhcp" ? @confdhcp : @conft_b_p;
+    my @page_fields_bools = ();
+    my @page_fields_singles = ();
+    my @domain_array = $domain eq "dns" ? @confdns : ($domain eq "dhcp" ? @confdhcp : @conft_b_p);
     foreach my $configfield ( @domain_array ) {
         next if ( grep { /^$configfield$/ } ( @confarrs ) );
         next if ( %dnsmconfigvals{"$configfield"}->{"mult"} ne "" );
         next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne $page );
         if ( grep { /^$configfield$/ } ( @confbools ) ) {
-            push @bools, $configfield;
+            push(@page_fields_bools, $configfield);
         }
         elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
-            push @singles, $configfield;
+            push(@page_fields_singles, $configfield);
         }
     }
 
     # check user input for obvious errors
-    foreach my $configfield ( @singles ) {
+    foreach my $configfield ( @page_fields_singles ) {
         my $item = $dnsmconfig{"$configfield"};
         my $internalfield = &config_to_internal($configfield);
         if ( grep { /^$internalfield$/ } ( @{$sel} )) {
@@ -564,9 +580,9 @@ sub apply_simple_vals {
     }
     # adjust everything to what we got
 
-    &update_booleans( \@bools, $sel, \%dnsmconfig );
+    &update_booleans( \@page_fields_bools, $sel, \%dnsmconfig );
 
-    &update_simple_vals( \@singles, $sel, \%$dnsmconfig );
+    &update_simple_vals( \@page_fields_singles, $sel, \%$dnsmconfig );
 }
 
 sub check_other_vals {
@@ -822,10 +838,8 @@ sub edit_file_chooser_link {
     $hidden_input_fields .= "<input type=\"hidden\" name=\"".$input."_idx\"></input>";
 
     my $submit_script = "<script>";
-    # $submit_script .= $formid."_".$input."_intvl = setInterval(function() {\n\tif(\$( \"#$input\" ).val()) {\n\t\tclearInterval(".$formid."_".$input."_intvl);\n\t\tdelete ".$formid."_".$input."_intvl;\n\t\tsetTimeout(function() {\n\t\t\t\$( \"#$formid\" ).submit();\n\t\t\t\$( \"#$input\" ).val('');\n\t\t}, 0);\n\t}\n}, 50);";
     $submit_script .= "".$formid."_".$input."_temp = '';\n";
     $submit_script .= "var " . $formid."_".$input."_intvl = setInterval(function() {\n\t\$(\"input[name=$input]\").each(function(){\n\t\tif(\$(this).val()!=".$formid."_".$input."_temp) {\n\t\t\tclearInterval(".$formid."_".$input."_intvl);\n\t\t\tdelete ".$formid."_".$input."_intvl;\n\t\t\tsetTimeout(function() {\n\t\t\t\t\$( \"#".$formid."\" ).submit();\n\t\t\t\t\$(this).val('');\n\t\t\t\t".$formid."_".$input."_temp='';\n\t\t}, 0);\n\t\t}\n\t});\n}, 50);";
-    # $submit_script .= "var " . $formid."_".$input."_intvl = setInterval(function() {\n\t\$(\"input[name=$input]\").each(function(){\n\t\tif(\$(this).val()!=".$formid."_".$input."_temp) {\n\t\t\tclearInterval(".$formid."_".$input."_intvl);\n\t\t\tdelete ".$formid."_".$input."_intvl;\n\t\t\tsetTimeout(function() {\n\t\t\t\t\n\t\t\t\t\$(this).val('');\n\t\t\t\t".$formid."_".$input."_temp='';\n\t\t}, 0);\n\t\t}\n\t});\n}, 50);";
     $submit_script .= "</script>";
     return ($file_edit_link, $hidden_input_fields, $submit_script);
 }

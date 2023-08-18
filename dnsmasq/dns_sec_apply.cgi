@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO dns_sec_apply.cgi; update DNS server info     
+#    DNSMasq Webmin Module - dns_sec_apply.cgi; update DNS server info     
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO log_rotate.cgi; trigger DNSmasq log rotation
+#    DNSMasq Webmin Module - log_rotate.cgi; trigger DNSmasq log rotation
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

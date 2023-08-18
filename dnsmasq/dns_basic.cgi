@@ -76,7 +76,7 @@ print ui_tabs_end_tab('mode', 'basic');
 
 foreach my $v ( @vals ) {
     print ui_tabs_start_tab('mode', $v->{"internalfield"});
-    &show_path_list($v->{"internalfield"}, $apply_cgi, $v->{"add_button_text"}, $v->{"val_label"}, $v->{"chooser_mode"}, $formidx++);
+    &show_path_list($v->{"internalfield"}, $apply_cgi . "?mode=" . $v->{"internalfield"}, $v->{"add_button_text"}, $v->{"val_label"}, $v->{"chooser_mode"}, $formidx++);
     print ui_tabs_end_tab('mode', $v->{"internalfield"});
 }
 

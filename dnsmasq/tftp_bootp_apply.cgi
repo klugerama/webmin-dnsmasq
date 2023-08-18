@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO tftp_bootp_apply.cgi; update misc TFTP/Bootp info     
+#    DNSMasq Webmin Module - tftp_bootp_apply.cgi; update misc TFTP/Bootp info     
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

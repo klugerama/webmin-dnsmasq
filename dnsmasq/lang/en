@@ -504,8 +504,10 @@ index_dhcp_tags=DHCP Tag Matching
 index_dhcp_other_tags=Other DHCP Tag Matching
 index_dhcp_vendorclass=Vendor Class Specification
 index_dhcp_userclass=User Class Specification
+index_dhcp_bridge_interface=DHCP Interface Bridge
 
 _range=DHCP range
+_interface_bridge=DHCP interface bridge
 
 dhcp_option_header=For DHCP client option $1
 dhcp_ipversion4=IPv4
@@ -571,6 +573,7 @@ p_desc_dhcp_option=DHCP Client Options
 p_desc_domain=DHCP Domain Name(s)
 p_desc_dhcp_range=DHCP Server Address Ranges
 p_desc_dhcp_host=DHCP Reservations
+p_desc_bridge_interface=DHCP Interface Bridge
 
 p_label_dhcp_range=Enable the DHCP server. Addresses will be given out from the range &amp;lt;start-addr&gt; to &amp;lt;end-addr&gt;
 p_label_dhcp_host=Specify per-host parameters for the DHCP server

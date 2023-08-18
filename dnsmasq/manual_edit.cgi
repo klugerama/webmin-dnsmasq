@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO manual_edit.cgi; Manually edit config files
+#    DNSMasq Webmin Module - manual_edit.cgi; Manually edit config files
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

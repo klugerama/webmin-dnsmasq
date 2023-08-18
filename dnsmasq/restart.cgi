@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - # TODO restart.cgi; restart DNSmasq
+#    DNSMasq Webmin Module - restart.cgi; restart DNSmasq
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify

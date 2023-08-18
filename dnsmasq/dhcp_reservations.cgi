@@ -31,7 +31,7 @@ print &header_style();
 
 my $returnto = $in{"returnto"} || "dhcp_reservations.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_host_reservations"};
-my $apply_cgi = "dhcp_reservations_apply.cgi"; #TODO create this file
+my $apply_cgi = "dhcp_reservations_apply.cgi";
 
 my $internalfield = "dhcp_host";
 my $configfield = &internal_to_config($internalfield);
