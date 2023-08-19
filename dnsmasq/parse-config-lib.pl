@@ -2911,7 +2911,7 @@ sub init_configfield_fields {
         "conf_file" => { 
             "param_order" => [ "filename" ],
             "filename" => {
-                "length" => 75,
+                "length" => 40,
                 "valtype" => "file",
                 "default" => "",
                 "required" => 1,
@@ -2922,7 +2922,7 @@ sub init_configfield_fields {
         "conf_dir" => { 
             "param_order" => [ "dirname", "filter", "exceptions" ],
             "dirname" => {
-                "length" => 75,
+                "length" => 40,
                 "valtype" => "dir",
                 "default" => "",
                 "required" => 1,
@@ -2949,7 +2949,7 @@ sub init_configfield_fields {
         "servers_file" => { 
             "param_order" => [ "filename" ],
             "filename" => {
-                "length" => 75,
+                "length" => 40,
                 "valtype" => "file",
                 "default" => "",
                 "required" => 1,

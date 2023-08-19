@@ -75,10 +75,10 @@ if (@listen_iface_adds && join("", @listen_iface_adds) ne "") {
     }
 
 }
-elsif ($in{"interface_idx"} ne "" && $in{"interface_val"} ne "") {
+elsif ($in{"interface_idx"} ne "" && $in{"interface"} ne "") {
     my $item = $dnsmconfig{"interface"}[$in{"interface_idx"}];
     my $file_arr = &read_file_lines($item->{"file"});
-    my $val = "interface=" . $in{"interface_val"};
+    my $val = "interface=" . $in{"interface"};
     &update($item->{"line"}, $val, \@$file_arr, 0);
     &flush_file_lines();
 }
@@ -91,10 +91,10 @@ elsif (@except_iface_adds && join("", @except_iface_adds) ne "") {
     }
 
 }
-elsif ($in{"except_interface_idx"} ne "" && $in{"except_interface_val"} ne "") {
+elsif ($in{"except_interface_idx"} ne "" && $in{"except_interface"} ne "") {
     my $item = $dnsmconfig{"except-interface"}[$in{"except_interface_idx"}];
     my $file_arr = &read_file_lines($item->{"file"});
-    my $val = "except-interface=" . $in{"except_interface_val"};
+    my $val = "except-interface=" . $in{"except_interface"};
     &update($item->{"line"}, $val, \@$file_arr, 0);
     &flush_file_lines();
 }
@@ -107,10 +107,10 @@ elsif (@no_dhcp_iface_adds && join("", @no_dhcp_iface_adds) ne "") {
     }
 
 }
-elsif ($in{"no_dhcp_interface_idx"} ne "" && $in{"no_dhcp_interface_val"} ne "") {
+elsif ($in{"no_dhcp_interface_idx"} ne "" && $in{"no_dhcp_interface"} ne "") {
     my $item = $dnsmconfig{"no-dhcp-interface"}[$in{"no_dhcp_interface_idx"}];
     my $file_arr = &read_file_lines($item->{"file"});
-    my $val = "no-dhcp-interface=" . $in{"no_dhcp_interface_val"};
+    my $val = "no-dhcp-interface=" . $in{"no_dhcp_interface"};
     &update($item->{"line"}, $val, \@$file_arr, 0);
     &flush_file_lines();
 }

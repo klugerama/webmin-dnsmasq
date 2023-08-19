@@ -431,7 +431,7 @@ sub update_selected {
     my ($configfield, $action, $selected_idxes, $dnsmconfig) = @_;
     my @conf_filenames;
     my $actioncode = $action eq "enable" ? 0 : $action eq "disable" ? 1 : $action eq "delete" ? 2 : -1;
-    foreach my $selected_idx (@$selected_idxes) {
+    foreach my $selected_idx (@{$selected_idxes}) {
         my $sourcefile = $dnsmconfig{$configfield}[$selected_idx]->{"file"};
         if (! grep { /^$sourcefile$/ } ( @conf_filenames ) ) {
             push @conf_filenames, $sourcefile;
@@ -441,11 +441,11 @@ sub update_selected {
         my $file_arr = &read_file_lines($conf_filename);
         # if deleting - since we're using index - they must be handled in reverse
         # if not deleting, it doesn't matter
-        my @reversed_selected_idxes = reverse @$selected_idxes;
+        my @reversed_selected_idxes = reverse @{$selected_idxes};
         foreach my $selected_idx (@reversed_selected_idxes) {
             my $item = $dnsmconfig{$configfield}[$selected_idx];
             if ($item->{"file"} eq $conf_filename) {
-                &update( $item->{"line"}, "",
+                &update( $item->{"line"}, undef,
                     \@$file_arr, $actioncode );
             }
         }
@@ -829,19 +829,14 @@ sub edit_file_chooser_link {
         . "\$(\"input[name=" . $input. "_idx]\").val($idx);"
         . "\$(\"#" . $formid . "_" . $input. "_b\").trigger(\"click\");event.stopPropagation();return false;'>" . $link_text . "</a>";
 
-    my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\"></input>"
-        . "<button class='btn file-chooser-button chooser_button hidden' id=\"" . $formid . "_" . $input. "_b\""
-        . "style='min-width:90px; width:auto; height:33px;' onClick='ifield = \$( \"#$input\" )[0]; "
+    my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\" class=\"edit-file-input\"></input>"
+        . "<button class='btn file-chooser-button chooser_button hidden' id=\"" . $formid . "_" . $input. "_b\" "
+        . "style='min-width:90px; width:auto; height:33px;' onClick='\$(input[name=".$input."]).val(null); ifield = \$( \"#$input\" )[0]; "
         . "chooser = window.open(\"" . $theme_webprefix . "/" . $link . ", \"chooser\"); chooser.ifield = ifield; window.ifield = ifield;'>"
         . "</button>\n"
         . "";
     $hidden_input_fields .= "<input type=\"hidden\" name=\"".$input."_idx\"></input>";
-
-    my $submit_script = "<script>";
-    $submit_script .= "".$formid."_".$input."_temp = '';\n";
-    $submit_script .= "var " . $formid."_".$input."_intvl = setInterval(function() {\n\t\$(\"input[name=$input]\").each(function(){\n\t\tif(\$(this).val()!=".$formid."_".$input."_temp) {\n\t\t\tclearInterval(".$formid."_".$input."_intvl);\n\t\t\tdelete ".$formid."_".$input."_intvl;\n\t\t\tsetTimeout(function() {\n\t\t\t\t\$( \"#".$formid."\" ).submit();\n\t\t\t\t\$(this).val('');\n\t\t\t\t".$formid."_".$input."_temp='';\n\t\t}, 0);\n\t\t}\n\t});\n}, 50);";
-    $submit_script .= "</script>";
-    return ($file_edit_link, $hidden_input_fields, $submit_script);
+    return ($file_edit_link, $hidden_input_fields);
 }
 
 =head2 add_interface_chooser_button(text, input, formid, [addmode])
@@ -893,19 +888,14 @@ sub edit_interface_chooser_link {
         . "\$(\"input[name=" . $input. "_idx]\").val($idx);"
         . "\$(\"#" . $formid . "_" . $input. "_b\").trigger(\"click\");event.stopPropagation();return false;'>" . $link_text . "</a>";
 
-    my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\"></input>"
-        . "<button class='btn btn-inverse btn-tiny iface-chooser-button chooser_button hidden' id=\"" . $formid . "_" . $input. "_b\""
-        . "style='min-width:90px; width:auto; height:33px;' onClick='ifield = \$( \"#$input\" )[0]; "
+    my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\" class=\"edit-iface-input\"></input>"
+        . "<button class='btn btn-inverse btn-tiny iface-chooser-button chooser_button hidden' id=\"" . $formid . "_" . $input. "_b\" "
+        . "style='min-width:90px; width:auto; height:33px;' onClick='\$(input[name=".$input."]).val(null); ifield = \$( \"#$input\" )[0]; "
         . "chooser = window.open(\"" . $theme_webprefix . "/" . $link . ", \"chooser\"); chooser.ifield = ifield; window.ifield = ifield;'>"
         . "</button>\n"
         . "";
     $hidden_input_fields .= "<input type=\"hidden\" name=\"".$input."_idx\"></input>";
-
-    my $submit_script = "<script>";
-    $submit_script .= "".$formid."_".$input."_temp = '';\n";
-    $submit_script .= "var " . $formid."_".$input."_intvl = setInterval(function() {\n\t\$(\"input[name=$input]\").each(function(){\n\t\tif(\$(this).val()!=".$formid."_".$input."_temp) {\n\t\t\tclearInterval(".$formid."_".$input."_intvl);\n\t\t\tdelete ".$formid."_".$input."_intvl;\n\t\t\tsetTimeout(function() {\n\t\t\t\t\$( \"#".$formid."\" ).submit();\n\t\t\t\t\$(this).val('');\n\t\t\t\t".$formid."_".$input."_temp='';\n\t\t}, 0);\n\t\t}\n\t});\n}, 50);";
-    $submit_script .= "</script>";
-    return ($iface_edit_link, $hidden_input_fields, $submit_script);
+    return ($iface_edit_link, $hidden_input_fields);
 }
 
 =head2 edit_item_popup_modal_link(url, internalfield, formid, link_text)
@@ -961,16 +951,6 @@ sub edit_item_link {
     }
     $hidden_input_fields .= "</div>\n";
 
-    # my $edit_script = "<script>\n"
-    #     . "function submit_" . $formid . "(vals) {\n"
-    #     . "  vals.forEach((o) => {\n"
-    #     . "    let f=o.f;let v=o.v;\n"
-    #     . "    \$(\"#" . $formid . " input[name=\"+f+\"]\").val(v);\n"
-    #     . "  });\n"
-    #     . "  \$(\"#" . $formid . "\").submit();\n"
-    #     . "}\n"
-    #     . "</script>\n";
-    # return ($link, $hidden_input_fields, $edit_script);
     return ($link, $hidden_input_fields);
 }
 
@@ -1278,12 +1258,17 @@ sub get_field_auto_columns {
 # &show_field_table("listen_address", "dns_iface_apply.cgi", $text{"_listen"}, \%dnsmconfig);
 sub show_field_table {
     my ($internalfield, $apply_cgi, $addtext, $dnsmconfig, $formidx) = @_;
+    my $addtype = defined($_[5]) ? $_[5] : undef;
+    my $include_movers = defined($_[6]) ? $_[6] : undef;
+    my $returnto = defined($_[7]) ? $_[7] : undef;
+    my $returnlabel = defined($_[8]) ? $_[8] : undef;
     my $configfield = &internal_to_config($internalfield);
     my $definition = %configfield_fields{$internalfield};
     my $add_button;
     my $hidden_add_input_fields;
-    my $hidden_edit_input_fields;
-    my $edit_submit_script;
+    my $hidden_interface_edit_input_fields;
+    my $hidden_file_edit_input_fields;
+    my $hidden_item_edit_input_fields;
     my @newfields = @{$definition->{"param_order"}};
     my @editfields = ( "idx", @newfields );
     my $formid = $internalfield . "_form";
@@ -1293,19 +1278,38 @@ sub show_field_table {
         "",
         $text{"enabled"}
     );
-    if ( @newfields == 1 ) {
-        push(@column_headers, $definition->{"@newfields[0]"}->{"label"} );
-        push( @tds, $td_left );
-    }
-    else {
+    # if ( @newfields == 1 ) {
+    #     push(@column_headers, $definition->{"@newfields[0]"}->{"label"} );
+    #     push( @tds, $td_left );
+    # }
+    # else {
         foreach my $param ( @newfields ) {
             push(@column_headers, $definition->{"$param"}->{"label"} );
             push( @tds, $td_left );
         }
+    # }
+    if ($include_movers) {
+            push(@column_headers, "" );
+            push( @tds, $td_left );
     }
     my @list_link_buttons = &list_links( "sel", $formidx );
-    if ($definition->{"val"} && $definition->{"val"}->{"valtype"} eq "interface") {
+    my $first_field = $newfields[0];
+    if (!$addtype) {
+        if ($definition->{$first_field} && $definition->{$first_field}->{"valtype"} eq "interface") {
+            $addtype = "interface";
+        }
+        elsif ($definition->{$first_field} && grep { /^$definition->{$first_field}->{"valtype"}$/ } ( @pathtypes )) {
+            $addtype = "file";
+        }
+        else {
+            $addtype = "item";
+        }
+    }
+    if ($addtype eq "interface") {
         ($add_button, $hidden_add_input_fields) = &add_interface_chooser_button( &text("add_", $text{"_iface"}), "new_" . $internalfield, $formid );
+    }
+    elsif ($addtype eq "file") {
+        ($add_button, $hidden_add_input_fields) = &add_file_chooser_button( &text("add_", $text{"_" . $definition->{$first_field}->{"valtype"}}), "new_" . $internalfield, $formid );
     }
     else {
         ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $addtext), $internalfield, $text{"p_label_$internalfield"}, $formid, \@newfields );
@@ -1315,7 +1319,7 @@ sub show_field_table {
     my $count=0;
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     print &ui_links_row(\@list_link_buttons);
-    if ($definition->{"val"} && $definition->{"val"}->{"valtype"} eq "interface") {
+    if ($addtype eq "interface" || $addtype eq "file") {
         print $hidden_add_input_fields . $add_button;
     }
     print &ui_columns_start( \@column_headers, 100, undef, undef, 
@@ -1337,14 +1341,15 @@ sub show_field_table {
             if ($count == 0) {
                 if ($valtype eq "interface") {
                     # edit_interface_chooser_link(text, input, current_value, idx, formid, [addmode])
-                    ($edit_link, $hidden_edit_input_fields, $edit_submit_script) = &edit_interface_chooser_link($val, $internalfield, $val, $count, $formid);
+                    ($edit_link, $hidden_interface_edit_input_fields) = &edit_interface_chooser_link($val, $internalfield, $val, $count, $formid);
                 }
                 elsif (grep { /^$valtype$/ } ( @pathtypes )) {
-                    ($edit_link, $hidden_edit_input_fields, $edit_submit_script) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "file" ? 0 : 1), $val, $count, $formid);
+                    # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
+                    ($edit_link, $hidden_file_edit_input_fields) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "dir" ? 1 : 0), $val, $count, $formid);
                 }
                 else {
                     # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-                    ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
+                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
                 }
             }
             else {
@@ -1352,7 +1357,8 @@ sub show_field_table {
                     ($edit_link) = &edit_interface_chooser_link($val, $internalfield, $val, $count, $formid);
                 }
                 elsif (grep { /^$valtype$/ } ( @pathtypes )) {
-                    ($edit_link) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "file" ? 0 : 1), $val, $count, $formid);
+                    # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
+                    ($edit_link) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "dir" ? 1 : 0), $val, $count, $formid);
                 }
                 else {
                     ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
@@ -1360,23 +1366,29 @@ sub show_field_table {
             }
             push ( @cols, $edit_link );
         }
+        if ($include_movers) {
+            local $mover = &get_mover_buttons("item_move.cgi?internalfield=$internalfield&returnto=$returnto&returnlabel=$returnlabel", $count, int(@{$dnsmconfig{$configfield}}) );
+            push ( @cols, $mover );
+        }
         print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
     }
     print &ui_columns_end();
     print &ui_links_row(\@list_link_buttons);
-    if ($definition->{"val"} && $definition->{"val"}->{"valtype"} eq "interface") {
+    if ($addtype eq "interface" || $addtype eq "file") {
         print $hidden_add_input_fields . $add_button;
     }
     print "<p>" . $text{"with_selected"} . "</p>";
     print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
-    if (!$definition->{"val"} || $definition->{"val"}->{"valtype"} ne "interface") {
+    # if (!$definition->{"val"} || $definition->{"val"}->{"valtype"} ne "interface") {
+    if ($addtype ne "interface" && $addtype ne "file") {
         print $hidden_add_input_fields;
     }
-    print $hidden_edit_input_fields;
-    print $edit_submit_script;
+    print $hidden_interface_edit_input_fields;
+    print $hidden_file_edit_input_fields;
+    print $hidden_item_edit_input_fields;
     print &ui_form_end();
     print &ui_hr();
 }
@@ -1387,7 +1399,6 @@ sub show_path_list {
     my $count=0;
     my $edit_link;
     my $hidden_edit_input_fields;
-    my $edit_submit_script;
     my $formid = $internalfield . "_form";
     print &ui_form_start( $apply_cgi . "?mode=$internalfield", "post", undef, "id='$formid'" );
     my @list_link_buttons = &list_links( "sel", $formidx );
@@ -1406,7 +1417,7 @@ sub show_path_list {
         local @cols;
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
         # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
-        ($edit_link, $hidden_edit_input_fields, $edit_submit_script) = &edit_file_chooser_link($item->{"val"}, $internalfield, $chooser_mode, $item->{"val"}, $count, $formid);
+        ($edit_link, $hidden_edit_input_fields) = &edit_file_chooser_link($item->{"val"}, $internalfield, $chooser_mode, $item->{"val"}, $count, $formid);
         push ( @cols, $edit_link );
         print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
         $count++;
@@ -1420,7 +1431,6 @@ sub show_path_list {
     print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
     print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
     print $hidden_edit_input_fields;
-    print $edit_submit_script;
     print &ui_form_end( );
     print $g;
 }
@@ -1596,7 +1606,8 @@ sub add_js {
              . "    \$(\"<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".select-none\");\n" # adds icon to "select none" link/button
              . "    \$(\"<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".file-chooser-button\");\n" # adds icon to "new file" link/button
              . "    \$(\".new-file-input, .new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());\$(this).parent().prev().css(\"margin-right\", \"0px !important\");\$(this).parent().addClass(\"new-dnsm-button-container\");});\n" # adds "new file/interface" link to button list
-             . "    \$(\".new-file-input, .new-iface-input\").each(function(){replaceWithWrapper(\$(this), \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
+             . "    \$(\".new-file-input, .new-iface-input\").each(function(){replaceWithWrapper(\$(this), \"add\", \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
+             . "    \$(\".edit-file-input, .edit-iface-input\").each(function(){replaceWithWrapper(\$(this), \"edit\", \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
              . "    \$(\"<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".iface-chooser-button\");\n" # adds icon to "new interface" link/button
              . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 0px;'></i>\").prependTo(\".add-item-button\");\n" # adds icon to "new <item>" link/button
              . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".remove-item-button\");\n" # adds icon to "remove <item>" link/button
@@ -1650,7 +1661,7 @@ sub add_js {
              . "  });"
              . "  \$(\"#\"+formid).submit();"
              . "}\n";
-    $script .= "function replaceWithWrapper(selector, property, callback) {\n"
+    $script .= "function replaceWithWrapper(selector, context, property, callback) {\n"
              . "    function findDescriptor(obj, prop){\n"
              . "        if (obj != null){\n"
              . "            return Object.hasOwnProperty.call(obj, prop)?\n"
@@ -1668,15 +1679,18 @@ sub add_js {
              . "\n"
              . "            get() { //overwrite getter\n"
              . "                var v = get.call(this);  //call the original getter\n"
-             . "                //console.log(\"get '+property+':\", v, this);\n"
+             . "                //console.log(\"get \"+property+\":\", v, this);\n"
              . "                return v;\n"
              . "            },\n"
              . "\n"
              . "            set(v) { //same for setter\n"
-             . "                //console.log(\"set '+property+':\", v, this);\n"
+             . "                var ov = get.call(this);  //call the original getter\n"
+             . "                //console.log(\"context :\", context, this);\n"
+             . "                //console.log(\"original \"+property+\":\", ov, this);\n"
+             . "                //console.log(\"set \"+property+\":\", v, this);\n"
              . "                set.call(this, v);\n"
-             . "                callback(obj, property, v)\n"
-             . "            }"
+             . "                if (context == \"add\" || (ov && v)) callback(obj, property, v);\n"
+             . "            }\n"
              . "        });\n"
              . "    });\n"
              . "}\n";
