@@ -7,6 +7,7 @@
 BEGIN { push(@INC, ".."); };
 use POSIX 'ceil';
 use URI::Escape;
+use File::Basename;
 use WebminCore;
 init_config();
 our %access = &get_module_acl();
@@ -465,6 +466,10 @@ sub config_to_internal {
     return $i;
 }
 
+sub is_integer {
+   defined $_[0] && $_[0] =~ /^[+-]?\d+$/;
+}
+
 sub update_booleans {
     my $result;
     my ( $page_fields_bools, $sel, $dnsmconfig ) = @_;
@@ -564,7 +569,7 @@ sub apply_simple_vals {
             if ( $in{$internalfield . "val"} ne "" ) {
                 my $item_template = %dnsmconfigvals{"$configfield"};
                 if ( $item_template->{"valtype"} eq "int" && ($in{$internalfield . "val"} !~ /^$NUMBER$/) ) {
-                    &send_to_error( $configfield, $text{"err_numbbad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
                 }
                 elsif ( $item_template->{"valtype"} eq "file" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
                     &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
@@ -612,7 +617,7 @@ sub check_other_vals {
                 }
                 if ( $in{$internalfield . "_" . $key} ne "" ) {
                     if ( $definition->{"valtype"} eq "int" && ($in{$internalfield . "_" . $key} !~ /^$NUMBER$/) ) {
-                        &send_to_error( $configfield, $text{"err_numbbad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
                     }
                     elsif ( $definition->{"valtype"} eq "file" && ($in{$internalfield . "_" . $key} !~ /^$FILE$/) ) {
                         &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
@@ -645,9 +650,9 @@ sub add_to_list {
 }
 
 sub send_to_error {
-    my ($line, $err_type, $returnto, $returnlabel) = @_;
+    my ($line, $err_desc, $returnto, $returnlabel) = @_;
     my $line = "error.cgi?line=" . &urlize($line);
-    $line .= "&type=" . &urlize($err_type);
+    $line .= "&type=" . &urlize($err_desc);
     $line .= "&returnto=" . $returnto;
     $line .= "&returnlabel=" . &urlize($returnlabel);
     &redirect( $line );
@@ -907,7 +912,7 @@ sub edit_interface_chooser_link {
         link_text - Text to appear in link
 =cut
 sub edit_item_popup_modal_link {
-    my ($url, $internalfield, $formid, $link_text) = @_;
+    my ($url, $internalfield, $formid, $link_text, $idx) = @_;
 
     my $sep = $url =~ /\?/ ? "&" : "?";
     $url .= $sep . "internalfield=$internalfield";
@@ -917,7 +922,7 @@ sub edit_item_popup_modal_link {
         $link_text = "<span style='color: #595959 !important; font-style: italic;'>" . $text{"empty_value"} . "</span>"
     }
 
-    my $link = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\">";
+    my $link = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" dnsm_array_idx=\"$idx\">";
     $link .= "$link_text";
     $link .= "</a>";
     return $link;
@@ -935,15 +940,16 @@ sub edit_item_popup_modal_link {
         [extra-url-params] - URL-formatted string of any extra param=value pairs (if multiple, delimited with "&")
 =cut
 sub edit_item_link {
-    my ($link_text, $internalfield, $title, $idx, $formid, $fields) = @_;
-    my $extra_url_params = @_[6] || "";
+    my ($link_text, $internalfield, $title, $idx, $formid, $fields, $fidx) = @_;
+    my $extra_url_params = @_[7] || "";
     if ($extra_url_params) {
         $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
     }
 
     $title =~ s/ /+/g ;
     my $qparams = "action=edit&idx=$idx&title=$title" . $extra_url_params;
-    my $link = &edit_item_popup_modal_link("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $link_text);
+    $qparams .= "&fidx=" . $fidx;
+    my $link = &edit_item_popup_modal_link("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $link_text, $fidx);
 
     my $hidden_input_fields = "<div>\n";
     foreach my $fieldname ( @$fields ) {
@@ -1349,7 +1355,7 @@ sub show_field_table {
                 }
                 else {
                     # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
+                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"});
                 }
             }
             else {
@@ -1361,7 +1367,7 @@ sub show_field_table {
                     ($edit_link) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "dir" ? 1 : 0), $val, $count, $formid);
                 }
                 else {
-                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields);
+                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"});
                 }
             }
             push ( @cols, $edit_link );
@@ -1400,7 +1406,7 @@ sub show_path_list {
     my $edit_link;
     my $hidden_edit_input_fields;
     my $formid = $internalfield . "_form";
-    print &ui_form_start( $apply_cgi . "?mode=$internalfield", "post", undef, "id='$formid'" );
+    print &ui_form_start( $apply_cgi . "?tab=$internalfield", "post", undef, "id='$formid'" );
     my @list_link_buttons = &list_links( "sel", $formidx );
     my ($file_chooser_button, $hidden_add_input_fields) = &add_file_chooser_button( &text("add_", $add_button_text), "new_" . $internalfield, $chooser_mode, $formid );
     print &ui_links_row(\@list_link_buttons);
@@ -1533,11 +1539,87 @@ sub custom_theme_ui_links_row {
 }
 
 sub check_for_file_errors {
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
+    my ($returnto, $returnlabel, $dnsmconfig) = @_;
+    my $error_check_result = "";
+    my $error_check_action = "";
+    $returnto = basename($returnto);
+    if ($in{"forced_edit"} == 1) {
+        if (defined($in{"sel"})) {
+            my @sel = split(/\0/, $in{"sel"});
+            foreach my $selid ( @sel ) {
+                my $f = $in{"file_" . $selid};
+                my $l = $in{"line_" . $selid};
+                my $a = $in{"disable_sel"} ? 1 : ($in{"delete_sel"} ? 2 : 0);
+                my $f_arr = &read_file_lines($f);
+                &update($l, undef, \@$f_arr, $a);
+                &flush_file_lines();
+            }
+            $error_check_result = $redirect;
+            $error_check_action = "redirect";
+        }
+        elsif ($in{"bad_ifield"}) {
+            $error_check_result .= "<script type='text/javascript'>\n"
+                    . "\$(document).ready(function() {\n"
+                    . "  setTimeout(function() {\n";
+            if (defined($in{"bad_idx"})) {
+                $error_check_result .= "    \$(\"a[dnsm_array_idx='" . $in{"bad_idx"} . "']\").first().trigger(\"click\");\n";
+            }
+            else {
+                $error_check_result .= "    \$(\"input[name*=" . $in{"bad_ifield"} . "]\").first().closest(\"form\").find(\"button[name=submit]\").trigger(\"click\");\n";
+            }
+            $error_check_result .= "  }, 5);\n"
+                    . "});\n"
+                    . "</script>\n";
+            $error_check_action = "goto";
+        }
+    }
+    elsif ( @{$dnsmconfig->{"error"}} > 0) {
+        my $errorcount = @{$dnsmconfig->{"error"}};
+        $error_check_result = "<div class=\"conf-error-block\">"
+                            . "<h3 style=\"color: red;\">".$text{"error_heading"}."</h3>"
+                            . &text( "err_has_errors_", $errorcount ) . "<br/><br/>"
+                            # . "<form action=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" method=\"\">"
+                            . "<a href=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" class=\"btn btn-lg btn-danger conf-error-button\">"
+                            . "<i class=\"fa fa-fw fa-arrow-right\">&nbsp;</i>"
+                            . "<span>" . $text{"err_goto"} . "</span></a>"
+                            # . "</form>"
+                            # . &ui_form_start("error.cgi", "post")
+                            # . &ui_hidden("returnto", $returnto)
+                            # . &ui_hidden("returnlabel", $returnlabel)
+                            # . &ui_submit( $text{"err_goto"}, "goto", undef, undef, "fa fa-fw fa-arrow-right" )
+                            # . &ui_form_end()
+                            . "</div>";
+        $error_check_action = "warn";
+    }
+    return ($error_check_action, $error_check_result);
 }
+
+sub deserialize_string {
+    my ($str) = @_;
+    my @v = split(/,/, $str);
+    my $var = { };
+    if ($v[0] eq 'HASH') {
+        for(my $i=2; $i<@v; $i+=4) {
+            $var->{&un_urlize($v[$i])} =
+                &un_urlize($v[$i+2]);
+        }
+    }
+    else {
+        $var = &unserialize_variable($str);
+    }
+    return $var;
+}
+
+sub create_error {
+    my ($file, $line, $desc, $configfield, $param, $idx) = @_;
+    return {
+                "file" => $file,
+                "line" => $line,
+                "desc" => $desc,
+                "configfield" => $configfield,
+                "param" => $param,
+                "idx" => defined($idx) ? $idx : -1,
+           };
 }
 
 sub header_js {
@@ -1592,10 +1674,23 @@ sub header_style {
             . "html[data-bgs='nightRider'] .hl-aw, .hl-aw {\n"
             . "  background-color: unset !important;\n"
             . "}\n"
+            . ".conf-error-block {\n"
+            . "  width: 100%;\n"
+            . "  padding: 14px;\n"
+            . "  display: block;\n"
+            . "  border: 2px solid black;\n"
+            . "}\n"
+            . ".conf-error-button {\n"
+            . "  display: inline-flex;\n"
+            . "  align-self: center;\n"
+            . "  justify-content: center;\n"
+            . "  align-items: center;\n"
+            . "}\n"
             . "\n"
             . "</style>\n";
     return $style;
 }
+
 =head2 add_js()
 =cut
 sub add_js {

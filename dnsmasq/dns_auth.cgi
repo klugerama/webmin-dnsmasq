@@ -25,9 +25,17 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+# read posted data
+&ReadParse();
 
-&header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_auth_settings"} );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+if ($error_check_action eq "redirect") {
+    &redirect ( $error_check_result );
+}
+
+&ui_print_header($text{"index_dns_auth_settings"},  $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
+print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dns_auth.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
@@ -45,6 +53,6 @@ foreach my $configfield ( @confdns ) {
 
 print &add_js();
 
-ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});
+ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_auth.cgi ###.

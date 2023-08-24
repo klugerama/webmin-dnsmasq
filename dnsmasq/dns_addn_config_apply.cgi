@@ -30,16 +30,9 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $mode = $in{"mode"} || "basic";
-my $returnto = $in{"returnto"} || "dns_addn_config.cgi?mode=$mode";
+my $tab = $in{"tab"} || "basic";
+my $returnto = $in{"returnto"} || "dns_addn_config.cgi?tab=$tab";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
-}
-# check user input for obvious errors
 
 # adjust everything to what we got
 

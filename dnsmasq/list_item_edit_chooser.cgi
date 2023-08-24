@@ -140,8 +140,8 @@ my $headstuff = "<script type='text/javascript'>\n"
 $headstuff .= &header_style();
 
 &popup_header(undef, $headstuff);
-# &header(title, image, [help], [config], [nomodule], [nowebmin], [rightside], [head-stuff], [body-stuff], [below])
-# &header($title, undef, undef, 0, 1, 1, undef, $headstuff);
+# &ui_print_header(subtext, title, image, [help], [config], [nomodule], [nowebmin], [rightside], [head-stuff], [body-stuff], [below])
+# &ui_print_header(undef, $title, undef, undef, 0, 1, 1, undef, $headstuff);
 
 my $title_header = "<div class=\"modal-title\" style=\"display: flex; width: 100%;\"><span style=\"width: 100%;\"><h4>" . $title . "</h4></span>"
     . "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" style=\"height: 24px; width: 24px; float: right; padding: 1px 5px; margin: 2px; \">"

@@ -41,12 +41,7 @@ $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dns_sec.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_sec_settings"};
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-	&redirect( $line );
-	exit;
-}
+
 # check for input data errors
 if( ($in{resolv_std}) && ($in{resolv_file} !~ /^$FILE$/) ) {
 	my $line = "error.cgi?line=".$text{"p_label_resolv_file"};

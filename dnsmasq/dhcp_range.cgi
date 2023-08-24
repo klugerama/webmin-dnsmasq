@@ -28,8 +28,14 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_range"});
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_dhcp_range"}, \%dnsmconfig );
+if ($error_check_action eq "redirect") {
+    &redirect ( $error_check_result );
+}
+
+&ui_print_header($text{"index_dhcp_range"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
+print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dhcp_range.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_range"};
@@ -92,10 +98,10 @@ sub show_ip_range_list {
         foreach my $val ( @vals ) {
             # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip" . $ipver);
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, "ipversion=ip" . $ipver);
             }
             else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, "ipversion=ip" . $ipver);
+                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, "ipversion=ip" . $ipver);
             }
             push( @cols, $edit_link );
         }
@@ -129,6 +135,6 @@ print ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
+ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dhcp_range.cgi ###.

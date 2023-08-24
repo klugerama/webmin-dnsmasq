@@ -32,24 +32,9 @@ my $config_file = &read_file_lines( $config_filename );
 my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line="error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
-}
-# check for input data errors
 # adjust everything to what we got
-
-# adjust everything to what we got
-
-# $action = $in{"enable_sel"} ? "enable" : $in{"disable_sel"} ? "disable" : $in{"delete_sel"} ? "delete" : "";
-# if ($action ne "") {
-#     &update_selected("dhcp-option", $action, \@sel, \%$dnsmconfig);
-# }
 
 # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-
 if ($in{'new_dhcp_option'} ne "") {
     my $val = "";
     if ($in{"new_dhcp_option_tag"} ne "") {

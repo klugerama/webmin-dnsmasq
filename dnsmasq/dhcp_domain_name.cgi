@@ -28,8 +28,14 @@ my $config_file = &read_file_lines( $config_filename );
 
 &ReadParse();
 
-&header( $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_domain_name"} );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+if ($error_check_action eq "redirect") {
+    &redirect ( $error_check_result );
+}
+
+&ui_print_header($text{"index_dhcp_domain_name"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
+print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dhcp_domain_name.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_domain_name"};
@@ -39,6 +45,6 @@ my $apply_cgi = "dhcp_domain_name_apply.cgi";
 
 print &add_js();
 
-&ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dhcp_domain_name.cgi ###.

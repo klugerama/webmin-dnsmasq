@@ -30,12 +30,6 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "tftp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_settings_basic"};
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
-}
 
 my $result = "";
 my @sel = split(/\0/, $in{'sel'});
@@ -67,7 +61,7 @@ foreach my $configfield ( @tftp_singles ) {
         if ( $in{$internalfield . "val"} ne "" ) {
             my $item_template = %dnsmconfigvals{"$configfield"};
             if ( $item_template->{"valtype"} eq "int" && ($in{$internalfield . "val"} !~ /^$NUMBER$/) ) {
-                &send_to_error( $configfield, $text{"err_numbbad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
             }
             elsif ( $item_template->{"valtype"} eq "file" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
                 &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );

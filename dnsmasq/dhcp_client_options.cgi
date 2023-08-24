@@ -26,8 +26,14 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_client_options"});
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+if ($error_check_action eq "redirect") {
+    &redirect ( $error_check_result );
+}
+
+&ui_print_header($text{"index_dhcp_client_options"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
+print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_client_options"};
@@ -37,6 +43,6 @@ my $apply_cgi = "dhcp_client_options_apply.cgi";
 
 print &add_js();
 
-&ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dhcp_client_options.cgi ###.

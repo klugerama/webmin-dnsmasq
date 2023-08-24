@@ -28,8 +28,14 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dns_iface_settings"});
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+if ($error_check_action eq "redirect") {
+    &redirect ( $error_check_result );
+}
+
+&ui_print_header($text{"index_dns_iface_settings"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
+print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dns_iface.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_iface_settings"};
@@ -51,27 +57,27 @@ foreach my $v ( @vals ) {
 }
 push(@tabs, [ 'listen_address', $text{"p_desc_listen_address"} ]);
 
-my $mode = $in{"mode"} || "basic";
-print ui_tabs_start(\@tabs, 'mode', $mode);
+my $tab = $in{"tab"} || "basic";
+print ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('mode', 'basic');
+print ui_tabs_start_tab('tab', 'basic');
 &show_basic_fields( \%dnsmconfig, "dns_iface", \@page_fields, $apply_cgi, $text{"index_dns_iface_settings"} );
-print ui_tabs_end_tab('mode', 'basic');
+print ui_tabs_end_tab('tab', 'basic');
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('mode', $v);
-    &show_field_table($v, $apply_cgi . "?mode=" . $v, $text{"_iface"}, \%dnsmconfig, $formidx++);
-    print ui_tabs_end_tab('mode', $v);
+    print ui_tabs_start_tab('tab', $v);
+    &show_field_table($v, $apply_cgi . "?tab=" . $v, $text{"_iface"}, \%dnsmconfig, $formidx++);
+    print ui_tabs_end_tab('tab', $v);
 }
 
-print ui_tabs_start_tab('mode', 'listen_address');
-&show_field_table("listen_address", $apply_cgi . "?mode=listen_address", $text{"_listen"}, \%dnsmconfig, $formidx++);
-print ui_tabs_end_tab('mode', 'listen_address');
+print ui_tabs_start_tab('tab', 'listen_address');
+&show_field_table("listen_address", $apply_cgi . "?tab=listen_address", $text{"_listen"}, \%dnsmconfig, $formidx++);
+print ui_tabs_end_tab('tab', 'listen_address');
 
 print ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});
+ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_iface.cgi ###.

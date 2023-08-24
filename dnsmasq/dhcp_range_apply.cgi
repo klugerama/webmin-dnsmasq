@@ -29,22 +29,15 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $mode = $in{"mode"} || "basic";
-my $returnto = $in{"returnto"} || "dhcp_range.cgi?mode=$mode";
+my $tab = $in{"tab"} || "basic";
+my $returnto = $in{"returnto"} || "dhcp_range.cgi?tab=$tab";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_range"};
-
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
-}
 
 my $result = "";
 
-# =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] 
+# =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<tab>][,<netmask>[,<broadcast>]][,<lease time>] 
 # -OR- 
-# =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
+# =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<tab>][,<prefix-len>][,<lease time>]
 sub eval_input_fields {
     my ($is_new) = @_;
 
@@ -87,9 +80,9 @@ sub eval_input_fields {
         if ($in{$par_prefix . "dhcp_range_end"} ne "") {
             $val .= "," . $in{$par_prefix . "dhcp_range_end"};
         }
-        foreach my $mode ( "static", "ra-only", "ra-names", "ra-stateless", "slaac", "ra-advrouter", "off-link" ) {
-            if ($in{$par_prefix . "dhcp_range_$mode"} == 1) {
-                $val .= ",$mode";
+        foreach my $tab ( "static", "ra-only", "ra-names", "ra-stateless", "slaac", "ra-advrouter", "off-link" ) {
+            if ($in{$par_prefix . "dhcp_range_$tab"} == 1) {
+                $val .= ",$tab";
             }
         }
         if ($in{$par_prefix . "dhcp_range_prefix-length"} ne "") {

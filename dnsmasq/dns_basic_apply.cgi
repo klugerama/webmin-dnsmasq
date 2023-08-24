@@ -28,15 +28,9 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $mode = $in{"mode"} || "basic";
-my $returnto = $in{"returnto"} || "dns_basic.cgi?mode=$mode";
+my $tab = $in{"tab"} || "basic";
+my $returnto = $in{"returnto"} || "dns_basic.cgi?tab=$tab";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
-}
 
 my @sel = split(/\0/, $in{'sel'});
 my @hosts_file_adds = split(/\0/, $in{'new_addn_hosts'});

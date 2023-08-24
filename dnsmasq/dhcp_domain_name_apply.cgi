@@ -32,15 +32,6 @@ my $config_file = &read_file_lines( $config_filename );
 my $returnto = $in{"returnto"} || "dhcp_domain_name.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_domain_name"};
 
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
-}
-
-my $result = "";
-
 if ($in{'new_domain_domain'} ne "") {
     my $val = $in{"new_domain_domain"};
     if ($in{"new_domain_range"} ne "") {

@@ -25,11 +25,19 @@ my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
+# read posted data
+&ReadParse();
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), undef, undef, $text{"index_dhcp_settings_basic"});
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+if ($error_check_action eq "redirect") {
+    &redirect ( $error_check_result );
+}
+
+&ui_print_header($text{"index_dhcp_settings_basic"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
+print $error_check_result;
 
-my $mode = $in{mode} || "basic";
+my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dhcp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 my $apply_cgi = "dhcp_basic_apply.cgi";
@@ -44,24 +52,24 @@ my @tabs = ( [ 'basic', $text{'index_basic'} ],
             [ 'other', $text{"index_other"} ],
             [ 'bridge_interface', $text{'index_dhcp_bridge_interface'} ],
            );
-print ui_tabs_start(\@tabs, 'mode', $mode);
+print ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('mode', 'basic');
-&show_basic_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi . "mode=basic", $text{"index_dhcp_settings_basic"} );
-print ui_tabs_end_tab('mode', 'basic');
+print ui_tabs_start_tab('tab', 'basic');
+&show_basic_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi . "tab=basic", $text{"index_dhcp_settings_basic"} );
+print ui_tabs_end_tab('tab', 'basic');
 
-print ui_tabs_start_tab('mode', 'other');
-&show_other_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi . "mode=basic", " " );
-print ui_tabs_end_tab('mode', 'other');
+print ui_tabs_start_tab('tab', 'other');
+&show_other_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi . "tab=basic", " " );
+print ui_tabs_end_tab('tab', 'other');
 
-print ui_tabs_start_tab('mode', 'bridge_interface');
-&show_field_table("bridge_interface", $apply_cgi . "mode=bridge_interface", $text{"_interface_bridge"}, \%dnsmconfig, 3);
-print ui_tabs_end_tab('mode', 'bridge_interface');
+print ui_tabs_start_tab('tab', 'bridge_interface');
+&show_field_table("bridge_interface", $apply_cgi . "tab=bridge_interface", $text{"_interface_bridge"}, \%dnsmconfig, 3);
+print ui_tabs_end_tab('tab', 'bridge_interface');
 
 print ui_tabs_end();
 
 print &add_js();
 
-&ui_print_footer("index.cgi?mode=dhcp", $text{"index_dhcp_settings"}, "index.cgi?mode=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dhcp_basic.cgi ###.

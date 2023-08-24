@@ -31,14 +31,6 @@ my $config_file = &read_file_lines( $config_filename );
 my $returnto = $in{"returnto"} || "dhcp_reservations.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-    my $line="error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-    &redirect( $line );
-    exit;
-}
-# check for input data errors
-
 sub eval_input_fields {
     # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
     # "mac", "clientid", "infiniband", "settag", "tag", "ip", "hostname", "leasetime", "ignore"

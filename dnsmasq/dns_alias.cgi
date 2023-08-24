@@ -28,8 +28,14 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-&header($text{"index_title"}, "", "intro", 1, 0, 0, &restart_button(), "<script type='text/javascript'>//test</script>", "body-stuff-test", $text{"index_dns_alias_settings"});
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+if ($error_check_action eq "redirect") {
+    &redirect ( $error_check_result );
+}
+
+&ui_print_header($text{"index_dns_alias_settings"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
+print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dns_alias.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_alias_settings"};
@@ -67,27 +73,27 @@ my @tabs = (
 foreach my $v ( @vals ) {
     push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
 }
-my $mode = $in{mode} || "basic";
-print ui_tabs_start(\@tabs, 'mode', $mode);
+my $tab = $in{"tab"} || "basic";
+print ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('mode', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "mode=basic", $text{"index_dns_alias"} );
-print ui_tabs_end_tab('mode', 'basic');
+print ui_tabs_start_tab('tab', 'basic');
+&show_basic_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "tab=basic", $text{"index_dns_alias"} );
+print ui_tabs_end_tab('tab', 'basic');
 
-print ui_tabs_start_tab('mode', 'other');
-&show_other_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "mode=other", $text{"index_other"} );
-print ui_tabs_end_tab('mode', 'other');
+print ui_tabs_start_tab('tab', 'other');
+&show_other_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "tab=other", $text{"index_other"} );
+print ui_tabs_end_tab('tab', 'other');
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('mode', $v->{"internalfield"});
-    &show_field_table($v->{"internalfield"}, $apply_cgi . "?mode=" . $v->{"internalfield"}, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
-    print ui_tabs_end_tab('mode', $v->{"internalfield"});
+    print ui_tabs_start_tab('tab', $v->{"internalfield"});
+    &show_field_table($v->{"internalfield"}, $apply_cgi . "?tab=" . $v->{"internalfield"}, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
+    print ui_tabs_end_tab('tab', $v->{"internalfield"});
 }
 
 print ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?mode=dns", $text{"index_dns_settings"});
+ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_alias.cgi ###.

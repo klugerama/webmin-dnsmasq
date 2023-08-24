@@ -29,16 +29,10 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $mode = $in{"mode"} || "basic";
-my $returnto = $in{"returnto"} || "dns_records.cgi?mode=$mode";
+my $tab = $in{"tab"} || "basic";
+my $returnto = $in{"returnto"} || "dns_records.cgi?tab=$tab";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_records_settings"};
 
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-	&redirect( $line );
-	exit;
-}
 # check for input data errors
 if( ($in{resolv_std}) && ($in{resolv_file} !~ /^$FILE$/) ) {
 	my $line = "error.cgi?line=".$text{"p_label_resolv_file"};
@@ -96,7 +90,7 @@ else {
 &flush_file_lines();
 #
 # re-load basic page
-&redirect( $returnto . "?mode=" . $mode );
+&redirect( $returnto . "?tab=" . $tab );
 
 # 
 # sub-routines

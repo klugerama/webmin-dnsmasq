@@ -37,16 +37,16 @@ my $config_file = &read_file_lines( $config_filename );
 my $returnto = $in{"returnto"};
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
 # check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-	&header( $text{"index_title"}, "" );
-	print "<hr><h2>";
-	print $text{"warn_errors"};
-	print $dnsmconfig{"errors"};
-	print $text{"didnt_apply"};
-	print "</h3><hr>\n";
-	&footer( "/", $text{"index"});
-	exit;
-}
+# if( $dnsmconfig{"errors"} > 0 ) {
+# 	&ui_print_header(undef, $text{"index_title"}, "" );
+# 	print "<hr><h2>";
+# 	print $text{"warn_errors"};
+# 	print $dnsmconfig{"errors"};
+# 	print $text{"didnt_apply"};
+# 	print "</h3><hr>\n";
+# 	&footer( "/", $text{"index"});
+# 	exit;
+# }
 # adjust everything to what we got
 #
 my $internalfield = $in{"internalfield"};

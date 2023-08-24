@@ -30,12 +30,6 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $returnto = $in{"returnto"} || "dns_auth.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-	&redirect( $line );
-	exit;
-}
 # check for input data errors
 
 # adjust everything to what we got

@@ -28,24 +28,11 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my $mode = $in{"mode"} || "basic";
-my $returnto = $in{"returnto"} || "dns_iface.cgi?mode=$mode";
+my $tab = $in{"tab"} || "basic";
+my $returnto = $in{"returnto"} || "dns_iface.cgi?tab=$tab";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_iface_settings"};
-# check for errors in read config
-if( $dnsmconfig{"errors"} > 0 ) {
-	my $line = "error.cgi?line=xx&type=" . &urlize($text{"err_configbad"});
-	&redirect( $line );
-	exit;
-}
 
 # # adjust everything to what we got
-# #
-# &update( $dnsmconfig{"bind-interfaces"}->{"line"}, "bind-interfaces",
-# 	$config_file, ( $in{"bind_interfaces"} == 1 ) );
-# #
-# # write file!!
-# &flush_file_lines();
-#
 
 my @sel = split(/\0/, $in{'sel'});
 my @listen_iface_adds = split(/\0/, $in{'new_interface'});

@@ -26,8 +26,8 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&header($text{"index_title"}, "", , "intro", 1, 0, 0, &restart_button());
-print &header_style();
+# &ui_print_header($text{"index_title"}, "", , "intro", 1, 0, 0, &restart_button());
+# print &header_style();
 
 &ReadParse();
 
