@@ -1578,16 +1578,9 @@ sub check_for_file_errors {
         $error_check_result = "<div class=\"conf-error-block\">"
                             . "<h3 style=\"color: red;\">".$text{"error_heading"}."</h3>"
                             . &text( "err_has_errors_", $errorcount ) . "<br/><br/>"
-                            # . "<form action=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" method=\"\">"
                             . "<a href=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" class=\"btn btn-lg btn-danger conf-error-button\">"
                             . "<i class=\"fa fa-fw fa-arrow-right\">&nbsp;</i>"
                             . "<span>" . $text{"err_goto"} . "</span></a>"
-                            # . "</form>"
-                            # . &ui_form_start("error.cgi", "post")
-                            # . &ui_hidden("returnto", $returnto)
-                            # . &ui_hidden("returnlabel", $returnlabel)
-                            # . &ui_submit( $text{"err_goto"}, "goto", undef, undef, "fa fa-fw fa-arrow-right" )
-                            # . &ui_form_end()
                             . "</div>";
         $error_check_action = "warn";
     }
