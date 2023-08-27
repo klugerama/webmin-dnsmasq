@@ -667,27 +667,58 @@ sub this_url {
     return $url;
 }
 
-# list_auth_users(file)
-sub list_auth_users {
-    my ($file) = @_;
-    my @rv;
-    my $lnum = 0;
-    my $fh = "USERS";
-    &open_readfile($fh, $file);
-    while(<$fh>) {
-        if (/^(#*)([^:]+):(\S+)/) {
-            push(@rv, { 'user' => $2, 'pass' => $3,
-                    'enabled' => !$1, 'line' => $lnum });
-            }
-        $lnum++;
+sub get_usernames_list {
+    local(@uinfo, @users, %ucan, %found);
+    if ($access{'uedit_mode'} == 2 || $access{'uedit_mode'} == 3) {
+        map { $ucan{$_}++ } split(/\s+/, $access{'uedit'});
     }
-    close($fh);
-    if ($config{'sort_conf'}) {
-        return sort { $a->{'user'} cmp $b->{'user'} } @rv;
+    setpwent();
+    local %doneu;
+    while(@uinfo = getpwent()) {
+        next if ($doneu{$uinfo[0]}++);
+        if ($access{'uedit_mode'} == 5 && $access{'uedit'} !~ /^\d+$/) {
+            # Get group for matching by group name
+            @ginfo = getgrgid($uinfo[3]);
+        }
+        if ($access{'uedit_mode'} == 0 ||
+            $access{'uedit_mode'} == 2 && $ucan{$uinfo[0]} ||
+            $access{'uedit_mode'} == 3 && !$ucan{$uinfo[0]} ||
+            $access{'uedit_mode'} == 4 &&
+            (!$access{'uedit'} || $uinfo[2] >= $access{'uedit'}) &&
+            (!$access{'uedit2'} || $uinfo[2] <= $access{'uedit2'}) ||
+            $access{'uedit_mode'} == 5 &&
+            ($access{'uedit'} =~ /^\d+$/ && $uinfo[3] == $access{'uedit'} ||
+            $ginfo[0] eq $access{'uedit'})) {
+            push(@users, $uinfo[0]) if (!$found{$uinfo[0]}++);
+        }
     }
-    else {
-        return @rv;
+    endpwent() if ($gconfig{'os_type'} ne 'hpux');
+    return sort { $a cmp $b } @users;
+}
+
+sub get_groupnames_list {
+    local(@ginfo, @groups, %gcan, %found);
+    if ($access{'gedit_mode'} == 2 || $access{'gedit_mode'} == 3) {
+        map { $gcan{$_}++ } split(/\s+/, $access{'gedit'});
     }
+    setgrent();
+    local %doneg;
+    while(@ginfo = getgrent()) {
+        next if ($doneg{$ginfo[0]}++);
+        @mems = &unique( split(/ /, $ginfo[3]), @{$members{$ginfo[2]}} );
+        if (@mems > 3) { @mems = (@mems[0..1], "..."); }
+        $ginfo[3] = join(' ', @mems);
+        if ($access{'gedit_mode'} == 0 ||
+            $access{'gedit_mode'} == 2 && $gcan{$ginfo[0]} ||
+            $access{'gedit_mode'} == 3 && !$gcan{$ginfo[0]} ||
+            $access{'gedit_mode'} == 4 &&
+            (!$access{'gedit'} || $ginfo[2] >= $access{'gedit'}) &&
+            (!$access{'gedit2'} || $ginfo[2] <= $access{'gedit2'})) {
+            push(@groups, $ginfo[0]) if (!$found{$ginfo[0]}++);
+        }
+    }
+    endgrent() if ($gconfig{'os_type'} ne 'hpux');
+    return sort { $a cmp $b } @groups;
 }
 
 # can_access(file)

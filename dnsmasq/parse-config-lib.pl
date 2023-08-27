@@ -4278,8 +4278,18 @@ sub parse_config_file {
                                 when ("dir") {
                                 }
                                 when ("user") {
+                                    my @usernames = &get_usernames_list();
+                                    if (! grep { /^$val$/ } ( @usernames )) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_userbad"}, $configfield, $param, $temp{"idx"}));
+                                    }
                                 }
                                 when ("group") {
+                                    my @groupnames = &get_groupnames_list();
+                                    if (! grep { /^$val$/ } ( @groupnames )) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_groupbad"}, $configfield, $param, $temp{"idx"}));
+                                    }
                                 }
                                 when ("interface") {
                                     if (&foreign_available("net") && defined(net::active_interfaces)) {
