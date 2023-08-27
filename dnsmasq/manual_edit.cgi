@@ -92,7 +92,7 @@ $data = &read_file_lines($file, 1);
 $data = join("\n", @{$data});
 
 print &ui_textarea("data", $data, 20, 80, undef, undef, "style='width:100%'"),"<br>\n";
-print &ui_form_end([ [ "save", $text{'save'} ] ]);
+print &ui_form_end([ [ "save", $text{'save_button'} ] ]);
 
 &ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
