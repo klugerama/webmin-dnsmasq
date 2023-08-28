@@ -68,8 +68,13 @@ sub restart_button {
 sub find_dnsmasq{
     return $config{'dnsmasq_path'}
         if (-x &translate_filename($config{'dnsmasq_path'}) &&
-            !-d &translate_filename($config{'dnsmasq_path'}));
+            !-d &translate_filename($config{'dnsmasq_path'}) &&
+            &has_command($config{'dnsmasq_path'}));
     return undef;
+}
+
+sub find_config {
+    return (-e $config{'config_file'} && -r $config{'config_file'});
 }
 
 =head2 get_pid_file()
@@ -1574,6 +1579,27 @@ sub check_for_file_errors {
     my $error_check_result = "";
     my $error_check_action = "";
     $returnto = basename($returnto);
+    # check for the executable
+    if (!&find_dnsmasq()) {
+        &ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
+        print &text('index_eserver', "<tt>$config{'dnsmasq_path'}</tt>",
+                "@{[&get_webprefix()]}/config.cgi?$module_name"),"<p>\n";
+        # &foreign_require("software", "software-lib.pl");
+        # $lnk = &software::missing_install_link("dnsmasq", $text{'index_dnsmasq'},
+        #         "../$module_name/", $text{'index_title'});
+        # print $lnk,"<p>\n" if ($lnk);
+        &ui_print_footer("/", $text{'index'});
+        exit;
+    }
+    elsif (!&find_config()) {
+        # still doesn't exist!
+        &ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
+        print "<p>\n";
+        print &text('index_econf', "<tt>$config{'config_file'}</tt>",
+                "@{[&get_webprefix()]}/config.cgi?$module_name"),"<p>\n";
+        &ui_print_footer("/", $text{'index'});
+        exit;
+    }
     if ($in{"forced_edit"} == 1) {
         if (defined($in{"sel"})) {
             my @sel = split(/\0/, $in{"sel"});

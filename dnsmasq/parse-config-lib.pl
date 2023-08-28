@@ -354,7 +354,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "addn_hosts" => { 
+        "addn_hosts" => {  # =<file>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -362,8 +362,8 @@ sub init_configfield_fields {
                 "default" => "",
                 "template" => "<" . $text{"tmpl_path_to_file_or_directory"} . ">"
             }
-        }, # =<file>
-        "hostsdir" => { 
+        },
+        "hostsdir" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -373,7 +373,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
             }
-        }, # =<path>
+        },
         "expand_hosts" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -381,7 +381,7 @@ sub init_configfield_fields {
                 "default" => 0
             }
         },
-        "local_ttl" => { 
+        "local_ttl" => {  # =<time>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -392,8 +392,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<time>
-        "dhcp_ttl" => { 
+        },
+        "dhcp_ttl" => {  # =<time>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -404,8 +404,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<time>
-        "neg_ttl" => { 
+        },
+        "neg_ttl" => {  # =<time>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -416,8 +416,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<time>
-        "max_ttl" => { 
+        },
+        "max_ttl" => {  # =<time>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -428,8 +428,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<time>
-        "max_cache_ttl" => { 
+        },
+        "max_cache_ttl" => {  # =<time>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -440,8 +440,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<time>
-        "min_cache_ttl" => { 
+        },
+        "min_cache_ttl" => {  # =<time>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -452,8 +452,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<time>
-        "auth_ttl" => { 
+        },
+        "auth_ttl" => {  # =<time>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -464,8 +464,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<time>
-        "log_queries" => { 
+        },
+        "log_queries" => {  # [=extra]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -475,8 +475,8 @@ sub init_configfield_fields {
                 "template" => "extra", # literal value
                 "pattern" => "extra" # literal value
             }
-        }, # [=extra]
-        "log_facility" => { 
+        },
+        "log_facility" => {  # =<facility>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -485,7 +485,7 @@ sub init_configfield_fields {
                 "required" => 1,
                 "template" => "<" . $text{"tmpl_log_facility"} . ">"
             }
-        }, # =<facility>
+        },
         "log_debug" => {
             "param_order" => [ "val" ],
             "val" => {
@@ -493,7 +493,7 @@ sub init_configfield_fields {
                 "default" => 0
             }
         },
-        "log_async" => {
+        "log_async" => { # [=<lines>] 
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -504,8 +504,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_log_async"} . ">",
                 "pattern" => "\\d{1,10}",
             }
-        }, # [=<lines>] 
-        "pid_file" => {
+        },
+        "pid_file" => { # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -515,8 +515,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<path>
-        "user" => { 
+        },
+        "user" => {  # =<username>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -526,8 +526,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_username"},
                 "template" => "<" . $text{"tmpl_username"} . ">"
             }
-        }, # =<username>
-        "group" => { 
+        },
+        "group" => {  # =<groupname>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -537,8 +537,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_groupname"},
                 "template" => "<" . $text{"tmpl_groupname"} . ">"
             }
-        }, # =<groupname>
-        "port" => { 
+        },
+        "port" => {  # =<port>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -551,8 +551,8 @@ sub init_configfield_fields {
                 "min" => 0,
                 "max" => 65535
             }
-        }, # =<port>
-        "edns_packet_max" => { 
+        },
+        "edns_packet_max" => {  # =<size>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -563,8 +563,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_size"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<size>
-        "query_port" => { 
+        },
+        "query_port" => {  # =<query_port>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -577,8 +577,8 @@ sub init_configfield_fields {
                 "min" => 0,
                 "max" => 65535
             }
-        }, # =<query_port>
-        "min_port" => { 
+        },
+        "min_port" => {  # =<port>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -591,8 +591,8 @@ sub init_configfield_fields {
                 "min" => 0,
                 "max" => 65535
             }
-        }, # =<port>
-        "max_port" => { 
+        },
+        "max_port" => {  # =<port>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -605,8 +605,8 @@ sub init_configfield_fields {
                 "min" => 0,
                 "max" => 65535
             }
-        }, # =<port>
-        "interface" => { 
+        },
+        "interface" => {  # =<interface name>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -616,8 +616,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface"},
                 "template" => "<" . $text{"tmpl_interface"} . ">"
             }
-        }, # =<interface name>
-        "except_interface" => { 
+        },
+        "except_interface" => {  # =<interface name>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -627,8 +627,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface"},
                 "template" => "<" . $text{"tmpl_interface"} . ">"
             }
-        }, # =<interface name>
-        "auth_server" => {
+        },
+        "auth_server" => { # =<domain>,[<interface>|<ip-address>...]
             "param_order" => [ "domain", "for" ],
             "domain" => {
                 "length" => 10,
@@ -646,7 +646,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface_or_ip_address"},
                 "template" => "<" . $text{"tmpl_interface"} . ">|<" . $text{"tmpl_ip"} . ">..."
             }
-        }, # =<domain>,[<interface>|<ip-address>...]
+        },
         "local_service" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -654,7 +654,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "no_dhcp_interface" => { 
+        "no_dhcp_interface" => {  # =<interface name>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -664,8 +664,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface"},
                 "template" => "<" . $text{"tmpl_interface"} . ">"
             }
-        }, # =<interface name>
-        "listen_address" => { 
+        },
+        "listen_address" => {  # =<ipaddr>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -675,7 +675,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_ip_address"},
                 "template" => $text{"tmpl_ip"}
             }
-        }, # =<ipaddr>
+        },
         "bind_interfaces" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -704,7 +704,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "alias" => { 
+        "alias" => {  # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>]
             "param_order" => [ "from", "to", "netmask" ],
             "from" => {
                 "length" => 10,
@@ -730,8 +730,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_netmask"},
                 "template" => $text{"tmpl_netmask"}
             },
-        }, # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>]
-        "bogus_nxdomain" => { 
+        },
+        "bogus_nxdomain" => {  # =<ipaddr>[/prefix]
             "param_order" => [ "addr" ],
             "addr" => {
                 "length" => 10,
@@ -741,8 +741,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_ip_address"},
                 "template" => $text{"tmpl_ip"} . "[/" . $text{"tmpl_prefix"} . "]"
             }
-        }, # =<ipaddr>[/prefix]
-        "ignore_address" => { 
+        },
+        "ignore_address" => {  # =<ipaddr>[/prefix]
             "param_order" => [ "ip" ],
             "ip" => {
                 "length" => 10,
@@ -752,7 +752,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_ip_address"},
                 "template" => $text{"tmpl_ip"} . "[/" . $text{"tmpl_prefix"} . "]"
             }
-        }, # =<ipaddr>[/prefix]
+        },
         "filterwin2k" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -760,7 +760,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "resolv_file" => { 
+        "resolv_file" => {  # =<file>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -769,7 +769,7 @@ sub init_configfield_fields {
                 "required" => 1,
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<file>
+        },
         "no_resolv" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -777,7 +777,7 @@ sub init_configfield_fields {
                 "default" => 0
             },
         },
-        "enable_dbus" => { 
+        "enable_dbus" => {  # [=<service-name>]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -787,8 +787,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_service_name"},
                 "template" => "<" . $text{"tmpl_service_name"} . ">"
             },
-        }, # [=<service-name>]
-        "enable_ubus" => { 
+        },
+        "enable_ubus" => {  # [=<service-name>]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -798,7 +798,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_service_name"},
                 "template" => "<" . $text{"tmpl_service_name"} . ">"
             },
-        }, # [=<service-name>]
+        },
         "strict_order" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -834,7 +834,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "rebind_domain_ok" => { 
+        "rebind_domain_ok" => {  # =[<domain>]|[[/<domain>/[<domain>/]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -846,7 +846,7 @@ sub init_configfield_fields {
                 "arr" => 1,
                 "sep" => "/",
             }
-        }, # =[<domain>]|[[/<domain>/[<domain>/]
+        },
         "no_poll" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -868,7 +868,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "local" => { 
+        "local" => {  # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
             "param_order" => [ "domain", "ip", "source" ],
             "domain" => {
                 "length" => 15,
@@ -896,8 +896,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_source_interface_or_address"},
                 "template" => "@" . $text{"tmpl_interface"} . "|@" . $text{"tmpl_ip"} . "[#" . $text{"tmpl_port"} . "]"
             }
-        }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-        "server" => { 
+        },
+        "server" => {  # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
             "param_order" => [ "domain", "ip", "source" ],
             "domain" => {
                 "length" => 15,
@@ -925,8 +925,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_source_interface_or_address"},
                 "template" => "@<" . $text{"tmpl_interface"} . ">|@" . $text{"tmpl_ip"} . "[#" . $text{"tmpl_port"} . "]"
             }
-        }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-        "rev_server" => {
+        },
+        "rev_server" => { # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
             "param_order" => [ "domain", "ip", "source" ],
             "domain" => {
                 "length" => 15,
@@ -952,8 +952,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_source_interface_or_address"},
                 "template" => "@<" . $text{"tmpl_interface"} . ">|@" . $text{"tmpl_ip"} . "[#" . $text{"tmpl_port"} . "]"
             }
-        }, # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
-        "address" => { 
+        },
+        "address" => {  # =/<domain>[/<domain>...]/[<ipaddr>]
             "param_order" => [ "domain", "ip" ],
             "domain" => {
                 "length" => 10,
@@ -971,8 +971,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_ip_address"},
                 "template" => $text{"tmpl_ip"}
             },
-        }, # =/<domain>[/<domain>...]/[<ipaddr>]
-        "ipset" => { 
+        },
+        "ipset" => {  # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
             "param_order" => [ "domain", "ipset" ],
             "domain" => {
                 "length" => 20,
@@ -994,8 +994,8 @@ sub init_configfield_fields {
                 "arr" => 1,
                 "sep" => ",",
             },
-        }, # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
-        "connmark_allowlist_enable" => { 
+        },
+        "connmark_allowlist_enable" => {  # [=<mask>]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1005,8 +1005,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_mask"},
                 "template" => "<" . $text{"tmpl_mask"} . ">"
             }
-        }, # [=<mask>]
-        "connmark_allowlist" => { 
+        },
+        "connmark_allowlist" => {  # =<connmark>[/<mask>][,<pattern>[/<pattern>...]]
             "param_order" => [ "connmark", "mask", "pattern" ],
             "connmark" => {
                 "length" => 10,
@@ -1032,8 +1032,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_pattern"},
                 "template" => "<" . $text{"tmpl_pattern"} . ">[/<" . $text{"tmpl_pattern"} . ">...]"
             },
-        }, # =<connmark>[/<mask>][,<pattern>[/<pattern>...]]
-        "mx_host" => { 
+        },
+        "mx_host" => {  # =<mx name>[[,<hostname>],<preference>]
             "param_order" => [ "mxname", "host", "preference" ],
             "mxname" => {
                 "length" => 10,
@@ -1059,8 +1059,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_preference"},
                 "template" => "<" . $text{"tmpl_preference"} . ">"
             },
-        }, # =<mx name>[[,<hostname>],<preference>]
-        "mx_target" => { 
+        },
+        "mx_target" => {  # =<hostname>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1070,7 +1070,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_target"},
                 "template" => "<" . $text{"tmpl_hostname"} . ">"
             }
-        }, # =<hostname>
+        },
         "selfmx" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -1085,7 +1085,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "srv_host" => { 
+        "srv_host" => {  # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
             "param_order" => [ "service", "prot", "domain", "target", "port", "priority", "weight" ],
             "service" => {
                 "length" => 10,
@@ -1152,8 +1152,8 @@ sub init_configfield_fields {
                 "min" => 0,
                 "max" => 65535
             },
-        }, # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
-        "host_record" => { 
+        },
+        "host_record" => {  # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
             "param_order" => [ "name", "ipv4", "ipv6", "ttl" ],
             "name" => {
                 "length" => 10,
@@ -1188,8 +1188,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",,
                 "pattern" => "\\d{1,5}"
             },
-        }, # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
-        "dynamic_host" => { 
+        },
+        "dynamic_host" => {  # =<name>,[IPv4-address],[IPv6-address],<interface>
             "param_order" => [ "name", "ipv4", "ipv6", "interface" ],
             "name" => {
                 "length" => 10,
@@ -1223,8 +1223,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface"},
                 "template" => "<" . $text{"tmpl_interface"} . ">"
             },
-        }, # =<name>,[IPv4-address],[IPv6-address],<interface>
-        "txt_record" => { 
+        },
+        "txt_record" => {  # =<name>[[,<text>],<text>]
             "param_order" => [ "name", "text" ],
             "name" => {
                 "length" => 10,
@@ -1242,8 +1242,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_text"},
                 "template" => "[,<" . $text{"tmpl_text"} . ">],<" . $text{"tmpl_text"} . ">"
             },
-        }, # =<name>[[,<text>],<text>]
-        "ptr_record" => { 
+        },
+        "ptr_record" => {  # =<name>[,<target>]
             "param_order" => [ "name", "target" ],
             "name" => {
                 "length" => 10,
@@ -1261,8 +1261,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_target"},
                 "template" => "<" . $text{"tmpl_target"} . ">"
             },
-        }, # =<name>[,<target>]
-        "naptr_record" => { 
+        },
+        "naptr_record" => {  # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
             "param_order" => [ "name", "order", "preference", "flags", "service", "regexp", "replacement" ],
             "name" => {
                 "length" => 10,
@@ -1327,8 +1327,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_replacement"},
                 "template" => "<" . $text{"tmpl_replacement"} . ">",
             },
-        }, # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
-        "caa_record" => { 
+        },
+        "caa_record" => {  # =<name>,<flags>,<tag>,<value>
             "param_order" => [ "name", "flags", "tag", "value" ],
             "name" => {
                 "length" => 10,
@@ -1366,8 +1366,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_value"},
                 "template" => "<" . $text{"tmpl_value"} . ">"
             },
-        }, # =<name>,<flags>,<tag>,<value>
-        "cname" => { 
+        },
+        "cname" => {  # =<cname>,[<cname>,]<target>[,<TTL>]
             "param_order" => [ "cname", "target", "ttl" ],
             "cname" => {
                 "length" => 10,
@@ -1396,8 +1396,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
             },
-        }, # =<cname>,[<cname>,]<target>[,<TTL>]
-        "dns_rr" => { 
+        },
+        "dns_rr" => {  # =<name>,<RR-number>,[<hex data>]
             "param_order" => [ "name", "rrnumber", "hexdata" ],
             "name" => {
                 "length" => 10,
@@ -1427,8 +1427,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_hexdata"} . ">",
                 "pattern" => "[a-fA-F0-9\ :]*"
             },
-        }, # =<name>,<RR-number>,[<hex data>]
-        "interface_name" => { 
+        },
+        "interface_name" => {  # =<name>,<interface>[/4|/6]
             "param_order" => [ "name", "interface" ],
             "name" => {
                 "length" => 10,
@@ -1446,8 +1446,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface"},
                 "template" => "<" . $text{"tmpl_interface"} . ">[/4|/6]"
             },
-        }, # =<name>,<interface>[/4|/6]
-        "synth_domain" => { 
+        },
+        "synth_domain" => {  # =<domain>,<address range>[,<prefix>[*]]
             "param_order" => [ "domain", "addressrange", "prefix" ],
             "domain" => {
                 "length" => 10,
@@ -1473,8 +1473,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_prefix"},
                 "template" => "<" . $text{"tmpl_prefix"} . ">[*]"
             },
-        }, # =<domain>,<address range>[,<prefix>[*]]
-        "dumpfile" => { 
+        },
+        "dumpfile" => {  # =<path/to/file>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -1484,8 +1484,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<path/to/file>
-        "dumpmask" => { 
+        },
+        "dumpmask" => {  # =<mask>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1495,8 +1495,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_mask"},
                 "template" => "<" . $text{"tmpl_mask"} . ">"
             }
-        }, # =<mask>
-        "add_mac" => { 
+        },
+        "add_mac" => {  # [=base64|text]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1506,8 +1506,8 @@ sub init_configfield_fields {
                 "template" => "base64|text", # literal value
                 "pattern" => "base64|text" # literal value
             }
-        }, # [=base64|text]
-        "add_cpe_id" => { 
+        },
+        "add_cpe_id" => {  # =<string>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1516,8 +1516,8 @@ sub init_configfield_fields {
                 "required" => 1,
                 "template" => "<" . $text{"tmpl_string"} . ">"
             }
-        }, # =<string>
-        "add_subnet" => { 
+        },
+        "add_subnet" => {  # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
             "param_order" => [ "ipv4", "ipv6" ],
             "ipv4" => {
                 "length" => 10,
@@ -1535,8 +1535,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_ipv6_address"},
                 "template" => $text{"tmpl_ip6"}
             },
-        }, # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
-        "umbrella" => {  
+        },
+        "umbrella" => {   # [=deviceid:<deviceid>[,orgid:<orgid>]]
             "param_order" => [ "deviceid", "orgid" ],
             "deviceid" => {
                 "length" => 10,
@@ -1554,8 +1554,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_orgid"},
                 "template" => "orgid:<" . $text{"tmpl_orgid"} . ">"
             },
-        }, # [=deviceid:<deviceid>[,orgid:<orgid>]]
-        "cache_size" => { 
+        },
+        "cache_size" => {  # =<cachesize>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -1565,7 +1565,7 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<cachesize>
+        },
         "no_negcache" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -1573,7 +1573,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "dns_forward_max" => { 
+        "dns_forward_max" => {  # =<queries>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -1583,7 +1583,7 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<queries>
+        },
         "dnssec" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -1591,7 +1591,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "trust_anchor" => { 
+        "trust_anchor" => {  # =[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
             "param_order" => [ "class", "domain", "keytag", "algorithm", "digesttype", "digest" ],
             "class" => {
                 "length" => 10,
@@ -1641,8 +1641,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_digest"},
                 "template" => "<" . $text{"tmpl_digest"} . ">"
             },
-        }, # =[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
-        "dnssec_check_unsigned" => { 
+        },
+        "dnssec_check_unsigned" => {  # [=no]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1652,7 +1652,7 @@ sub init_configfield_fields {
                 "template" => "[no]", # literal value
                 "pattern" => "no" # literal value
             }
-        }, # [=no]
+        },
         "dnssec_no_timecheck" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -1660,7 +1660,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "dnssec_timestamp" => { 
+        "dnssec_timestamp" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -1670,7 +1670,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<path>
+        },
         "proxy_dnssec" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -1685,7 +1685,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "auth_zone" => { 
+        "auth_zone" => {  # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>]|<interface>.....][,exclude:<subnet>[/<prefix length>]|<interface>].....]
             "param_order" => [ "domain", "include", "exclude" ],
             "domain" => {
                 "length" => 10,
@@ -1715,8 +1715,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_exclude_subnets_or_interfaces"},
                 "template" => "<" . $text{"tmpl_subnet"} . ">[/<" . $text{"tmpl_prefix_length"} . ">]|<" . $text{"tmpl_interface"} . ">"
             }
-        }, # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>]|<interface>.....][,exclude:<subnet>[/<prefix length>]|<interface>].....]
-        "auth_soa" => {
+        },
+        "auth_soa" => { # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
             "param_order" => [ "serial", "hostmaster", "refresh", "retry", "expiry" ],
             "serial" => {
                 "length" => 10,
@@ -1761,8 +1761,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_expiry"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
-        "auth_sec_servers" => { 
+        },
+        "auth_sec_servers" => {  # =<domain>[,<domain>[,<domain>...]]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1774,8 +1774,8 @@ sub init_configfield_fields {
                 "arr" => 1,
                 "sep" => ",",
             }
-        }, # =<domain>[,<domain>[,<domain>...]]
-        "auth_peer" => { 
+        },
+        "auth_peer" => {  # =<ip-address>[,<ip-address>[,<ip-address>...]]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -1787,7 +1787,7 @@ sub init_configfield_fields {
                 "arr" => 1,
                 "sep" => ",",
             }
-        }, # =<ip-address>[,<ip-address>[,<ip-address>...]]
+        },
         "conntrack" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -1795,7 +1795,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "dhcp_range" => { 
+        "dhcp_range" => {  # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
             "param_order" => [ "tag", "settag", "start", "end", "mask", "broadcast", "prefix-length", "leasetime", "static", "proxy", "ra-only", "ra-names", "ra-stateless", "slaac", "ra-advrouter", "off-link" ],
             "tag" => {
                 "length" => 15,
@@ -1878,7 +1878,7 @@ sub init_configfield_fields {
                 "ipversion" => 4,
                 "valtype" => "bool",
                 "default" => 0,
-                "label" => $text{"p_label_val_proxy"},
+                "label" => $text{"p_label_val_proxy"}
             },
             "ra-only" => {
                 "ipversion" => 6,
@@ -1916,8 +1916,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "label" => $text{"p_label_val_off-link"},
             },
-        }, # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
-        "dhcp_host" => { 
+        },
+        "dhcp_host" => {  # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
             "param_order" => [ "mac", "clientid", "infiniband", "settag", "tag", "ip", "hostname", "leasetime", "ignore" ],
             "mac" => {
                 "length" => 10,
@@ -1990,8 +1990,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "label" => $text{"p_label_val_ignore"},
             },
-        }, # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
-        "dhcp_hostsfile" => { 
+        },
+        "dhcp_hostsfile" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2001,8 +2001,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<path>
-        "dhcp_optsfile" => { 
+        },
+        "dhcp_optsfile" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2012,8 +2012,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<path>
-        "dhcp_hostsdir" => { 
+        },
+        "dhcp_hostsdir" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2023,8 +2023,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_dirname"},
                 "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
             }
-        }, # =<path>
-        "dhcp_optsdir" => { 
+        },
+        "dhcp_optsdir" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2034,7 +2034,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_dirname"},
                 "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
             }
-        }, # =<path>
+        },
         "read_ethers" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2042,7 +2042,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "dhcp_option" => { 
+        "dhcp_option" => {  # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
             "param_order" => [ "option", "value", "tag", "vendor", "encap", "vi-encap", "forced" ],
             "option" => {
                 "length" => 10,
@@ -2099,8 +2099,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "label" => $text{"p_label_val_dhcp_option_forced"},
             },
-        }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-        "dhcp_option_force" => { 
+        },
+        "dhcp_option_force" => {  # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
             "param_order" => [ "tag", "encap", "vi-encap", "vendor", "option", "value" ],
             "tag" => {
                 "length" => 10,
@@ -2150,7 +2150,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_value"},
                 "template" => "<" . $text{"tmpl_value"} . ">[,<" . $text{"tmpl_value"} . ">]"
             },
-        }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+        },
         "dhcp_no_override" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2158,7 +2158,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "dhcp_relay" => { 
+        "dhcp_relay" => {  # =<local address>,<server address>[,<interface]
             "param_order" => [ "local", "server", "interface" ],
             "local" => {
                 "length" => 10,
@@ -2184,8 +2184,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface"},
                 "template" => "<" . $text{"tmpl_interface"} . ">"
             },
-        }, # =<local address>,<server address>[,<interface]
-        "dhcp_vendorclass" => { 
+        },
+        "dhcp_vendorclass" => {  # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
             "param_order" => [ "tag", "vendorclass" ],
             "tag" => {
                 "length" => 10,
@@ -2203,8 +2203,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_vendorclass"},
                 "template" => "<[enterprise:<" . $text{"tmpl_enterprise"} . ">,]<" . $text{"tmpl_vendorclass"} . ">"
             },
-        }, # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
-        "dhcp_userclass" => { 
+        },
+        "dhcp_userclass" => {  # =set:<tag>,<user-class>
             "param_order" => [ "tag", "userclass" ],
             "tag" => {
                 "length" => 10,
@@ -2222,8 +2222,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_userclass"},
                 "template" => "<" . $text{"tmpl_userclass"} . ">"
             },
-        }, # =set:<tag>,<user-class>
-        "dhcp_mac" => { 
+        },
+        "dhcp_mac" => {  # =set:<tag>,<MAC address>
             "param_order" => [ "tag", "mac" ],
             "tag" => {
                 "length" => 10,
@@ -2241,8 +2241,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_hwaddr"},
                 "template" => $text{"tmpl_mac"}
             },
-        }, # =set:<tag>,<MAC address>
-        "dhcp_circuitid" => { 
+        },
+        "dhcp_circuitid" => {  # =set:<tag>,<circuit-id>
             "param_order" => [ "tag", "circuitid" ],
             "tag" => {
                 "length" => 10,
@@ -2260,8 +2260,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_circuitid"},
                 "template" => "<" . $text{"tmpl_circuitid"} . ">"
             },
-        }, # =set:<tag>,<circuit-id>
-        "dhcp_remoteid" => { 
+        },
+        "dhcp_remoteid" => {  # =set:<tag>,<remote-id>
             "param_order" => [ "tag", "remoteid" ],
             "tag" => {
                 "length" => 10,
@@ -2279,8 +2279,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_remoteid"},
                 "template" => "<" . $text{"tmpl_remoteid"} . ">"
             },
-        }, # =set:<tag>,<remote-id>
-        "dhcp_subscrid" => { 
+        },
+        "dhcp_subscrid" => {  # =set:<tag>,<subscriber-id>
             "param_order" => [ "tag", "subscriberid" ],
             "tag" => {
                 "length" => 10,
@@ -2298,8 +2298,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_subscriberid"},
                 "template" => "<" . $text{"tmpl_subscriberid"} . ">"
             },
-        }, # =set:<tag>,<subscriber-id>
-        "dhcp_proxy" => { 
+        },
+        "dhcp_proxy" => {  # [=<ip addr>]......
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -2309,8 +2309,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_ip_addresses"},
                 "template" => $text{"tmpl_ip"}
             }
-        }, # [=<ip addr>]......
-        "dhcp_match" => { 
+        },
+        "dhcp_match" => {  # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
             "param_order" => [ "tag", "option", "vi-encap", "value" ],
             "tag" => {
                 "length" => 10,
@@ -2344,8 +2344,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_value"},
                 "template" => "<" . $text{"tmpl_value"} . ">"
             },
-        }, # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
-        "dhcp_name_match" => { 
+        },
+        "dhcp_name_match" => {  # =set:<tag>,<name>[*]
             "param_order" => [ "tag", "name" ],
             "tag" => {
                 "length" => 10,
@@ -2363,8 +2363,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_name"},
                 "template" => "<" . $text{"tmpl_name"} . ">[*]"
             },
-        }, # =set:<tag>,<name>[*]
-        "tag_if" => { 
+        },
+        "tag_if" => {  # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
             "param_order" => [ "settag", "iftag" ],
             "settag" => {
                 "length" => 10,
@@ -2382,8 +2382,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_tags"},
                 "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
             },
-        }, # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
-        "dhcp_ignore" => { 
+        },
+        "dhcp_ignore" => {  # =tag:<tag>[,tag:<tag>]
             "param_order" => [ "tag" ],
             "tag" => {
                 "length" => 10,
@@ -2393,8 +2393,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_tags"},
                 "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
             },
-        }, # =tag:<tag>[,tag:<tag>]
-        "dhcp_ignore_names" => { 
+        },
+        "dhcp_ignore_names" => {  # [=tag:<tag>[,tag:<tag>]]
             "param_order" => [ "tag" ],
             "tag" => {
                 "length" => 10,
@@ -2404,8 +2404,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_tags"},
                 "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
             },
-        }, # [=tag:<tag>[,tag:<tag>]]
-        "dhcp_generate_names" => { 
+        },
+        "dhcp_generate_names" => {  # =tag:<tag>[,tag:<tag>]
             "param_order" => [ "tag" ],
             "tag" => {
                 "length" => 10,
@@ -2415,8 +2415,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_tags"},
                 "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
             },
-        }, # =tag:<tag>[,tag:<tag>]
-        "dhcp_broadcast" => { 
+        },
+        "dhcp_broadcast" => {  # [=tag:<tag>[,tag:<tag>]]
             "param_order" => [ "tag" ],
             "tag" => {
                 "length" => 10,
@@ -2426,8 +2426,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_tags"},
                 "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
             },
-        }, # [=tag:<tag>[,tag:<tag>]]
-        "dhcp_boot" => { 
+        },
+        "dhcp_boot" => {  # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
             "param_order" => [ "tag", "filename", "host", "address" ],
             "tag" => {
                 "length" => 10,
@@ -2461,7 +2461,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_server_address"},
                 "template" => "<" . $text{"tmpl_server_address"} . "|" . $text{"tmpl_tftp_server_name"} . ">",
             },
-        }, # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
+        },
         "dhcp_sequential_ip" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2476,7 +2476,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "pxe_service" => { 
+        "pxe_service" => {  # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
             "param_order" => [ "tag", "csa", "menutext", "basename", "server" ],
             "tag" => {
                 "length" => 10,
@@ -2518,8 +2518,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_server_address_or_name"},
                 "template" => "<" . $text{"tmpl_server_address"} . ">|<" . $text{"tmpl_servername"} . ">"
             },
-        }, # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
-        "pxe_prompt" => { 
+        },
+        "pxe_prompt" => {  # =[tag:<tag>,]<prompt>[,<timeout>]
             "param_order" => [ "tag", "prompt", "timeout" ],
             "tag" => {
                 "length" => 10,
@@ -2546,8 +2546,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,5}"
             },
-        }, # =[tag:<tag>,]<prompt>[,<timeout>]
-        "dhcp_pxe_vendor" => { 
+        },
+        "dhcp_pxe_vendor" => {  # =<vendor>[,...]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -2557,8 +2557,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_vendor"},
                 "template" => "<" . $text{"tmpl_string"} . ">[,<" . $text{"tmpl_string"} . ">...]"
             }
-        }, # =<vendor>[,...]
-        "dhcp_lease_max" => { 
+        },
+        "dhcp_lease_max" => {  # =<number>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -2569,7 +2569,7 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,10}"
             }
-        }, # =<number>
+        },
         "dhcp_authoritative" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2584,7 +2584,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "dhcp_alternate_port" => { 
+        "dhcp_alternate_port" => {  # [=<server port>[,<client port>]]
             "param_order" => [ "serverport", "clientport" ],
             "serverport" => {
                 "length" => 3,
@@ -2608,8 +2608,8 @@ sub init_configfield_fields {
                 "min" => 0,
                 "max" => 65535
             },
-        }, # [=<server port>[,<client port>]]
-        "bootp_dynamic" => { 
+        },
+        "bootp_dynamic" => {  # [=<network-id>[,<network-id>]]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 20,
@@ -2621,7 +2621,7 @@ sub init_configfield_fields {
                 "arr" => 1,
                 "sep" => ",",
             },
-        }, # [=<network-id>[,<network-id>]]
+        },
         "no_ping" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2657,7 +2657,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "dhcp_leasefile" => { 
+        "dhcp_leasefile" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2667,8 +2667,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             },
-        }, # =<path>
-        "dhcp_duid" => { 
+        },
+        "dhcp_duid" => {  # =<enterprise-id>,<uid>
             "param_order" => [ "enterpriseid", "uid" ],
             "enterpriseid" => {
                 "length" => 10,
@@ -2686,8 +2686,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_uid"},
                 "template" => "<" . $text{"tmpl_uid"} . ">"
             },
-        }, # =<enterprise-id>,<uid>
-        "dhcp_script" => { 
+        },
+        "dhcp_script" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2697,8 +2697,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<path>
-        "dhcp_luascript" => { 
+        },
+        "dhcp_luascript" => {  # =<path>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2708,8 +2708,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<path>
-        "dhcp_scriptuser" => { 
+        },
+        "dhcp_scriptuser" => {  # =<username>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -2719,7 +2719,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_username"},
                 "template" => "<" . $text{"tmpl_username"} . ">"
             }
-        }, # =<username>
+        },
         "script_arp" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2741,7 +2741,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "bridge_interface" => { 
+        "bridge_interface" => {  # =<interface>,<alias>[,<alias>]
             "param_order" => [ "interface", "alias" ],
             "interface" => {
                 "length" => 10,
@@ -2759,8 +2759,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_aliases"},
                 "template" => "<" . $text{"tmpl_alias"} . ">[,<" . $text{"tmpl_alias"} . ">]"
             },
-        }, # =<interface>,<alias>[,<alias>]
-        "shared_network" => { 
+        },
+        "shared_network" => {  # =<interface|addr>,<addr>
             "param_order" => [ "interface", "addr" ],
             "interface" => {
                 "length" => 10,
@@ -2778,8 +2778,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_ip_address"},
                 "template" => "<" . $text{"tmpl_address"} . ">"
             },
-        }, # =<interface|addr>,<addr>
-        "domain" => { 
+        },
+        "domain" => {  # =<domain>[,<address range>[,local]]
             "param_order" => [ "domain", "range", "local" ],
             "domain" => {
                 "length" => 15,
@@ -2802,7 +2802,7 @@ sub init_configfield_fields {
                 "default" => 0,
                 "label" => $text{"p_label_val_local"},
             },
-        }, # =<domain>[,<address range>[,local]]
+        },
         "dhcp_fqdn" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2824,7 +2824,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "ra_param" => { 
+        "ra_param" => {  # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
             "param_order" => [ "interface", "mtu", "priority", "interval", "lifetime" ],
             "interface" => {
                 "length" => 10,
@@ -2869,8 +2869,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,5}"
             },
-        }, # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
-        "dhcp_reply_delay" => { 
+        },
+        "dhcp_reply_delay" => {  # =[tag:<tag>,]<integer>
             "param_order" => [ "tag", "delay" ],
             "tag" => {
                 "length" => 10,
@@ -2889,8 +2889,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,5}"
             },
-        }, # =[tag:<tag>,]<integer>
-        "enable_tftp" => { 
+        },
+        "enable_tftp" => {  # [=<interface>[,<interface>]]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 10,
@@ -2900,8 +2900,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interfaces"},
                 "template" => "<" . $text{"tmpl_interface"} . ">[,<" . $text{"tmpl_interface"} . ">]"
             },
-        }, # [=<interface>[,<interface>]]
-        "tftp_root" => { 
+        },
+        "tftp_root" => {  # =<directory>[,<interface>]
             "param_order" => [ "directory", "interface" ],
             "directory" => {
                 "length" => 15,
@@ -2919,7 +2919,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interface"},
                 "template" => "<" . $text{"tmpl_interface"} . ">"
             },
-        }, # =<directory>[,<interface>]
+        },
         "tftp_no_fail" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2927,7 +2927,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "tftp_unique_root" => { 
+        "tftp_unique_root" => {  # [=ip|mac]
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
@@ -2938,7 +2938,7 @@ sub init_configfield_fields {
                 "template" => "ip|mac", # literal value
                 "pattern" => "ip|mac" # literal value
             },
-        }, # [=ip|mac]
+        },
         "tftp_secure" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2953,7 +2953,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "tftp_max" => { 
+        "tftp_max" => {  # =<connections>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -2964,8 +2964,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<connections>
-        "tftp_mtu" => { 
+        },
+        "tftp_mtu" => {  # =<mtu size>
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 3,
@@ -2976,7 +2976,7 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_mtu"} . ">",
                 "pattern" => "\\d{1,5}"
             }
-        }, # =<mtu size>
+        },
         "tftp_no_blocksize" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -2984,7 +2984,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "tftp_port_range" => { 
+        "tftp_port_range" => {  # =<start>,<end>
             "param_order" => [ "start", "end" ],
             "start" => {
                 "length" => 3,
@@ -3008,7 +3008,7 @@ sub init_configfield_fields {
                 "min" => 0,
                 "max" => 65535
             },
-        }, # =<start>,<end>
+        },
         "tftp_single_port" => { 
             "param_order" => [ "val" ],
             "val" => {
@@ -3016,7 +3016,7 @@ sub init_configfield_fields {
                 "default" => 0,
             }
         },
-        "conf_file" => { 
+        "conf_file" => {  # =<file>
             "param_order" => [ "filename" ],
             "filename" => {
                 "length" => 40,
@@ -3026,8 +3026,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<file>
-        "conf_dir" => { 
+        },
+        "conf_dir" => {  # =<directory>[,<file-extension>......],
             "param_order" => [ "dirname", "filter", "exceptions" ],
             "dirname" => {
                 "length" => 40,
@@ -3053,8 +3053,8 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_exceptions"},
                 "template" => $text{"tmpl_exceptions"}
             },
-        }, # =<directory>[,<file-extension>......],
-        "servers_file" => { 
+        },
+        "servers_file" => {  # =<file>
             "param_order" => [ "filename" ],
             "filename" => {
                 "length" => 40,
@@ -3064,7 +3064,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
-        }, # =<file>
+        },
     );
 }
 
@@ -3092,6 +3092,9 @@ my $CLIENTID_NAME = "id:([0-9a-zA-Z\_\*\-]*)";
 # parse the configuration file and populate the %dnsmconfig structure
 # 
 sub parse_config_file {
+    # if (&is_installed() != 1) {
+    #     return 0;
+    # }
     &init_configfield_fields();
     my $lineno;
     my ($dnsmconfig_ref, $config_file, $config_filename, $is_not_main_config) = @_;
