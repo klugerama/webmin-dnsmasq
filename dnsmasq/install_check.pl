@@ -14,7 +14,7 @@ do 'dnsmasq-lib.pl';
 sub is_installed {
     return 0 if (!&find_dnsmasq());
     if ($_[0]) {
-        return 2 if (&find_config());
+        return 2 if (&find_config_file());
     }
     return 1;
 }
