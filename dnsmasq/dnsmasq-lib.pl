@@ -73,7 +73,7 @@ sub find_dnsmasq{
     return undef;
 }
 
-sub find_config {
+sub find_config_file {
     return (-e $config{'config_file'} && -r $config{'config_file'});
 }
 
@@ -1591,8 +1591,8 @@ sub check_for_file_errors {
         &ui_print_footer("/", $text{'index'});
         exit;
     }
-    elsif (!&find_config()) {
-        # still doesn't exist!
+    elsif (!&find_config_file()) {
+        # config doesn't exist!
         &ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
         print "<p>\n";
         print &text('index_econf', "<tt>$config{'config_file'}</tt>",
