@@ -29,7 +29,7 @@ If DNSMasq is installed and a configuration file exists but either or both are n
 ## Organization
 Settings for DNSMasq are broken down into three general categories - DNS settings, DHCP settings, and BOOTP/TFTP settings. Selecting the corresponding tab will show a series of icons with more specific sections under each category.
 
-All settings correspond to specific configuration options identified in the DNSMasq documentation. For any given option, hovering the mouse over the help icon will show the name of the option and a brief description of what it does, and how to specify parameters for that option (if any).
+All settings correspond to specific configuration options identified in the DNSMasq documentation. For any given option, hovering the mouse over the help icon to the right of the description will show the name of the option, a brief explanation of what it does, and how to specify parameters for that option (if any).
 
 ### Simple options
 Most options are either simply enabled or disabled. Some others may have one or a few values that must be specified in order to enable them. To enable an option, click the checkbox to the left of the option and click `Save`. More than one option at a time may be enabled or disabled.
