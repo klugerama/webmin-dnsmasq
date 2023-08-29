@@ -1,4 +1,4 @@
-A Webmin module for managing [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html).
+A Webmin module for managing [DNSMasq](https://thekelleys.org.uk/dnsmasq/doc.html).
 
 # Installation
 ## Directly from Github
@@ -23,7 +23,7 @@ By default this module presumes that the configuration file is named `dnsmasq.co
 
 In order to stop/start/restart/reload the `dnsmasq` service, this module also presumes that your system has `systemd` installed.
 
-If DNSMasq is installed and a configuration file exists but either or both are not in the default location, click on the `module configuration` link in the message (or the gear icon above the message) to go to the module configuration, where you will be able to specify the paths for the DNSMasq executable and the configuration file (among other things). The module configuration also allows you to change the commands to start, stop, and restart the dnsmasq service, as well as the commands to cause dnsmasq to reread certain configuration files (without restarting) and to dump dnsmasq logs. See the [dnsmasq documentation](https://thekelleys.org.uk/dnsmasq/doc.html) for further information about how those commands work.
+If DNSMasq is installed and a configuration file exists but either or both are not in the default location, click on the `module configuration` link in the message (or the gear icon above the message) to go to the module configuration, where you will be able to specify the paths for the DNSMasq executable and the configuration file (among other things). The module configuration also allows you to change the commands to start, stop, and restart the dnsmasq service, as well as the commands to cause DNSMasq to reread certain configuration files (without restarting) and to dump DNSMasq logs. See the [DNSMasq documentation](https://thekelleys.org.uk/dnsmasq/doc.html) for further information about how those commands work.
 # Usage
 
 ## Organization
@@ -53,6 +53,35 @@ To correct the error, you have three options:
 ### 1. Fix the value
 Clicking on any text in the error row will take you to the relevant settings page for that option, and (hopefully) provide you with more information regarding how to fix the problem. For list items, the appropriate edit dialog will pop up for that item.
 ### 2. Disable the option
-To disable the option and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Disable`. More than one error-causing option at a time may be disabled by checking more than one box.
+To disable the option and allow DNSMasq to use the default value, ensure the checkbox to the left of the error is checked and click `Disable`. More than one error-causing option at a time may be disabled by checking more than one box.
 ### 3. Delete the option
-To delete the option from the configuration file and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Delete`. More than one error-causing option at a time may be deleted by checking more than one box.
+To delete the option from the configuration file and allow DNSMasq to use the default value, ensure the checkbox to the left of the error is checked and click `Delete`. More than one error-causing option at a time may be deleted by checking more than one box.
+
+## Applying changes
+Click the restart icon at the top right of the module's page to restart DNSMasq. In most cases, DNSMasq must be restarted to apply configuration changes.
+
+The exceptions to this requirement are:
+
+* `addn-hosts` 
+  * DNS settings -> Basic DNS settings -> Additional hosts file(s)
+* `hostsdir`
+  * DNS settings -> Basic DNS settings -> Additional hosts file directories
+* `servers-file`
+  * DNS settings -> Additional Configuration Files -> "Additional configuration files (only 'server' and 'rev-server')"
+* `dhcp-hostsfile`
+  * DHCP settings -> Basic DHCP settings
+* `dhcp-optsfile`
+  * DHCP settings -> Basic DHCP settings
+* `dhcp-hostsdir`
+  * DHCP settings -> Basic DHCP settings
+* `dhcp-optsdir`
+  * DHCP settings -> Basic DHCP settings
+* `read-ethers`
+  * DHCP settings -> Basic DHCP settings
+
+For the above options, DNSMasq will reread the specified files and directories upon receiving a SIGHUP. In addition, it will:
+
+* clear its cache
+* reload /etc/hosts (unless `no-hosts` is enabled)
+* call the DHCP lease change script for all existing DHCP leases
+* reread /etc/resolv.conf (if `no-poll` is enabled)
