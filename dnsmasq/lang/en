@@ -345,7 +345,7 @@ p_desc_servers_file=Additional configuration files (only 'server' and 'rev-serve
 p_desc_ipset=Domain(s) IPs to Netfilter Ipset(s)
 p_desc_connmark_allowlist=Linux connection tracking mark-based DNS filter(s)
 
-p_label_no_hosts=No /etc/hosts
+p_label_no_hosts=Don&#39;t read the hostnames in /etc/hosts
 p_label_hostsdir=Read all the hosts files contained in the directory
 p_label_dhcp_ttl=As for local-ttl, but affects only replies with information from DHCP leases
 p_label_neg_ttl=Negative reply TTL
