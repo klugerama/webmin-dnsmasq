@@ -50,9 +50,9 @@ Finally, you may directly edit the configuration file(s) by clicking `Edit confi
 If any errors are found in the saved configuration, a box will show at the top of the page listing the details of the discovered issue. This contains the name of the option, the configuration file it is found in, and which line contains the offending error. If a required parameter is missing, or if there is something wrong with the specified value for that parameter, a short description will identify the issue.
 
 To correct the error, you have three options:
-### Disable the option
-To disable the option and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Disable`. More than one error-causing option at a time may be disabled by checking more than one box.
-### Delete the option
-To delete the option from the configuration file and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Delete`. More than one error-causing option at a time may be deleted by checking more than one box.
-### Fix the value
+### 1. Fix the value
 Clicking on any text in the error row will take you to the relevant settings page for that option, and (hopefully) provide you with more information regarding how to fix the problem. For list items, the appropriate edit dialog will pop up for that item.
+### 2. Disable the option
+To disable the option and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Disable`. More than one error-causing option at a time may be disabled by checking more than one box.
+### 3. Delete the option
+To delete the option from the configuration file and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Delete`. More than one error-causing option at a time may be deleted by checking more than one box.
