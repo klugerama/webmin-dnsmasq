@@ -32,7 +32,7 @@ Settings for DNSMasq are broken down into three general categories - DNS setting
 All settings correspond to specific configuration options identified in the DNSMasq documentation. For any given option, hovering the mouse over the help icon to the right of the description will show the name of the option, a brief explanation of what it does, and how to specify parameters for that option (if any).
 
 ### Simple options
-Most options are either simply enabled or disabled. Some others may have one or a few values that must be specified in order to enable them. To enable an option, click the checkbox to the left of the option and click `Save`. More than one option at a time may be enabled or disabled.
+Most options are either simply enabled or disabled. Some others may have one or a few values that must be specified in order to enable them. To enable an option, click the checkbox to the left of the option and click `Save`. More than one option at a time may be enabled or disabled by checking more than one box.
 
 For those options that require additional parameters, the form will provide some guidance as to what type of information is required before you can save.
 
@@ -41,4 +41,18 @@ Some options may be specified multiple times. For these, a list is presented. To
 
 To edit an item in the list, click on any of the values to show an edit dialog.
 
-To enable one or more list item, click the checkbox to the left of the item and click `Enable`. More than one item at a time may be enabled or disabled.
+To enable one or more list item, click the checkbox to the left of the item and click `Enable`. More than one item at a time may be enabled or disabled by checking more than one box.
+
+### Manual configuration file editing
+Finally, you may directly edit the configuration file(s) by clicking `Edit config files` under the `DNS settings` tab.
+
+## Errors
+If any errors are found in the saved configuration, a box will show at the top of the page listing the details of the discovered issue. This contains the name of the option, the configuration file it is found in, and which line contains the offending error. If a required parameter is missing, or if there is something wrong with the specified value for that parameter, a short description will identify the issue.
+
+To correct the error, you have three options:
+### Disable the option
+To disable the option and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Disable`. More than one error-causing option at a time may be disabled by checking more than one box.
+### Delete the option
+To delete the option from the configuration file and allow dnsmasq to use the default value, ensure the checkbox to the left of the error is checked and click `Delete`. More than one error-causing option at a time may be deleted by checking more than one box.
+### Fix the value
+Clicking on any text in the error row will take you to the relevant settings page for that option, and (hopefully) provide you with more information regarding how to fix the problem. For list items, the appropriate edit dialog will pop up for that item.
