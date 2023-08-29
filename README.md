@@ -18,8 +18,27 @@ A Webmin module for managing [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.htm
 5. Click `Install Module`
 6. A new entry will appear under the `Servers` menu: `DNSMasq DNS & DHCP server`
 
-# Usage
-
-So far this module presumes that `dnsmasq.conf` can be found directly under `/etc/`. If your configuration file is in a different location by default, please [report a GitHub issue](https://github.com/klugerama/webmin-dnsmasq/issues) with your OS, distribution & distribution version, and DNSMasq version.
+## Module settings
+By default this module presumes that the configuration file is named `dnsmasq.conf` and can be found directly under `/etc/`. If your configuration file has a different name or is in a different location by default, please [report a GitHub issue](https://github.com/klugerama/webmin-dnsmasq/issues) and include your OS, distribution & distribution version, and DNSMasq version.
 
 In order to stop/start/restart/reload the `dnsmasq` service, this module also presumes that your system has `systemd` installed.
+
+If DNSMasq is installed and a configuration file exists but either or both are not in the default location, click on the `module configuration` link in the message (or the gear icon above the message) to go to the module configuration, where you will be able to specify the paths for the DNSMasq executable and the configuration file (among other things). The module configuration also allows you to change the commands to start, stop, and restart the dnsmasq service, as well as the commands to cause dnsmasq to reread certain configuration files (without restarting) and to dump dnsmasq logs. See the [dnsmasq documentation](https://thekelleys.org.uk/dnsmasq/doc.html) for further information about how those commands work.
+# Usage
+
+## Organization
+Settings for DNSMasq are broken down into three general categories - DNS settings, DHCP settings, and BOOTP/TFTP settings. Selecting the corresponding tab will show a series of icons with more specific sections under each category.
+
+All settings correspond to specific configuration options identified in the DNSMasq documentation. For any given option, hovering the mouse over the help icon will show the name of the option and a brief description of what it does, and how to specify parameters for that option (if any).
+
+### Simple options
+Most options are either simply enabled or disabled. Some others may have one or a few values that must be specified in order to enable them. To enable an option, click the checkbox to the left of the option and click `Save`. More than one option at a time may be enabled or disabled.
+
+For those options that require additional parameters, the form will provide some guidance as to what type of information is required before you can save.
+
+### List options
+Some options may be specified multiple times. For these, a list is presented. To add an item to the list, click the `Add *` button above or below the list. This will open a dialog, showing the corresponding values that must be specified. Added items are enabled by default.
+
+To edit an item in the list, click on any of the values to show an edit dialog.
+
+To enable one or more list item, click the checkbox to the left of the item and click `Enable`. More than one item at a time may be enabled or disabled.
