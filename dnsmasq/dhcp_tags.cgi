@@ -65,11 +65,11 @@ print ui_tabs_start_tab('tab', 'basic_match');
 print ui_tabs_end_tab('tab', 'basic_match');
 
 print ui_tabs_start_tab('tab', 'userclass');
-&show_field_table("dhcp_userclass", $apply_cgi,$text{"userclass"}, \%dnsmconfig, 2);
+&show_field_table("dhcp_userclass", $apply_cgi, $text{"_userclass"}, \%dnsmconfig, 2);
 print ui_tabs_end_tab('tab', 'userclass');
 
 print ui_tabs_start_tab('tab', 'vendorclass');
-&show_field_table("dhcp_vendorclass", $apply_cgi,$text{"vendorclass"}, \%dnsmconfig, 3);
+&show_field_table("dhcp_vendorclass", $apply_cgi, $text{"_vendorclass"}, \%dnsmconfig, 3);
 print ui_tabs_end_tab('tab', 'vendorclass');
 
 print ui_tabs_end();

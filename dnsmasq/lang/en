@@ -21,10 +21,8 @@ description_expand=Description...
 save_button=Save
 submit_button=Submit
 cancel_button=Cancel
-undo_button=Undo
-delete_button=Delete
+# undo_button=Undo
 restarting=Trying to restart DNSmasq. Script messages are:
-delet=Delete
 selected_none=Nothing selected
 error_heading=Configuration Error
 errors_heading=Configuration Errors
@@ -58,8 +56,6 @@ with_selected=With selected:
 enable_sel=Enable
 disable_sel=Disable
 delete_sel=Delete
-disable_sel_error=Disable
-delete_sel_error=Delete
 add_=Add $1
 create_=Create $1
 edit_=Edit $1
@@ -163,7 +159,7 @@ tmpl_circuitid=circuit-id
 tmpl_remoteid=remote-id
 tmpl_subscriberid=subscriber-id
 
-# DNS settings
+# DNS-specific settings
 index_dns_settings=DNS settings
 index_dns_settings_basic=Basic DNS settings
 index_dns_servers=DNS Servers
@@ -178,44 +174,19 @@ index_dns_auth_settings=Authoritative DNS Settings
 index_dns_addn_config=Additional Configuration Files
 index_dns_manual_edit=Edit config files
 
-table_upstream_dns_servers=DNS Upstream Servers
-table_upstream_dns_rev_servers=DNS Upstream Servers (Reverse Domain)
-table_=
-
-server_name=Specific domain
-server_address=Server address
-listen=Listen on
-domain_name=Domain name
-subnet=Subnet
-range=Range
-netmask_used=Use a netmask
-net_id=Network/Client ID
-dynamic=Defined in resolv.conf file
-domain=For domain
-ip_address=IP address
-source=Source
 manual_file=Edit File:
 _file=File
 _dir=Directory
-_path=Path
-_dns_serv=upstream server
 _addr=address
 _iface=interface
 _upstream_srv=upstream DNS server
-_xiface=except interface
 _listen=listen address
-#_forced=forced domain
-_alias=alias
-_nx=aliased NXDOMAIN
-_forced=forced domain response
 _alias=IP address alias
 _nx=aliased NXDOMAIN response
-_name=name
 _domain=Domain
 _hostsfile=hosts file
 _hostsdir=hosts directory
 _resolvfile=resolv file
-_ipsets=Ipset(s)
 _connmark=Connmark filter
 
 # Property labels/descriptions
@@ -501,8 +472,6 @@ p_label_val_filter=Filter
 p_label_val_exceptions=Exceptions
 p_label_val_pattern=Pattern
 
-# Unused
-
 # DHCP settings
 index_dhcp_settings=DHCP settings
 index_dhcp_settings_basic=Basic DHCP settings
@@ -517,10 +486,13 @@ index_dhcp_vendorclass=Vendor Class Specification
 index_dhcp_userclass=User Class Specification
 index_dhcp_bridge_interface=DHCP Interface Bridge
 
+_vendorclass=Vendor class
+_userclass=User class
+_dhcp_option=DHCP client option
+_host=DHCP host specification
 _range=DHCP range
 _interface_bridge=DHCP interface bridge
 
-dhcp_option_header=For DHCP client option $1
 dhcp_ipversion4=IPv4
 dhcp_ipversion6=IPv6
 
@@ -668,7 +640,6 @@ p_label_val_infiniband=InfiniBand
 p_label_val_ignore=Ignore Client ID
 p_label_val_encap=Option Encapsulation
 p_label_val_vi_encap=Vendor-Identifying Vendor Options
-#p_label_val_option_vendor=Encapsulated Vendor-class Options
 p_label_val_option_vendor=Vendor
 p_label_val_option=Option
 p_label_val_dhcp_option_forced=Forced
@@ -683,33 +654,6 @@ p_label_val_tag=Tag
 p_label_val_tags=Tag(s)
 p_label_val_set_tag=Set tag
 p_label_val_set_tags=Set tag(s)
-
-# Unused
-
-timed=Use a lease time
-ided=Network ID
-id=Network ID to use
-dhcp6_res_client=Client
-_host=host specification
-vendor=Vendor
-vendorclass=Vendor class
-user=User
-userclass=User class
-class=Class
-_vendorclass=vendor class
-_userclass=user class
-misc=Miscellaneous DHCP options
-dhcp_options=DHCP client options
-dhcp_encap=Option Encapsulation
-_dhcp_option=DHCP client option
-_host=DHCP host specification
-dhcp_vi_encap=Vendor identifier encapsulation
-opt_spec=DHCP option specification
-bootp_host=Hostname
-bootp_file=File
-bootp_address=IP Address
-lfiletouse=Nonstandard leasefile to use
-flags=Flags
 
 # TFTP settings
 index_tftp_settings=TFTP settings
@@ -734,6 +678,9 @@ p_man_desc_tftp_single_port=Run in a mode where the TFTP server uses ONLY the we
 p_man_desc_dhcp_boot=(IPv4 only) Set BOOTP options to be returned by the DHCP server. Server name and address are optional: if not provided, the name is left empty, and the address set to the address of the machine running dnsmasq. If dnsmasq is providing a TFTP service (see 'enable-tftp' ) then only the filename is required here to enable network booting. If the optional tag(s) are given, they must match for this configuration to be sent. Instead of an IP address, the TFTP server address can be given as a domain name which is looked up in /etc/hosts. This name can be associated in /etc/hosts with multiple IP addresses, which are used round-robin. This facility can be used to load balance the tftp load among a set of servers.
 p_man_desc_pxe_service=Most uses of PXE boot-ROMS simply allow the PXE system to obtain an IP address and then download the file specified by 'dhcp-boot' and execute it. However the PXE system is capable of more complex functions when supported by a suitable DHCP server. This specifies a boot option which may appear in a PXE boot menu. &quot;CSA&quot; is client system type, only services of the correct type will appear in a menu. The known types are x86PC, PC98, IA64_EFI, Alpha, Arc_x86, Intel_Lean_Client, IA32_EFI, x86-64_EFI, Xscale_EFI, BC_EFI, ARM32_EFI and ARM64_EFI; an integer may be used for other types. The parameter after the menu text may be a file name, in which case dnsmasq acts as a boot server and directs the PXE client to download the file by TFTP, either from itself ('enable-tftp' must be set for this to work) or another TFTP server if the final server address/name is given. Note that the &quot;layer&quot; suffix (normally &quot;.0&quot;) is supplied by PXE, and need not be added to the basename. Alternatively, the basename may be a filename, complete with suffix, in which case no layer suffix is added. If an integer boot service type, rather than a basename is given, then the PXE client will search for a suitable boot service for that type on the network. This search may be done by broadcast, or direct to a server if its IP address/name is provided. If no boot service type or filename is provided (or a boot service type of 0 is specified) then the menu entry will abort the net boot procedure and continue booting from local media. The server address can be given as a domain name which is looked up in /etc/hosts. This name can be associated in /etc/hosts with multiple IP addresses, which are used round-robin.
 p_man_desc_pxe_prompt=Setting this provides a prompt to be displayed after PXE boot. If the timeout is given then after the timeout has elapsed with no keyboard input, the first available menu option will be automatically executed. If the timeout is zero then the first available menu item will be executed immediately. If 'pxe-prompt' is omitted the system will wait for user input if there are multiple items in the menu, but boot immediately if there is only one. See 'pxe-service' for details of menu items.
+p_man_desc_bootp_dynamic=(IPv4 only) Enable dynamic allocation of IP addresses to BOOTP clients. Use this with care, since each address allocated to a BOOTP client is leased forever, and therefore becomes permanently unavailable for re-use by other hosts. if this is given without tags, then it unconditionally enables dynamic allocation. With tags, only when the tags are all set. It may be repeated with different tag sets.
+
+p_desc_bootp_dynamic=Enable dynamic allocation of IP addresses to BOOTP clients (IPv4 only)
 
 p_label_dhcp_pxe_vendor=Used to consider customized vendor identifiers valid for identifying PXE clients
 p_label_enable_tftp=Enable the TFTP server function
@@ -775,8 +722,5 @@ p_label_val_start_port=Start port
 p_label_val_end_port=End port
 
 # Unused
-p_man_desc_bootp_dynamic=(IPv4 only) Enable dynamic allocation of IP addresses to BOOTP clients. Use this with care, since each address allocated to a BOOTP client is leased forever, and therefore becomes permanently unavailable for re-use by other hosts. if this is given without tags, then it unconditionally enables dynamic allocation. With tags, only when the tags are all set. It may be repeated with different tag sets.
-
-p_desc_bootp_dynamic=Enable dynamic allocation of IP addresses to BOOTP clients (IPv4 only)
 
 

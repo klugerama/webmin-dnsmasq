@@ -87,8 +87,8 @@ foreach my $error ( @{$dnsmconfig{"error"}} ) {
 print &ui_columns_end();
 print &ui_links_row(\@list_link_buttons);
 print "<p>" . $text{"with_selected"} . "</p>";
-print &ui_submit($text{"disable_sel_error"}, "disable_sel");
-print &ui_submit($text{"delete_sel_error"}, "delete_sel");
+print &ui_submit($text{"disable_sel"}, "disable_sel");
+print &ui_submit($text{"delete_sel"}, "delete_sel");
 print &ui_form_end();
 
 print &add_js();
