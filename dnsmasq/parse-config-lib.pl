@@ -3191,7 +3191,7 @@ sub parse_config_file {
                         $configfield = "server";
                         $valtemp{"is_local"} = 1;
                     }
-                    given ( "$configfield" ){
+                    given ( "$configfield" ) {
                         when ("auth-server") { # =<domain>,[<interface>[/4|/6]|<ip-address>...]
                             if( $remainder =~ /^($NAME),(.*)$/ ) {
                                 $valtemp{"domain"} = $1;

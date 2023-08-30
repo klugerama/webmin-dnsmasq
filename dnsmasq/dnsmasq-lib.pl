@@ -25,6 +25,9 @@ our $td_left = "style=\"text-align: left; width: auto;\"";
 our $td_label = "style=\"text-align: left; width: auto; word-break: break-word; overflow-wrap: break-word;\"";
 our $td_right = "style=\"text-align: right; width: auto;\"";
 
+$last_config_change_flag = $module_var_directory."/config-flag";
+$last_restart_time_flag = $module_var_directory."/restart-flag";
+
 sub radio_default_or_yes {
     my ($def) = @_;
     my $default_text = ( $def == 0 ? "No" : "(no)" );
@@ -50,7 +53,7 @@ sub restart_button {
     if (&is_dnsmasq_running()) {
         return ($access{'restart'} ?
             "<a href='restart.cgi?" . $args . "'>" . $text{"index_button_restart"} . "</a><br>\n" : "").
-            ($access{'start'} ?
+            ($access{'stop'} ?
             "<a href='stop.cgi?" . $args . "'>" . $text{"index_button_stop"} . "</a>" : "");
         # return "<a href=\"restart.cgi?$args\">$text{"lib_buttac"}</a><br>\n".
         #     "<a href=\"stop.cgi?$args\">$text{"lib_buttsd"}</a>\n";
@@ -139,10 +142,10 @@ sub reload_dnsmasq_files {
     return undef;
 }
 
-=head2 dump_log()
+=head2 dump_logs()
     Generate a complete cache dump, and returns undef on success or an error message on failure
 =cut
-sub dump_log {
+sub dump_logs {
     if ($config{'dnsmasq_dump_log'}) {
         # Use the configured start command
         &clean_environment();
@@ -342,16 +345,6 @@ sub needs_config_restart {
         return 1;
     }
     return 0;
-}
-
-# Returns HTML for a link to put in the top-right corner of every page
-sub rotate_logs_button {
-    return undef if ($config{'restart_pos'} == 2);
-    my $args = "redir=".&urlize(&this_url());
-    if (&is_dnsmasq_running()) {
-        return ($access{'restart'} ?
-            "<a href='log_rotate.cgi?" . $args . "'>" . $text{"lib_buttac"} . "</a>" : "");
-    }
 }
 
 # Returns the structure(s) with some name

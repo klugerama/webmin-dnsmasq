@@ -23,7 +23,7 @@ require 'tftp.cgi';
 
 # $|=1;
 
-my %access=&get_module_acl;
+my %access=&get_module_acl();
 
 ## put in ACL checks here if needed
 
@@ -46,7 +46,7 @@ if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
-&ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0);
+&ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
 print $error_check_result;
 

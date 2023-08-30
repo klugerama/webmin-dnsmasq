@@ -75,6 +75,12 @@ sub show_dns_settings {
             "icon" => "manual.gif",
             "page" => 9
         },
+        {
+            "link" => "dnsmasq_control.cgi",
+            "title" => $text{"index_dns_control"},
+            "icon" => "misc.gif",
+            "page" => 10
+        },
     );
     local $i;
     for ($i = 0; $i < @buttons; $i++ ) {

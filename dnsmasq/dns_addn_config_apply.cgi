@@ -19,7 +19,7 @@ do '../web-lib.pl';
 do '../ui-lib.pl';
 do 'dnsmasq-lib.pl';
 
-my %access=&get_module_acl;
+my %access=&get_module_acl();
 
 ## put in ACL checks here if needed
 

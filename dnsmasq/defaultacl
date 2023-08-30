@@ -1,4 +1,5 @@
-root=/
-logging=1
 start=1
+stop=1
 restart=1
+reload=1
+dump_logs=1

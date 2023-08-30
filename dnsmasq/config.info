@@ -4,6 +4,6 @@ pid_filename=PID full path and filename,0
 dnsmasq_start=Command to start DNSmasq,3,Use system service manager or start manually
 dnsmasq_stop=Command to stop DNSmasq,3,Use system service manager or kill process manually
 dnsmasq_restart=Command to restart DNSmasq,10,-Use system service manager or stop/start manually,restart-Run stop and start commands
-dnsmasq_reload_files=Command to load certain DNSmasq files,3,Use DNSmasq or HUP signal
+dnsmasq_reload_files=Command to reload certain DNSmasq files,3,Use DNSmasq or HUP signal
 dnsmasq_dump_log=Command to dump DNSMasq logs,3,Use DNSmasq or USR1 signal
 test_config=Test config file before applying changes?,1,1-Yes,0-No

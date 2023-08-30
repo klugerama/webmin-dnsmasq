@@ -17,7 +17,7 @@
 
 require 'dnsmasq-lib.pl';
 
-my %access=&get_module_acl;
+my %access=&get_module_acl();
 
 ## put in ACL checks here if needed
 
@@ -26,16 +26,9 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-# &ui_print_header($text{"index_title"}, "", , "intro", 1, 0, 0, &restart_button());
-# print &header_style();
-
 &ReadParse();
 
-## Insert Output code here
-# output as web page
-
 &error_setup($text{'stop_err'});
-
 $access{'stop'} || &error($text{'stop_ecannot'});
 $err = &stop_dnsmasq();
 &error($err) if ($err);
