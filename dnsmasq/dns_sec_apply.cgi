@@ -22,7 +22,7 @@ do 'dnsmasq-lib.pl';
 $|=1;
 &init_config("DNSMasq");
 
-%access=&get_module_acl;
+%access=&get_module_acl();
 
 ## put in ACL checks here if needed
 

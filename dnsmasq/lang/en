@@ -12,6 +12,30 @@ index_eserver=The DNSMasq server executable $1 does not exist. If you have DNSMa
 index_dnsmasq=DNSMasq
 index_econf=The DNSMasq configuration file $1 does not exist. If you have DNSMasq installed, adjust the <a href='$2'>module configuration</a> to use the correct path.
 
+acl_start=Can start DNSmasq?
+acl_stop=Can stop DNSmasq?
+acl_restart=Can apply DNSmasq configuration?
+acl_reload=Can reload DNSmasq configuration?
+acl_dump_logs=Can dump DNSmasq logs?
+
+stop_err=Failed to stop DNSmasq
+stop_ecannot=You are not allowed to stop DNSmasq
+
+start_err=Failed to start DNSmasq
+start_ecannot=You are not allowed to start DNSmasq
+start_ecmd=$1 failed : $2
+start_eunknown=Unknown reason
+start_eafter=DNSmasq does not appear to be running
+
+restart_err=Failed to restart DNSmasq
+restart_ecannot=You are not allowed to restart DNSmasq
+
+reload_err=Failed to reload configuration
+reload_ecannot=You are not allowed to reload DNSmasq
+
+dump_logs_err=Failed to dump DNSmasq logs
+dump_logs_ecannot=You are not allowed to dump DNSmasq logs
+
 column_option=Option
 column_value=Value
 enabled=Enabled
@@ -64,16 +88,19 @@ empty_value=&lt;empty&gt;
 
 footnote_required_parameter=Required parameter if value is enabled
 
-acl_root=Root directory for ACL files
-acl_sections=Allowed configuration pages
-acl_start=Can start and stop DNSmasq?
-acl_restart=Can apply DNSmasq configuration?
-
 index_button_start=Start DNSmasq
 index_button_restart=Restart DNSmasq
 index_button_stop=Stop DNSmasq
+index_button_reload=Reload configs
+index_button_dump_logs=Dump logs
 index_basic=Basic Settings
 index_other=Other Settings
+
+start_desc=Click this button to start DNSMasq.
+restart_desc=Click this button to restart DNSMasq. This is necessary to apply most configuration changes.
+stop_desc=Click this button to stop DNSMasq.
+reload_desc=Click this button to force DNSMasq to reread certain configuration files without restarting. See the README file or DNSMasq documentation for more information.
+dump_logs_desc=Click this button to dump DNSMasq logs to the configured log facility without restarting.
 
 tmpl_path_to_file_or_directory=/path/to/file/or/directory
 tmpl_path_to_file=/path/to/file
@@ -173,6 +200,7 @@ index_dns_sec_settings=DNS Security Settings
 index_dns_auth_settings=Authoritative DNS Settings
 index_dns_addn_config=Additional Configuration Files
 index_dns_manual_edit=Edit config files
+index_dns_control=Service Control
 
 manual_file=Edit File:
 _file=File

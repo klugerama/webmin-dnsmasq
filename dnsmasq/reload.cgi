@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#    DNSMasq Webmin Module - reload_dnsmasq_files.cgi; causes DNSmasq to reload certain files
+#    DNSMasq Webmin Module - reload.cgi; causes DNSmasq to reload certain files
 #    Copyright (C) 2023 by Loren Cress
 #    
 #    This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 
 require 'dnsmasq-lib.pl';
 
-my %access=&get_module_acl;
+my %access=&get_module_acl();
 
 ## put in ACL checks here if needed
 
@@ -26,23 +26,18 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-&ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_style();
-
 &ReadParse();
 
-## Insert Output code here
-# output as web page
 if ($config{'test_config'}) {
     $err = &test_config();
     &error("<pre>".&html_escape($err)."</pre>") if ($err);
 }
 
-&error_setup($text{'start_err'});
-$access{'stop'} || &error($text{'start_ecannot'});
+&error_setup($text{'reload_err'});
+$access{'reload'} || &error($text{'reload_ecannot'});
 $err = &reload_dnsmasq_files();
 &error($err) if ($err);
-&webmin_log("start");
+&webmin_log("reload");
 &redirect($in{'returnto'});
 
-### END of reload_dnsmasq_files.cgi ###.
+### END of reload.cgi ###.

@@ -17,7 +17,7 @@
 
 require 'dnsmasq-lib.pl';
 
-my %access=&get_module_acl;
+my %access=&get_module_acl();
 
 ## put in ACL checks here if needed
 
@@ -26,23 +26,20 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-# &ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-# print &header_style();
-
 &ReadParse();
 
-## Insert Output code here
-# output as web page
 if ($config{'test_config'}) {
     $err = &test_config();
     &error("<pre>".&html_escape($err)."</pre>") if ($err);
 }
 
-&error_setup($text{'start_err'});
-$access{'stop'} || &error($text{'start_ecannot'});
+&error_setup($text{'restart_err'});
+$access{'stop'} || &error($text{'stop_ecannot'});
+$access{'restart'} || &error($text{'restart_ecannot'});
+$access{'start'} || &error($text{'start_ecannot'});
 $err = &restart_dnsmasq();
 &error($err) if ($err);
-&webmin_log("start");
+&webmin_log("restart");
 &redirect($in{'returnto'});
 
 ### END of restart.cgi ###.

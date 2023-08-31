@@ -8,3 +8,4 @@ lib/.precomp
 build.sh
 .vscode
 dnsmasq.wbm*
+dnsmasq/help/dnsmasq*.txt
