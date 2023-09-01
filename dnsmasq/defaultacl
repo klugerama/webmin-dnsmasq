@@ -3,3 +3,4 @@ stop=1
 restart=1
 reload=1
 dump_logs=1
+view_logs=1

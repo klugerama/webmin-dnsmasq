@@ -81,6 +81,12 @@ sub show_dns_settings {
             "icon" => "misc.gif",
             "page" => 10
         },
+        {
+            "link" => "view_log.cgi",
+            "title" => $text{"index_dns_view_log"},
+            "icon" => "logs.gif",
+            "page" => 11
+        },
     );
     local $i;
     for ($i = 0; $i < @buttons; $i++ ) {

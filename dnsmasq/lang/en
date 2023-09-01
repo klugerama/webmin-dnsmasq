@@ -17,6 +17,7 @@ acl_stop=Can stop DNSmasq?
 acl_restart=Can apply DNSmasq configuration?
 acl_reload=Can reload DNSmasq configuration?
 acl_dump_logs=Can dump DNSmasq logs?
+acl_view_logs=Can view DNSmasq logs?
 
 stop_err=Failed to stop DNSmasq
 stop_ecannot=You are not allowed to stop DNSmasq
@@ -35,6 +36,12 @@ reload_ecannot=You are not allowed to reload DNSmasq
 
 dump_logs_err=Failed to dump DNSmasq logs
 dump_logs_ecannot=You are not allowed to dump DNSmasq logs
+
+view_logs_ecannot=You are not allowed to view DNSmasq logs
+view_header=Last $1 lines of $2
+view_empty=Log file is empty
+view_refresh=Refresh
+view_filter=Only show lines with text $1
 
 column_option=Option
 column_value=Value
@@ -201,6 +208,7 @@ index_dns_auth_settings=Authoritative DNS Settings
 index_dns_addn_config=Additional Configuration Files
 index_dns_manual_edit=Edit config files
 index_dns_control=Service Control
+index_dns_view_log=View Logfile
 
 manual_file=Edit File:
 _file=File
