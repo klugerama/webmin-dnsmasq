@@ -15,11 +15,7 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-do '../web-lib.pl';
-do '../ui-lib.pl';
-do 'dnsmasq-lib.pl';
-
-my %access=&get_module_acl();
+require "dnsmasq-lib.pl";
 
 ## put in ACL checks here if needed
 

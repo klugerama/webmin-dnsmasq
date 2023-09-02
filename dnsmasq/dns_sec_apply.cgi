@@ -15,26 +15,14 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-do '../web-lib.pl';
-do '../ui-lib.pl';
-do 'dnsmasq-lib.pl';
-
-$|=1;
-&init_config("DNSMasq");
-
-%access=&get_module_acl();
+require "dnsmasq-lib.pl";
 
 ## put in ACL checks here if needed
 
-
-## sanity checks
-
-
-## Insert Output code here
 # read config file
 $config_filename = $config{config_file};
 $config_file = &read_file_lines( $config_filename );
-# pass into data structure
+
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 # read posted data
 &ReadParse();

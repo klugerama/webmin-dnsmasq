@@ -21,17 +21,8 @@ require 'dns.cgi';
 require 'dhcp.cgi';
 require 'tftp.cgi';
 
-# $|=1;
-
-my %access=&get_module_acl();
-
 ## put in ACL checks here if needed
 
-## sanity checks
-
-# uses the index_title entry from ./lang/en or appropriate
-
-## Insert Output code here
 # read config file
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
@@ -46,6 +37,7 @@ if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
+## Insert Output code here
 &ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
 print $error_check_result;

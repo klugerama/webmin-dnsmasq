@@ -18,8 +18,6 @@
 require 'dnsmasq-lib.pl';
 use experimental qw( switch );
 
-my %access=&get_module_acl();
-
 # read config file
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );

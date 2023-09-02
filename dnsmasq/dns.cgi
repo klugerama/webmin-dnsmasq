@@ -70,22 +70,28 @@ sub show_dns_settings {
             "page" => 8
         },
         {
-            "link" => "manual_edit.cgi",
-            "title" => $text{"index_dns_manual_edit"},
+            "link" => "manual_edit.cgi?type=config",
+            "title" => $text{"index_dns_config_edit"},
             "icon" => "manual.gif",
             "page" => 9
+        },
+        {
+            "link" => "manual_edit.cgi?type=script",
+            "title" => $text{"index_dns_scripts_edit"},
+            "icon" => "manual.gif",
+            "page" => 10
         },
         {
             "link" => "dnsmasq_control.cgi",
             "title" => $text{"index_dns_control"},
             "icon" => "misc.gif",
-            "page" => 10
+            "page" => 11
         },
         {
             "link" => "view_log.cgi",
             "title" => $text{"index_dns_view_log"},
             "icon" => "logs.gif",
-            "page" => 11
+            "page" => 12
         },
     );
     local $i;

@@ -2444,6 +2444,7 @@ sub init_configfield_fields {
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">",
+                "script" => 1,
             },
             "host" => {
                 "length" => 10,
@@ -2695,7 +2696,8 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
-                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">",
+                "script" => 1
             }
         },
         "dhcp_luascript" => {  # =<path>
@@ -2706,7 +2708,8 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
-                "template" => "<" . $text{"tmpl_path_to_file"} . ">"
+                "template" => "<" . $text{"tmpl_path_to_file"} . ">",
+                "script" => 1
             }
         },
         "dhcp_scriptuser" => {  # =<username>
@@ -3097,11 +3100,14 @@ sub parse_config_file {
     # }
     &init_configfield_fields();
     my $lineno;
-    my ($dnsmconfig_ref, $config_file, $config_filename, $is_not_main_config) = @_;
+    my ($dnsmconfig_ref, $config_file, $config_filename) = @_;
+    my $is_extra_config = $_[3] ? $_[3] : 0;
 
-    if ($is_not_main_config != 1) { # initialize the config with all known options 
-                                    # (except those that can be specified multiple times)
+    if ($is_extra_config == 0) { # initialize the config with all known options 
+                                       # (except those that can be specified multiple times)
+        $dnsmconfig_ref->{"configfiles"} = ();
         push ( @{ $dnsmconfig_ref->{"configfiles"} }, $config_filename);
+        $dnsmconfig_ref->{"scripts"} = ();
         $dnsmconfig_ref->{"idx"} = ();
         $dnsmconfig_ref->{"error"} = ();
         while ( ($key, $vals) = each %dnsmconfigvals ) {
@@ -3153,7 +3159,7 @@ sub parse_config_file {
             if ($line =~ /(^[\#]*[\s]*([a-z0-9\-]{3,}))\=(.*)$/ ) {
                 my $configfield = $2;
                 my $internalfield = &config_to_internal($configfield);
-                my $fdef = %configfield_fields{$internalfield};
+                my $fdef = $configfield_fields{$internalfield};
                 $remainder = $3;
                 %temp = ( );
                 $temp{"used"} = ($line !~ /^\#/);
@@ -3166,21 +3172,27 @@ sub parse_config_file {
                     push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, "$configfield: unknown option"));
                     next;
                 }
-                my %confvar = %dnsmconfigvals{"$configfield"};
-                if ( $confvar{"mult"} ne "" ) {
-                    my $sep = $confvar{"mult"};
+                my $confvar = \%{ $dnsmconfigvals{"$configfield"} };
+                if ( $confvar->{"mult"} ne "" ) {
+                    my $sep = $confvar->{"mult"};
                     # $temp{"val"} = @();
-                    while ( $remainder =~ /^$sep?($NAME)($sep[0-9a-zA-Z\.\-\/]*)*/ ) {
+                    while ( $remainder && $remainder =~ /^$sep?($NAME)($sep[0-9a-zA-Z\.\-\/]*)*/ ) {
                         push @{ $temp{"val"} }, ( $1 );
                         $remainder = $2;
                     }
                 }
                 elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
-                    if ($fdef->{"val"}->{"arr"} == 1) {
+                    if (defined($fdef->{"val"}->{"arr"}) && $fdef->{"val"}->{"arr"} == 1) {
                         push( @{$temp{"val"}}, split(",", $remainder) );
+                        if (defined($fdef->{"val"}->{"script"}) && $fdef->{"val"}->{"script"} == 1 && $temp{"used"} && ! grep { $remainder } ( @{ $dnsmconfig_ref->{"scripts"} } )) {
+                            push ( @{ $dnsmconfig_ref->{"scripts"} }, $remainder);
+                        }
                     }
                     else {
                         $temp{"val"} = $remainder;
+                        if (defined($fdef->{"val"}->{"script"}) && $fdef->{"val"}->{"script"} == 1 && $temp{"used"} && ! grep { $remainder } ( @{ $dnsmconfig_ref->{"scripts"} } )) {
+                            push ( @{ $dnsmconfig_ref->{"scripts"} }, $remainder);
+                        }
                     }
                     # $temp{"val"} = "test";
                 }
@@ -3204,100 +3216,100 @@ sub parse_config_file {
                         when ("alias") { # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>]
                             $valtemp{"netmask-used"} = 0;
                             # our $IPADDR = "(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])";
-                            if ( $remainder =~ /^($IPADDR\-$IPADDR)\,($IPADDR)\,($IPADDR)$/ ) { # range with netmask
+                            if ( $remainder && $remainder =~ /^($IPADDR\-$IPADDR)\,($IPADDR)\,($IPADDR)$/ ) { # range with netmask
                                 $valtemp{"from"} = $1;
                                 $valtemp{"to"} = $2;
                                 $valtemp{"netmask"} = $3;
                                 $valtemp{"netmask-used"} = 1;
                             }
-                            elsif ( $remainder =~ /^($IPADDR\-$IPADDR)\,($IPADDR)$/ ) { # range without netmask
+                            elsif ( $remainder && $remainder =~ /^($IPADDR\-$IPADDR)\,($IPADDR)$/ ) { # range without netmask
                                 $valtemp{"from"} = $1;
                                 $valtemp{"to"} = $2;
                             }
-                            elsif ( $remainder =~ /^($IPADDR)\,($IPADDR)\,($IPADDR)$/ ) { # IP with netmask
+                            elsif ( $remainder && $remainder =~ /^($IPADDR)\,($IPADDR)\,($IPADDR)$/ ) { # IP with netmask
                                 $valtemp{"from"} = $1;
                                 $valtemp{"to"} = $2;
                                 $valtemp{"netmask"} = $3;
                                 $valtemp{"netmask-used"} = 1;
                             }
-                            elsif ( $remainder =~ /^($IPADDR)\,($IPADDR)$/ ) { # IP without netmask
+                            elsif ( $remainder && $remainder =~ /^($IPADDR)\,($IPADDR)$/ ) { # IP without netmask
                                 $valtemp{"from"} = $1;
                                 $valtemp{"to"} = $2;
                             }
                         }
                         when ("bogus-nxdomain") { # =<ipaddr>[/prefix]
-                            if ( $remainder =~ /^($IPADDR(\/[0-9]{1,2})?)$/ ) {
+                            if ( $remainder && $remainder =~ /^($IPADDR(\/[0-9]{1,2})?)$/ ) {
                                 $valtemp{"addr"} = $1;
                             }
                         }
                         when ("ignore-address") { # =<ipaddr>[/prefix]
-                            if ( $remainder =~ /^\/($IPADDR(\/[0-9]{1,2})?)$/ ) {
+                            if ( $remainder && $remainder =~ /^\/($IPADDR(\/[0-9]{1,2})?)$/ ) {
                                 $valtemp{"ip"} = $1;
                             }
                         }
                         when ("local") { # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
                             $current = 0;
-                            while ( $remainder =~ /^\/((?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9\.])?)+[a-z0-9][a-z0-9\-]{0,61}[a-z0-9])\/(.*)$/ ) {
+                            while ( $remainder && $remainder =~ /^\/((?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9\.])?)+[a-z0-9][a-z0-9\-]{0,61}[a-z0-9])\/(.*)$/ ) {
                                 push( @{ $valtemp{"domain"} }, $1 );
                                 $remainder = $2;
                                 last if ($current++ >= $max_iterations);
                             }
-                            if ( $remainder =~ /^($IPADDR(#[0-9]{1,5})?)(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($IPADDR(#[0-9]{1,5})?)(.*)$/ ) {
                                 $valtemp{"ip"} = $1;
                                 $remainder = $2;
                             }
-                            elsif ( $remainder =~ /^($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
+                            elsif ( $remainder && $remainder =~ /^($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
                                 $valtemp{"ip"} = $1;
                                 $remainder = $2;
                             }
-                            if ( $remainder =~ /^@(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^@(.*)$/ ) {
                                 $valtemp{"source"} = $1;
                             }
                         }
                         when ("server") { # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
                             $current = 0;
-                            while ( $remainder =~ /^\/((?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9\.])?)+[a-z0-9][a-z0-9\-]{0,61}[a-z0-9])\/(.*)$/ ) {
+                            while ( $remainder && $remainder =~ /^\/((?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9\.])?)+[a-z0-9][a-z0-9\-]{0,61}[a-z0-9])\/(.*)$/ ) {
                                 push( @{ $valtemp{"domain"} }, $1 );
                                 $remainder = $2;
                                 last if ($current++ >= $max_iterations);
                             }
-                            if ( $remainder =~ /^($IPADDR(#[0-9]{1,5})?)(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($IPADDR(#[0-9]{1,5})?)(.*)$/ ) {
                                 $valtemp{"ip"} = $1;
                                 $remainder = $3;
                             }
-                            elsif ( $remainder =~ /^($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
+                            elsif ( $remainder && $remainder =~ /^($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
                                 $valtemp{"ip"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^@(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^@(.*)$/ ) {
                                 $valtemp{"source"} = $1;
                             }
                         }
                         when ("rev-server") { # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
-                            if ( $remainder =~ /^\/($IPADDR\/[0-9]{1,2})(,.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^\/($IPADDR\/[0-9]{1,2})(,.*)$/ ) {
                                 $valtemp{"domain"} = $1;
                                 $remainder = $2;
                             }
-                            if ( $remainder =~ /^\/($IPADDR(#[0-9]{1,5})?)(,.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^\/($IPADDR(#[0-9]{1,5})?)(,.*)$/ ) {
                                 $valtemp{"ip"} = $1;
                                 $remainder = $2;
                             }
-                            elsif ( $remainder =~ /^\/($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
+                            elsif ( $remainder && $remainder =~ /^\/($IPV6ADDR(%[a-zA-Z0-9])?)(.*)$/ ) {
                                 $valtemp{"ip"} = $1;
                                 $remainder = $2;
                             }
-                            if ( $remainder =~ /^@(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^@(.*)$/ ) {
                                 $valtemp{"source"} = $1;
                             }
                         }
                         when ("address") { # =/<domain>[/<domain>...]/[<ipaddr>]
-                            if ( $remainder =~ /^\/(.*)\/($IPADDR)?$/ ) {
+                            if ( $remainder && $remainder =~ /^\/(.*)\/($IPADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
                                 if ( defined ($2) ) {
                                     $valtemp{"ip"} = $2;
                                 }
                             }
-                            elsif ( $remainder =~ /^\/(.*)\/($IPV6ADDR)?$/ ) {
+                            elsif ( $remainder && $remainder =~ /^\/(.*)\/($IPV6ADDR)?$/ ) {
                                 $valtemp{"domain"}=$1;
                                 if ( defined ($2) ) {
                                     $valtemp{"ip"} = $2;
@@ -3311,17 +3323,17 @@ sub parse_config_file {
                             # }
                         }
                         when ("ipset") { # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
-                            if ( $remainder =~ /^\/([a-zA-Z\_\.][0-9a-zA-Z\_\.\-\/]*)\/([0-9a-zA-Z\,\.\-]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^\/([a-zA-Z\_\.][0-9a-zA-Z\_\.\-\/]*)\/([0-9a-zA-Z\,\.\-]*)$/ ) {
                                 my $domains = $1;
                                 my $ipsets = $2;
                                 $current = 0;
-                                while ($domains =~ /^([a-zA-Z\_\.][0-9a-zA-Z\_\.\-]*)((?:\/)(.*))*$/ ) {
+                                while ($domains && $domains =~ /^([a-zA-Z\_\.][0-9a-zA-Z\_\.\-]*)((?:\/)(.*))*$/ ) {
                                     push( @{ $valtemp{"domain"} }, $1 );
                                     $domains = $3;
                                     last if ($current++ >= $max_iterations);
                                 }
                                 $current = 0;
-                                while ($ipsets =~ /^([0-9a-zA-Z\.\-]+)((?:,)(.*))*$/ && defined($1) ) {
+                                while ( $ipsets && $ipsets =~ /^([0-9a-zA-Z\.\-]+)((?:,)(.*))*$/ && defined($1) ) {
                                     push( @{ $valtemp{"ipset"} }, $1 );
                                     $ipsets = $3;
                                     last if ($current++ >= $max_iterations);
@@ -3346,7 +3358,7 @@ sub parse_config_file {
                             if( $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
                                 $valtemp{"mxname"} = $1;
                                 $remainder = $3;
-                                if ( $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
+                                if ( $remainder && $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
                                     $valtemp{"host"}=$1;
                                     $valtemp{"preference"}=$3;
                                 }
@@ -3359,24 +3371,24 @@ sub parse_config_file {
                             }
                         }
                         when ("srv-host") { # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
-                            if( $remainder =~ /^((_[a-zA-Z]*)\.(_[a-zA-Z]*)\.)(.*)$/ ) {
+                            if( $remainder && $remainder =~ /^((_[a-zA-Z]*)\.(_[a-zA-Z]*)\.)(.*)$/ ) {
                                 $valtemp{"service"} = $2;
                                 $valtemp{"prot"} = $3;
                                 $remainder = $4;
-                                if ( $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
+                                if ( $remainder && $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
                                     $valtemp{"domain"}=$1;
                                     $remainder=$3;
                                 }
-                                if ( $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
+                                if ( $remainder && $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
                                     $valtemp{"target"}=$1;
                                     $remainder=$3;
-                                    if ( $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
+                                    if ( $remainder && $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
                                         $valtemp{"port"}=$1;
                                         $remainder=$3;
-                                        if ( $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
+                                        if ( $remainder && $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
                                             $valtemp{"priority"}=$1;
                                             $remainder=$3;
-                                            if ( $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
+                                            if ( $remainder && $remainder =~ /^($NUMBER)((?:,)(.*))*$/ ) {
                                                 $valtemp{"weight"}=$1;
                                             }
                                         }
@@ -3388,42 +3400,42 @@ sub parse_config_file {
                             }
                         }
                         when ("host-record") { # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
-                            if ( $remainder =~ /^(.*)((?:,)($IPADDR))((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)($IPADDR))((?:,)(.*))*$/ ) {
                                 $valtemp{"ipv4"} = $3;
                                 $remainder = $1 . $4;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)($IPV6ADDR))((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)($IPV6ADDR))((?:,)(.*))*$/ ) {
                                 $valtemp{"ipv6"} = $3;
                                 $remainder = $1 . $4;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)([0-9]{1,5}))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)([0-9]{1,5}))$/ ) {
                                 $valtemp{"ttl"} = $3;
                                 $remainder = $1;
                             }
                             $valtemp{"name"} = $remainder;
                         }
                         when ("dynamic-host") { # =<name>[,IPv4-address][,IPv6-address],<interface>
-                            if ( $remainder =~ /^(.*)((?:,)($IPADDR))((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)($IPADDR))((?:,)(.*))$/ ) {
                                 $valtemp{"ipv4"} = $3;
                                 $remainder = $1 . $4;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)($IPV6ADDR))((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)($IPV6ADDR))((?:,)(.*))$/ ) {
                                 $valtemp{"ipv6"} = $3;
                                 $remainder = $1 . $4;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"name"} = $1;
                                 $valtemp{"interface"} = $3;
                             }
                         }
                         when ("txt-record") { # =<name>[[,<text>],<text>]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"name"} = $1;
                                 $valtemp{"text"} = $3;
                             }
                         }
                         when ("ptr-record") { # =<name>[,<target>]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"name"} = $1;
                                 if ( defined($3) ) {
                                     $valtemp{"target"} = $3;
@@ -3431,27 +3443,27 @@ sub parse_config_file {
                             }
                         }
                         when ("naptr-record") { # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"name"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"order"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"preference"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"flags"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"service"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                 $valtemp{"regexp"} = $1;
                                 if ( defined($3) ) {
                                     $valtemp{"replacement"} = $3;
@@ -3459,35 +3471,35 @@ sub parse_config_file {
                             }
                         }
                         when ("caa-record") { # =<name>,<flags>,<tag>,<value>
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"name"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"flags"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"tag"} = $1;
                                 $valtemp{"value"} = $3;
                             }
                         }
                         when ("cname") { # =<cname>,[<cname>,]<target>[,<TTL>]
-                            if ( $remainder =~ /^(.*)((?:,)([0-9]{1,5}))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)([0-9]{1,5}))$/ ) {
                                 $valtemp{"ttl"} = $3;
                                 $remainder = $1;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"target"} = $3;
                                 $valtemp{"cname"} = $3;
                             }
                         }
                         when ("dns-rr") { # =<name>,<RR-number>,[<hex data>]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"name"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                 $valtemp{"rrnumber"} = $1;
                                 if ( defined($3) ) {
                                     $valtemp{"hexdata"} = $3;
@@ -3495,17 +3507,17 @@ sub parse_config_file {
                             }
                         }
                         when ("interface-name") { # =<name>,<interface>[/4|/6]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"name"} = $1;
                                 $valtemp{"interface"} = $3;
                             }
                         }
                         when ("synth-domain") { # =<domain>,<address range>[,<prefix>[*]]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"domain"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                 $valtemp{"addressrange"} = $1;
                                 if ( defined($3) ) {
                                     $valtemp{"prefix"} = $3;
@@ -3513,16 +3525,16 @@ sub parse_config_file {
                             }
                         }
                         when ("add-subnet") { # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
-                            if ( $remainder =~ /^($IPADDR(\/[0-9]{1,5})?)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^($IPADDR(\/[0-9]{1,5})?)((?:,)(.*))*$/ ) {
                                 $valtemp{"ipv4"} = $1;
                                 $remainder = $4;
                             }
-                            if ( $remainder =~ /^($IPV6ADDR(\/[0-9]{1,5})?)$/ ) {
+                            if ( $remainder && $remainder =~ /^($IPV6ADDR(\/[0-9]{1,5})?)$/ ) {
                                 $valtemp{"ipv6"} = $1;
                             }
                         }
                         when ("umbrella") { # [=deviceid:<deviceid>[,orgid:<orgid>]]
-                            if ( $remainder =~ /^((?:deviceid:)(.*))((?:,orgid:)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^((?:deviceid:)(.*))((?:,orgid:)(.*))*$/ ) {
                                 $valtemp{"deviceid"} = $2;
                                 if ( defined($4) ) {
                                     $valtemp{"orgid"} = $4;
@@ -3530,23 +3542,23 @@ sub parse_config_file {
                             }
                         }
                         when ("trust-anchor") { # =[<class>,]<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"digest"} = $3;
                                 $remainder = $1;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"digesttype"} = $3;
                                 $remainder = $1;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"algorithm"} = $3;
                                 $remainder = $1;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"keytag"} = $3;
                                 $remainder = $1;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                 $valtemp{"domain"} = $1;
                                 if ( defined($1) ) {
                                     $valtemp{"class"} = $1;
@@ -3554,12 +3566,12 @@ sub parse_config_file {
                             }
                         }
                         when ("auth-zone") { # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>].....][,exclude:<subnet>[/<prefix length>]].....]
-                            if ( $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^($NAME)((?:,)(.*))*$/ ) {
                                 $valtemp{"domain"} = $1;
                                 $remainder = $3;
-                                if ( $remainder =~ /(exclude:.*)*$/ ) {
+                                if ( $remainder && $remainder =~ /(exclude:.*)*$/ ) {
                                     $current = 0;
-                                    while ( $remainder =~ /((?:exclude:)($IPADDR))((?:,exclude:)(.*))*$/ ) {
+                                    while ( $remainder && $remainder =~ /((?:exclude:)($IPADDR))((?:,exclude:)(.*))*$/ ) {
                                         push( @{ $valtemp{"exclude"} }, $2 );
                                         $remainder = $4;
                                         last if ($current++ >= $max_iterations);
@@ -3567,7 +3579,7 @@ sub parse_config_file {
                                 }
                                 if ( $remainder ne "" ) {
                                     $current = 0;
-                                    while ( $remainder =~ /^($IPADDR)((?:,)(.*))*$/ ) {
+                                    while ( $remainder && $remainder =~ /^($IPADDR)((?:,)(.*))*$/ ) {
                                         push( @{ $valtemp{"include"} }, $1 );
                                         $remainder = $3;
                                         last if ($current++ >= $max_iterations);
@@ -3576,19 +3588,19 @@ sub parse_config_file {
                             }
                         }
                         when ("auth-soa") { # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"serial"} = $1;
                                 $remainder = $3;
-                                if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                                if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                     $valtemp{"hostmaster"} = $1;
                                     $remainder = $3;
-                                    if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                                    if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                         $valtemp{"refresh"} = $1;
                                         $remainder = $3;
-                                        if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                                        if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                             $valtemp{"retry"} = $1;
                                             $remainder = $3;
-                                            if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                                 $valtemp{"expiry"} = $1;
                                             }
                                         }
@@ -3598,7 +3610,7 @@ sub parse_config_file {
                         }
                         when ("dhcp-range") { # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
                             $current = 0;
-                            while ($remainder =~ /^($TAG)\,([0-9a-zA-Z\.\,\-\_: ]*)/ ) { # first get tag
+                            while ( $remainder && $remainder =~ /^($TAG)\,([0-9a-zA-Z\.\,\-\_: ]*)/ ) { # first get tag
                                 my $tagdirective = $1;
                                 $remainder = $4;
                                 if ($tagdirective =~ /^tag:([0-9a-zA-Z\-\_]*)/) {
@@ -3615,55 +3627,55 @@ sub parse_config_file {
                             }
                             $valtemp{"ipversion"} = 4;
                             $valtemp{"static"} = 0;
-                            if ($remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) { # IPv4
+                            if ( $remainder && $remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) { # IPv4
                                 # ...start...
                                 $valtemp{"start"} = $1;
                                 $remainder = $3;
                                 $valtemp{"proxy"} = 0;
-                                if ($remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
+                                if ($remainder && $remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
                                     # ...end...
                                     $valtemp{"end"} = $1;
                                     $remainder = $3;
                                 }
-                                elsif ($remainder =~ /^(static)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
+                                elsif ($remainder && $remainder =~ /^(static)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
                                     $valtemp{"static"} = 1;
                                     $remainder = $3;
                                 }
-                                elsif ($remainder =~ /^(proxy)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
+                                elsif ($remainder && $remainder =~ /^(proxy)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
                                     $valtemp{"proxy"} = 1;
                                     $remainder = $3;
                                 }
                                 $valtemp{"mask"} = "";
                                 $valtemp{"mask-used"} = 0;
-                                if ($remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
+                                if ($remainder && $remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
                                     # ...netmask
                                     $valtemp{"mask"} = $1;
                                     $valtemp{"mask-used"} = 1;
                                     $remainder = $3;
-                                    if ($remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
+                                    if ($remainder && $remainder =~ /^($IPADDR)((?:\,)([0-9a-zA-Z\.\,\-\_]*))*/ ) {
                                         # ...broadcast
                                         $valtemp{"broadcast"} = $1;
                                         $remainder = $3;
                                     }
                                 }
-                                if ($remainder =~ /^($TIME)/ ) {
+                                if ($remainder && $remainder =~ /^($TIME)/ ) {
                                     # ...time (optionally)
                                     $valtemp{"leasetime"} = $1;
                                     $valtemp{"time-used"} = ($1 =~ /^\d/);
                                     $remainder = $2;
                                 }
                             }
-                            elsif ($remainder =~ /^($IPV6ADDR)\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*)/ ) { # IPv6
+                            elsif ( $remainder && $remainder =~ /^($IPV6ADDR)\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*)/ ) { # IPv6
                                 # start...
                                 # $temp{"id"}="";
                                 $valtemp{"start"} = $1;
-                                $remainder = $2 . $3;
+                                $remainder = $2 . ($3 ? $3 : "");
                                 $valtemp{"prefix-length"} = 64;
                                 $valtemp{"ipversion"} = 6;
-                                if ($remainder =~ /^($IPV6ADDR)\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*)/ ) {
+                                if ( $remainder && $remainder =~ /^($IPV6ADDR)\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*)/ ) {
                                     # ...end
                                     $valtemp{"end"} = $1;
-                                    $remainder = $2 . $3;
+                                    $remainder = $2 . ($3 ? $3 : "");
                                 }
                                 $valtemp{"ra-only"} = 0;
                                 $valtemp{"ra-names"} = 0;
@@ -3672,7 +3684,7 @@ sub parse_config_file {
                                 $valtemp{"ra-advrouter"} = 0;
                                 $valtemp{"off-link"} = 0;
                                 $current = 0;
-                                while ($remainder =~ /^($IPV6PROP)(\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*))*/ ) {
+                                while ( $remainder && $remainder =~ /^($IPV6PROP)(\,[\s]*([0-9a-zA-Z\.\,\-\_: ]*))*/ ) {
                                     if ($1 eq "static") {
                                         $valtemp{"static"} = 1;
                                     }
@@ -3698,13 +3710,13 @@ sub parse_config_file {
                                     $remainder = $3;
                                     last if ($current++ >= $max_iterations);
                                 }
-                                if ($remainder =~ /^([0-9]{1,3})\,[\s]*($TIME)/ ) {
+                                if ($remainder && $remainder =~ /^([0-9]{1,3})\,[\s]*($TIME)/ ) {
                                     # ...prefix-length, time (optionally)
                                     $valtemp{"prefix-length"} = $1;
                                     $valtemp{"leasetime"}=$2;
                                     $valtemp{"time-used"}=($2 =~ /^\d/);
                                 }
-                                elsif ($remainder =~ /^($TIME)/ ) {
+                                elsif ($remainder && $remainder =~ /^($TIME)/ ) {
                                     # ...time (optionally)
                                     $valtemp{"leasetime"}=$1;
                                     $valtemp{"time-used"}=($1 =~ /^\d/);
@@ -3717,32 +3729,32 @@ sub parse_config_file {
                             # }
                         }
                         when ("dhcp-host") { # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
-                            if ($remainder =~ /^(([0-9a-zA-Z\,\.\-\_: ]*)(\,))(($TIME)|infinite)$/ && defined ($4)) {
+                            if ( $remainder && $remainder =~ /^(([0-9a-zA-Z\,\.\-\_: ]*)(\,))(($TIME)|infinite)$/ && defined ($4)) {
                                 # time (optional)
                                 $remainder = $2;
                                 $valtemp{"leasetime"}=$4;
                                 $valtemp{"time-used"}=($4 =~ /^\d/);
                             }
                             $current = 0;
-                            while ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\* ]*)($SETTAG)((,)([0-9a-zA-Z\.\,\-\_:\* ]*))*$/ && defined ($3) && defined ($4)) {
+                            while ($remainder && $remainder =~ /^([0-9a-zA-Z\.\,\-\_:\* ]*)($SETTAG)((,)([0-9a-zA-Z\.\,\-\_:\* ]*))*$/ && defined ($3) && defined ($4)) {
                                 push( @{$valtemp{"settag"}}, $2);
                                 $remainder = $1 . $5;
                                 last if ($current++ >= $max_iterations);
                             }
-                            if ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\* ]*)($TAG)((,)([0-9a-zA-Z\.\,\-\_:\* ]*))*$/ && defined ($3) && defined ($4)) {
+                            if ( $remainder && $remainder =~ /^([0-9a-zA-Z\.\,\-\_:\* ]*)($TAG)((,)([0-9a-zA-Z\.\,\-\_:\* ]*))*$/ && defined ($3) && defined ($4)) {
                                 $valtemp{"tag"}=$4;
-                                $remainder = $1 . $7;
+                                $remainder = $1 . ($7 ? $7 : "");
                             }
                             $valtemp{"mac"} = "";
-                            if ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:]*)($INFINIBAND)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ && defined ($2)) {
+                            if ( $remainder && $remainder =~ /^([0-9a-zA-Z\.\,\-\_:]*)($INFINIBAND)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ && defined ($2)) {
                                 $remainder = $1 . $6;
                                 $valtemp{"infiniband"}=$2;
                             }
-                            elsif ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:]*)($CLIENTID)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ && defined ($2)) {
+                            elsif ( $remainder && $remainder =~ /^([0-9a-zA-Z\.\,\-\_:]*)($CLIENTID)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ && defined ($2)) {
                                 $remainder = $1 . $6;
                                 $valtemp{"clientid"}=$2;
                             }
-                            elsif ($remainder =~ /^(([0-9a-zA-Z\.\,\-\_:\[\]]*,[\h]*)*)($DUID)((,[\h]*([0-9a-zA-Z\.\,\-\_\:\[\]]*))*)$/ && defined ($3)) {
+                            elsif ( $remainder && $remainder =~ /^(([0-9a-zA-Z\.\,\-\_:\[\]]*,[\h]*)*)($DUID)((,[\h]*([0-9a-zA-Z\.\,\-\_\:\[\]]*))*)$/ && defined ($3)) {
                                 $valtemp{"clientid"} = $3;
                                 my $firstpart = $1;
                                 my $lastpart = $5;
@@ -3756,7 +3768,7 @@ sub parse_config_file {
                             }
                             else {
                                 $current = 0;
-                                while ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\*]*)($MAC)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ ) { # IPv4 only
+                                while ( $remainder && $remainder =~ /^([0-9a-zA-Z\.\,\-\_:\*]*)($MAC)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ ) { # IPv4 only
                                     $remainder = $1 . $4;
                                     if (defined ($2)) {
                                         $valtemp{"mac"} = ($valtemp{"mac"} eq "" ? $2 : $2 . "," . $valtemp{"mac"});
@@ -3767,8 +3779,8 @@ sub parse_config_file {
                                     last if ($current++ >= $max_iterations);
                                 }
                             }
-                            if ($remainder =~ /^([0-9a-zA-Z\.\,\-\_:\*]*)($CLIENTID_NAME)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ && defined ($2)) {
-                                $remainder = $1 . $5;
+                            if ( $remainder && $remainder =~ /^([0-9a-zA-Z\.\,\-\_:\*]*)($CLIENTID_NAME)(,([0-9a-zA-Z\.\,\-\_:\*]*))*$/ && defined ($2)) {
+                                $remainder = $1 . ($5 ? $5 : "");
                                 $valtemp{"clientid"} = $2;
                                 if ($valtemp{"mac"} ne "") {
                                     $valtemp{"ignore-clientid"} = $valtemp{"clientid"};
@@ -3776,24 +3788,24 @@ sub parse_config_file {
                                 }
                             }
                             $valtemp{"ignore"} = 0;
-                            if ($remainder =~ /^(([0-9a-zA-Z\.\,\-\_:\*]*)(,))*(ignore)$/  && defined ($4)) {
+                            if ( $remainder && $remainder =~ /^(([0-9a-zA-Z\.\,\-\_:\*]*)(,))*(ignore)$/  && defined ($4)) {
                                 # ...time (optionally)
                                 $remainder = $2;
                                 $valtemp{"ignore"} = 1;
                             }
                             $valtemp{"ip"} = "";
                             $current = 0;
-                            while ($remainder =~ /^((?:[0-9a-zA-Z\,\-\_:]*)(?:,))*($IPADDR)(,([0-9a-zA-Z\.\,\-\_:]*))*$/ && defined ($2)) {
-                                $remainder = $1 . (defined ($3) && defined ($4) ? "," . $4 : "");
+                            while ($remainder && $remainder =~ /^((?:[0-9a-zA-Z\,\-\_:]*)(?:,))*($IPADDR)(,([0-9a-zA-Z\.\,\-\_:]*))*$/ && defined ($2)) {
+                                $remainder = ($1 ? $1 : "") . ($3 && $4 ? "," . $4 : "");
                                 $valtemp{"ip"} = ($valtemp{"ip"} ? "," : "") . $2;
                                 last if ($current++ >= $max_iterations);
                             }
-                            if ($remainder =~ /^(([0-9a-zA-Z\,\-\_\:]*\,\h*)*)(\[($IPV6ADDR)\])(,\h*[0-9a-zA-Z\.\-\_:]*)*\h*$/ && defined ($3)) { # IPv6
-                                $remainder= $1 . (defined ($1) && defined ($5) ? "," . $5 : "");
+                            if ($remainder && $remainder =~ /^(([0-9a-zA-Z\,\-\_\:]*\,\h*)*)(\[($IPV6ADDR)\])(,\h*[0-9a-zA-Z\.\-\_:]*)*\h*$/ && defined ($3)) { # IPv6
+                                $remainder = $1 . (defined ($1) && defined ($5) ? "," . $5 : "");
                                 $valtemp{"ip"} .= ($valtemp{"ip"} ? "," : "") . $3;
                             }
                             $valtemp{"hostname-used"} = 0;
-                            if ($remainder =~ /^([\h\,]*)($NAME)([\h\,]*)$/ ) {
+                            if ($remainder && $remainder =~ /^([\h\,]*)($NAME)([\h\,]*)$/ ) {
                                 # network id...hostname?
                                 $valtemp{"hostname"}=$2;
                                 $valtemp{"hostname-used"} = 1;
@@ -3807,30 +3819,30 @@ sub parse_config_file {
                             $valtemp{"tag"} = ( );
                             $current = 0;
                             # $TAG = "(set|tag):([0-9a-zA-Z\_\.\-]*)";
-                            while ($remainder =~ /^($TAG)((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
+                            while ($remainder && $remainder =~ /^($TAG)((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 my $tag  = $3;
                                 push @{ $valtemp{"tag"} }, $tag;
                                 $remainder = $6;
                                 $remainder =~ s/^\s+|\s+$//g ;
                                 last if ($current++ >= $max_iterations);
                             }
-                            if ($remainder =~ /^(vendor:([a-zA-Z\-\_]*))((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
+                            if ( $remainder && $remainder =~ /^(vendor:([a-zA-Z\-\_]*))((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 $valtemp{"vendor"} = $2;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
-                            if ($remainder =~ /^(encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
+                            if ( $remainder && $remainder =~ /^(encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 $valtemp{"encap"} = $2;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
-                            if ($remainder =~ /^(vi-encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
+                            if ( $remainder && $remainder =~ /^(vi-encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 $valtemp{"vi-encap"} = $2;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
                             # $OPTION = "option6?:([0-9a-zA-Z\-]*)|[0-9]{1,3}";
-                            if ($remainder =~ /^($OPTION)(([\s]*,[\s]*)?([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))$/) {
+                            if ( $remainder && $remainder =~ /^($OPTION)(([\s]*,[\s]*)?([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))$/) {
                                 $valtemp{"option"} = (defined ($2) ? $2 : $1);
                                 my $opt_id = $1;
                                 my $val = $5;
@@ -3847,30 +3859,30 @@ sub parse_config_file {
                             $valtemp{"tag"} = ( );
                             $current = 0;
                             # $TAG = "(set|tag):([0-9a-zA-Z\_\.\-]*)";
-                            while ($remainder =~ /^($TAG)((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
+                            while ( $remainder && $remainder =~ /^($TAG)((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))*$/) {
                                 my $tag  = $3;
                                 push @{ $valtemp{"tag"} }, $tag;
                                 $remainder = $6;
                                 $remainder =~ s/^\s+|\s+$//g ;
                                 last if ($current++ >= $max_iterations);
                             }
-                            if ($remainder =~ /^(vendor:([a-zA-Z\-\_]*))((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
+                            if ( $remainder && $remainder =~ /^(vendor:([a-zA-Z\-\_]*))((,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
                                 $valtemp{"vendor"} = $2;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
-                            if ($remainder =~ /^(encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
+                            if ( $remainder && $remainder =~ /^(encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
                                 $valtemp{"encap"} = $2;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
-                            if ($remainder =~ /^(vi-encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
+                            if ( $remainder && $remainder =~ /^(vi-encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
                                 $valtemp{"vi-encap"} = $2;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
                             # $OPTION = "option6?:([0-9a-zA-Z\-]*)|[0-9]{1,3}";
-                            if ($remainder =~ /^($OPTION)(([\s]*,[\s]*)?([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))$/) {
+                            if ( $remainder && $remainder =~ /^($OPTION)(([\s]*,[\s]*)?([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#\(\)]*))$/) {
                                 $valtemp{"option"} = (defined ($2) ? $2 : $1);
                                 my $opt_id = $1;
                                 my $val = $5;
@@ -3880,11 +3892,11 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-relay") { # =<local address>,<server address>[,<interface]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))$/ ) {
                                 $valtemp{"local"} = $1;
                                 $remainder = $3;
                             }
-                            if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                 $valtemp{"server"} = $1;
                                 if ( defined($3) ) {
                                     $valtemp{"interface"} = $3;
@@ -3892,79 +3904,79 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-vendorclass") { # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
-                            if ( $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 $valtemp{"tag"} = (defined ($4)) ? $4 : $3;
                                 $valtemp{"vendorclass"} = $5;
                             }
                         }
                         when ("dhcp-userclass") { # =set:<tag>,<user-class>
-                            if ( $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 $valtemp{"tag"} = (defined ($4)) ? $4 : $3;
                                 $valtemp{"userclass"} = $5;
                             }
                         }
                         when ("dhcp-mac") { # =set:<tag>,<MAC address>
-                            if ( $remainder =~ /^($TAG)\,($MAC)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG)\,($MAC)$/ ) {
                                 $valtemp{"tag"} = $3;
                                 $valtemp{"mac"} = $4;
                             }
                         }
                         when ("dhcp-circuitid") { # =set:<tag>,<circuit-id>
-                            if ( $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 $valtemp{"tag"} = (defined ($4)) ? $4 : $3;
                                 $valtemp{"circuitid"} = $5;
                             }
                         }
                         when ("dhcp-remoteid") { # =set:<tag>,<remote-id>
-                            if ( $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 $valtemp{"tag"} = (defined ($4)) ? $4 : $3;
                                 $valtemp{"remoteid"} = $5;
                             }
                         }
                         when ("dhcp-subscrid") { # =set:<tag>,<subscriber-id>
-                            if ( $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 $valtemp{"tag"} = (defined ($4)) ? $4 : $3;
                                 $valtemp{"subscriberid"} = $5;
                             }
                         }
                         when ("dhcp-match") { # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
-                            if ( $remainder =~ /^($TAG),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG),(.*)$/ ) {
                                 $valtemp{"tag"} = $3;
                                 $remainder = $4;
                             }
-                            if ($remainder =~ /^(vi-encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
+                            if ( $remainder && $remainder =~ /^(vi-encap:([0-9a-zA-Z\-\_]*))(([\s]*,[\s]*)([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))*$/) {
                                 $valtemp{"vi-encap"} = $2;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
-                            elsif ($remainder =~ /^($OPTION)(([\s]*,[\s]*)?([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))$/) {
+                            elsif ( $remainder && $remainder =~ /^($OPTION)(([\s]*,[\s]*)?([0-9a-zA-Z\,\_\.:;\-\/\\ \'\"\=\[\]\#]*))$/) {
                                 $valtemp{"option"} = (defined ($2) ? $2 : $1);
                                 $valtemp{"ipversion"} = $1 =~ /^option6/ ? 6 : 4;
                                 $remainder = $5;
                                 $remainder =~ s/^\s+|\s+$//g ;
                             }
                             my $dhcpmatchval = '';
-                            if ($remainder =~ /^(\S+)$/) {
+                            if ( $remainder && $remainder =~ /^(\S+)$/) {
                                 $dhcpmatchval = $1;
                                 $dhcpmatchval =~ s/^\s+|\s+$//g ;
                                 $valtemp{"value"} = $dhcpmatchval;
                             }
                         }
                         when ("dhcp-name-match") { # =set:<tag>,<name>[*]
-                            if ( $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG|([0-9a-zA-Z\_\.\-]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 $valtemp{"tag"} = (defined ($4)) ? $4 : $3;
                                 $valtemp{"name"} = $5;
                             }
                         }
                         when ("tag-if") { # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
                             $current = 0;
-                            while ( $remainder =~ /^((set:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            while ( $remainder && $remainder =~ /^((set:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"settag"} }, $3 );
                                 $remainder = $4;
                                 last if ($current++ >= $max_iterations);
                             }
                             $current = 0;
-                            while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            while ( $remainder && $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"iftag"} }, $3 );
                                 $remainder = $4;
                                 last if ($current++ >= $max_iterations);
@@ -3972,7 +3984,7 @@ sub parse_config_file {
                         }
                         when ("dhcp-ignore") { # =tag:<tag>[,tag:<tag>]
                             $current = 0;
-                            while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            while ( $remainder && $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
                                 last if ($current++ >= $max_iterations);
@@ -3980,7 +3992,7 @@ sub parse_config_file {
                         }
                         when ("dhcp-ignore-names") { # [=tag:<tag>[,tag:<tag>]]
                             $current = 0;
-                            while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            while ( $remainder && $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
                                 last if ($current++ >= $max_iterations);
@@ -3988,7 +4000,7 @@ sub parse_config_file {
                         }
                         when ("dhcp-generate-names") { # =tag:<tag>[,tag:<tag>]
                             $current = 0;
-                            while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            while ( $remainder && $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
                                 last if ($current++ >= $max_iterations);
@@ -3996,22 +4008,23 @@ sub parse_config_file {
                         }
                         when ("dhcp-broadcast") { # [=tag:<tag>[,tag:<tag>]]
                             $current = 0;
-                            while ( $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
+                            while ( $remainder && $remainder =~ /^((tag:)([0-9a-zA-Z\_\.\-!]*))\,([0-9a-zA-Z\,\.\-\:]*)$/ ) {
                                 push( @{ $valtemp{"tag"} }, $3 );
                                 $remainder = $4;
                                 last if ($current++ >= $max_iterations);
                             }
                         }
                         when ("dhcp-boot") { # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
-                            if ( $remainder =~ /^($TAG),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG),(.*)$/ ) {
                                 $valtemp{"tag"} = $3;
                                 $remainder = $4;
                             }
-                            if ( $remainder =~ /^([0-9a-zA-Z\.\-\_\/]+)\,(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^([0-9a-zA-Z\.\-\_\/]+)\,(.*)$/ ) {
                                 $valtemp{"filename"} = $1;
+                                push ( @{ $dnsmconfig_ref->{"scripts"} }, $valtemp{"filename"}) if ($temp{"used"} && ! grep { $valtemp{"filename"} } ( @{ $dnsmconfig_ref->{"scripts"} } ));
                                 $remainder = $2;
                             }
-                            if ( $remainder =~ /^($NAME)\,(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($NAME)\,(.*)$/ ) {
                                 $valtemp{"host"} = $1;
                                 $valtemp{"address"} = $2;
                             }
@@ -4021,20 +4034,23 @@ sub parse_config_file {
                             }
                         }
                         when ("pxe-service") { # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
-                            if ( $remainder =~ /^($TAG),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG),(.*)$/ ) {
                                 $valtemp{"tag"} = $3;
                                 $remainder = $4;
                             }
-                            if ( $remainder =~ /^([0-9a-zA-Z\_\-]*),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^([0-9a-zA-Z\_\-]*),(.*)$/ ) {
                                 $valtemp{"csa"} = $1;
                                 $remainder = $2;
                             }
-                            if ( $remainder =~ /^(.*),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"menutext"} = $1;
                                 $remainder = $2;
-                                if ( $remainder =~ /^(.*),(.*)$/ ) {
+                                if ( $remainder && $remainder =~ /^(.*),(.*)$/ ) {
                                     $valtemp{"basename"} = $1;
                                     $valtemp{"server"} = $2;
+                                    if ($valtemp{"basename"} =! /^[0-9]*$/ && $temp{"used"} && ! grep { $valtemp{"basename"} } ( @{ $dnsmconfig_ref->{"scripts"} } )) {
+                                        push ( @{ $dnsmconfig_ref->{"scripts"} }, $valtemp{"basename"});
+                                    }
                                 }
                                 else {
                                     $valtemp{"basename"} = $remainder;
@@ -4045,11 +4061,11 @@ sub parse_config_file {
                             }
                         }
                         when ("pxe-prompt") { # =[tag:<tag>,]<prompt>[,<timeout>]
-                            if ( $remainder =~ /^($TAG),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG),(.*)$/ ) {
                                 $valtemp{"tag"} = $3;
                                 $remainder = $4;
                             }
-                            if ( $remainder =~ /^(.*)\,([0-9]{1,9})$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)\,([0-9]{1,9})$/ ) {
                                 $valtemp{"prompt"} = $1;
                                 $valtemp{"timeout"} = $2;
                             }
@@ -4058,7 +4074,7 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-alternate-port") { # [=<server port>[,<client port>]]
-                            if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                 $valtemp{"serverport"} = $1;
                                 if ( defined ($3) ) {
                                     $valtemp{"clientport"} = $3;
@@ -4066,17 +4082,17 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-duid") { # =<enterprise-id>,<uid>
-                            if ( $remainder =~ /^(.*),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"enterpriseid"} = $1;
                                 $valtemp{"uid"} = $2;
                             }
                         }
                         when ("bridge-interface") { # =<interface>,<alias>[,<alias>]
-                            if ( $remainder =~ /^(.*),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"interface"} = $1;
                                 $remainder = $2;
                                 $current = 0;
-                                while ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                                while ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                     push( @{ $valtemp{"alias"} }, $1 );
                                     $remainder = $3;
                                     last if ($current++ >= $max_iterations);
@@ -4084,28 +4100,28 @@ sub parse_config_file {
                             }
                         }
                         when ("shared-network") { # =<interface|addr>,<addr>
-                            if ( $remainder =~ /^(.*),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"interface"} = $1;
                                 $valtemp{"addr"} = $2;
                             }
                         }
                         when ("domain") { # =<domain>[,<address range>[,local]]
-                            if ( $remainder =~ /^($NAME|\#)\,([0-9a-zA-Z\,\.\/]*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($NAME|\#)\,([0-9a-zA-Z\,\.\/]*)$/ ) {
                                 $valtemp{"domain"} = $1;
                                 $remainder = $2;
                                 $valtemp{"range"} = '';
                                 $valtemp{"local"} = 0;
-                                if ( $remainder =~ /^([0-9\.]*)\,([0-9\.]*)([0-9a-z\,\.\/]*)*$/ ) {
+                                if ( $remainder && $remainder =~ /^([0-9\.]*)\,([0-9\.]*)([0-9a-z\,\.\/]*)*$/ ) {
                                     # range = <ip address>,<ip address>
                                     $valtemp{"range"} = $1 . ',' . $2;
-                                    if ( $remainder =~ /,\s*local$/ ) {
+                                    if ( $remainder && $remainder =~ /,\s*local$/ ) {
                                         $valtemp{"local"} = 1;
                                     }
                                 }
-                                elsif ( $remainder =~ /^(([0-9\,\.\/]*)\/(8|16|24))([0-9a-z\,\.\/]*)*$/ ) {
+                                elsif ( $remainder && $remainder =~ /^(([0-9\,\.\/]*)\/(8|16|24))([0-9a-z\,\.\/]*)*$/ ) {
                                     # range = <ip address>/<netmask>
                                     $valtemp{"range"} = $1;
-                                    if ( $remainder =~ /,\s*local$/ ) {
+                                    if ( $remainder && $remainder =~ /,\s*local$/ ) {
                                         $valtemp{"local"} = 1;
                                     }
                                 }
@@ -4118,18 +4134,18 @@ sub parse_config_file {
                             }
                         }
                         when ("ra-param") { # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
-                            if ( $remainder =~ /^(.*)\,(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*)\,(.*)$/ ) {
                                 $valtemp{"interface"} = $1;
                                 $remainder = $2;
-                                if ( $remainder =~ /^((?:mtu:)(.*))((?:,)(.*))$/ ) {
+                                if ( $remainder && $remainder =~ /^((?:mtu:)(.*))((?:,)(.*))$/ ) {
                                     $valtemp{"mtu"} = $2;
                                     $remainder = $4;
                                 }
-                                if ( $remainder =~ /^(high|low)((?:,)(.*))$/ ) {
+                                if ( $remainder && $remainder =~ /^(high|low)((?:,)(.*))$/ ) {
                                     $valtemp{"priority"} = $1;
                                     $remainder = $3;
                                 }
-                                if ( $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
+                                if ( $remainder && $remainder =~ /^(.*)((?:,)(.*))*$/ ) {
                                     $valtemp{"interval"} = $1;
                                     $valtemp{"lifetime"} = $3;
                                 }
@@ -4139,14 +4155,14 @@ sub parse_config_file {
                             }
                         }
                         when ("dhcp-reply-delay") { # =[tag:<tag>,]<integer>
-                            if ( $remainder =~ /^($TAG),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^($TAG),(.*)$/ ) {
                                 $valtemp{"tag"} = $3;
                                 $remainder = $4;
                             }
                             $valtemp{"delay"} = $remainder;
                         }
                         when ("tftp-root") { # =<directory>[,<interface>]
-                            if ( $remainder =~ /^(.*),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"directory"} = $1;
                                 $valtemp{"interface"} = $2;
                             }
@@ -4155,7 +4171,7 @@ sub parse_config_file {
                             }
                         }
                         when ("tftp-port-range") { # =<start>,<end>
-                            if ( $remainder =~ /^(.*),(.*)$/ ) {
+                            if ( $remainder && $remainder =~ /^(.*),(.*)$/ ) {
                                 $valtemp{"start"} = $1;
                                 $valtemp{"end"} = $2;
                             }
@@ -4183,16 +4199,16 @@ sub parse_config_file {
                             # conf-dir=/etc/dnsmasq.d/,*.conf
                             my $filter = "";
                             my $exceptions = "";
-                            if ( $remainder =~ /^([a-zA-Z0-9\_\.\/]*)\,([a-zA-Z0-9\.*]*)/ ) {
+                            if ( $remainder && $remainder =~ /^([a-zA-Z0-9\_\.\/]*)\,([a-zA-Z0-9\.*]*)/ ) {
                                 $valtemp{"dirname"}=$1;
                                 $remainder = $2;
                                 $valtemp{"filter"} = "";
                                 $valtemp{"exceptions"} = "";
-                                if ( $remainder =~ /^\*\.([a-zA-Z0-9\.]*)$/ ) { # Include all files in a directory which end in .*
+                                if ( $remainder && $remainder =~ /^\*\.([a-zA-Z0-9\.]*)$/ ) { # Include all files in a directory which end in .*
                                     $filter = ".$1";
                                     $valtemp{"filter"} = "*$filter";
                                 }
-                                elsif ( $remainder =~ /^[\.]([a-zA-Z0-9\.]*)$/ ) { # Include all the files in a directory except those ending in .*
+                                elsif ( $remainder && $remainder =~ /^[\.]([a-zA-Z0-9\.]*)$/ ) { # Include all the files in a directory except those ending in .*
                                     $exceptions = ".$1";
                                     $valtemp{"exceptions"} = $exceptions;
                                 }
@@ -4249,13 +4265,13 @@ sub parse_config_file {
                 }
                 if ($temp{"used"}) {
                     foreach my $param ( @{$fdef->{"param_order"}} ) {
-                        my $pdef = $fdef->{"$param"};
+                        my $pdef = \%{ $fdef->{"$param"} };
                         my $val = ($param eq "val" ? $temp{"val"} : $temp{"val"}{$param});
-                        if ($pdef->{"required"} == 1 && (!$val)) {
+                        if (defined($pdef->{"required"}) && $pdef->{"required"} == 1 && (!$val)) {
                             $dnsmconfig_ref->{"errors"}++;
                             push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_valreq"}, $configfield, $param, $temp{"idx"}));
                         }
-                        elsif ($val ne "") {
+                        elsif (defined($val) && $val ne "") {
                             # file, path, dir, user, group, int, string, interface, ip, time
                             given ($pdef->{"valtype"}) {
                                 when ("int") {
@@ -4331,6 +4347,14 @@ sub parse_config_file {
                     # push( @{ $dnsmconfig_ref->{"set_tags"} }, $set_tag );
                 }
             }
+        }
+    }
+    if ($access{"edit_hosts"}) {
+        if (! grep(/^\/etc\/hosts/, @{ $dnsmconfig_ref->{"configfiles"} } )) {
+            push( @{ $dnsmconfig_ref->{"configfiles"} }, "/etc/hosts" );
+        }
+        foreach my $addn_hosts ( @{ $dnsmconfig_ref->{"addn-hosts"} }) {
+            push( @{ $dnsmconfig_ref->{"configfiles"} }, $addn_hosts->{"val"} ) if ($addn_hosts->{"used"} && ! grep(/^$addn_hosts->{"val"}/, @{ $dnsmconfig_ref->{"configfiles"} } ));
         }
     }
 } #end of sub parse_config_file

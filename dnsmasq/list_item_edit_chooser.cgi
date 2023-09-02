@@ -16,10 +16,6 @@
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
 require 'dnsmasq-lib.pl';
-# BEGIN { push(@INC, ".."); };
-# use WebminCore;
-# init_config();
-# our %access = &get_module_acl();
 
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
