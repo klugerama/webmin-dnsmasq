@@ -40,10 +40,12 @@ dump_logs_err=Failed to dump DNSmasq logs
 dump_logs_ecannot=You are not allowed to dump DNSmasq logs
 
 view_logs_ecannot=You are not allowed to view DNSmasq logs
+
 view_header=Last $1 lines of $2
 view_empty=Log file is empty
 view_refresh=Refresh
 view_filter=Only show lines with text $1
+view_no_files=There are no files to view or edit.
 
 column_option=Option
 column_value=Value

@@ -75,11 +75,11 @@ my $tab = $in{"tab"} || "basic";
 print ui_tabs_start(\@tabs, 'tab', $tab);
 
 print ui_tabs_start_tab('tab', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "tab=basic", $text{"index_dns_alias"} );
+&show_basic_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "?tab=basic", $text{"index_dns_alias"} );
 print ui_tabs_end_tab('tab', 'basic');
 
 print ui_tabs_start_tab('tab', 'other');
-&show_other_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "tab=other", $text{"index_other"} );
+&show_other_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "?tab=other", $text{"index_other"} );
 print ui_tabs_end_tab('tab', 'other');
 
 foreach my $v ( @vals ) {

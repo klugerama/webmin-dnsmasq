@@ -65,6 +65,11 @@ else {
 }
 $file = $files[0] if ($file eq "");
 
+if (!$file) {
+    print $text{"view_no_files"};
+    &ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+    exit;
+}
 print "<script type='text/javascript'>\n";
 if ($line != -1) {
     print "\$(document).ready(function() {\n"
