@@ -268,8 +268,6 @@ sub start_dnsmasq {
 
 # Returns the process ID if DNSMasq is running
 sub is_dnsmasq_running {
-    my $dnsmconfig = &parse_config_file();
-
     # Find all possible PID files
     my @pidfiles;
     my $pidstruct = &find_config("pid-file", $dnsmconfig);

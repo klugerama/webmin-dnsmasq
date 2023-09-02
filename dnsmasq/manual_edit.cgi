@@ -17,8 +17,6 @@
 
 require 'dnsmasq-lib.pl';
 
-my %access=&get_module_acl();
-
 ## put in ACL checks here if needed
 
 my $config_filename = $config{config_file};
@@ -30,51 +28,79 @@ my $config_file = &read_file_lines( $config_filename );
 
 # $access{'types'} eq '*' && $access{'virts'} eq '*' ||
 # 	&error($text{'manual_ecannot'});
-# &ui_print_header(undef, $text{'index_dns_manual_edit'}, "");
+# &ui_print_header(undef, $text{'index_dns_config_edit'}, "");
 
 # check for errors in read config
-my $error_message = "<div>";
+my $ch = defined($in{"ch"}) ? $in{"ch"} : -1;
 my $line = defined($in{"line"}) ? $in{"line"} : -1;
 my $file = $in{"file"};
-@files = @{ $dnsmconfig{"configfiles"} };
-$file = $files[0] if ($file eq "");
-if( $dnsmconfig{"error"}) {
-    $error_message .= "<h2>" . @{$dnsmconfig{"error"}} . " errors found in configuration</h2><br/><br/>";
-    foreach my $e ( @{$dnsmconfig{"error"}} ) {
-        # $error_message .= "File: " . $e->{"file"} . " line: " . $e->{"line"} . "<br/>";
-        if ($line == -1) {
-            $line = $e->{"line"};
-            $file = $e->{"file"};
+my $type = $in{"type"} || "config";
+my @files = ();
+if ($type eq "config") {
+    push( @files, @{ $dnsmconfig{"configfiles"} } );
+    my $error_message = "<div>";
+    if( $dnsmconfig{"error"}) {
+        $error_message .= "<h2>" . @{$dnsmconfig{"error"}} . " errors found in configuration</h2><br/><br/>";
+        foreach my $e ( @{$dnsmconfig{"error"}} ) {
+            # $error_message .= "File: " . $e->{"file"} . " line: " . $e->{"line"} . "<br/>";
+            if ($line == -1) {
+                $line = $e->{"line"};
+                $file = $e->{"file"};
+            }
         }
     }
-}
-elsif ( $dnsmconfig{"errors"} > 0) {
-    $error_message .= "<h2>" . $dnsmconfig->{"errors"} . " errors found in configuration</h2><br/><br/>";
-}
-$error_message .= "</div>";
+    elsif ( $dnsmconfig{"errors"} > 0) {
+        $error_message .= "<h2>" . $dnsmconfig->{"errors"} . " errors found in configuration</h2><br/><br/>";
+    }
+    $error_message .= "</div>";
+    &ui_print_header($text{"index_dns_config_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+    print &header_style();
 
-&ui_print_header($text{"index_dns_manual_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_style();
+    print $error_message;
+}
+else {
+    push( @files, @{ $dnsmconfig{"scripts"} });
+    &ui_print_header($text{"index_dns_scripts_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+    print &header_style();
+}
+$file = $files[0] if ($file eq "");
 
-print $error_message;
+print "<script type='text/javascript'>\n";
 if ($line != -1) {
-    print "<script type='text/javascript'>\n"
-        . "\$(document).ready(function() {\n"
+    print "\$(document).ready(function() {\n"
         . "  setTimeout(function() {\n"
         . "    for (var i in window) {\n"
-        . "      if (i.startsWith(\"__cm_editor_\") && typeof window[i] == \"object\") {\n"
-        . "        window[i].doc.setSelection({line: " . ($line - 1) . ", ch:0},{line: " . $line . ", ch:0});\n"
-        . "      }\n"
+        . "      if (i.startsWith(\"__cm_editor_\") && typeof window[i] == \"object\") {\n";
+    if ($ch != -1) {
+        print "        window[i].doc.setCursor({line: " . ($line - 1) . ", ch:" . ($ch - 1) . "});\n";
+    }
+    else {
+        print "        window[i].doc.setSelection({line: " . ($line - 1) . ", ch:0},{line: " . $line . ", ch:0});\n";
+    }
+    print "      }\n"
         . "    }\n"
         . "  }, 5);\n"
         . "});\n"
-        . "</script>\n";
 }
+print "\n"
+    . "function getPosition() {\n"
+    . "  var line; var ch;\n"
+    . "  for (var i in window) {\n"
+    . "    if (i.startsWith(\"__cm_editor_\") && typeof window[i] == \"object\") {\n"
+    . "      ({line,ch} = window[i].doc.getCursor());\n"
+    . "      break;\n"
+    . "    }\n"
+    . "  }\n"
+    . "  \$('input[name=line]').attr('value', line + 1);\n"
+    . "  \$('input[name=ch]').attr('value', ch + 1);\n"
+    . "}\n"
+    . "</script>\n";
 
-my $returnto = $in{"returnto"} || "manual_edit.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_manual_edit"};
+my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type;
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_config_edit"};
 
-print "<form action=manual_edit.cgi>\n";
+print "<form action=\"manual_edit.cgi\">\n";
+print "<input type=hidden name=\"type\" value=\"$type\">\n";
 print "<input type=submit value='$text{'manual_file'}'>\n";
 print "<select name=file>\n";
 foreach $f (@files) {
@@ -85,8 +111,11 @@ foreach $f (@files) {
 print "</select></form>\n";
 $found || &error($text{'manual_efile'});
 
-print &ui_form_start("manual_edit_save.cgi", "form-data");
+print &ui_form_start("manual_edit_save.cgi", "form-data", undef, "onsubmit=\"getPosition();\"");
+print &ui_hidden("type", $type),"\n";
 print &ui_hidden("file", $file),"\n";
+print &ui_hidden("line", -1),"\n";
+print &ui_hidden("ch", -1),"\n";
 
 $data = &read_file_lines($file, 1);
 $data = join("\n", @{$data});

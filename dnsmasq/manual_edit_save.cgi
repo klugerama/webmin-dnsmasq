@@ -17,8 +17,6 @@
 
 require 'dnsmasq-lib.pl';
 
-my %access=&get_module_acl();
-
 ## put in ACL checks here if needed
 
 my $config_filename = $config{config_file};
@@ -28,13 +26,21 @@ my $config_file = &read_file_lines( $config_filename );
 
 &ReadParseMime();
 
-my $returnto = $in{"returnto"} || "manual_edit.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_manual_edit"};
+my $type = $in{"type"} || "config";
+my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type . "&file=" . $in{'file'} . "&line=" . $in{'line'} . "&ch=" . $in{'ch'};
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_config_edit"};
 # $access{'types'} eq '*' && $access{'virts'} eq '*' ||
 # 	&error($text{'manual_ecannot'});
 
-@files = @{ $dnsmconfig{"configfiles"} };
-&indexof($in{'file'}, @files) >= 0 || &error($text{'manual_efile'});
+my @files = ();
+if ($type eq "config") {
+    push( @files, @{ $dnsmconfig{"configfiles"} } );
+    &indexof($in{'file'}, @files) >= 0 || &error($text{'manual_econffile'});
+}
+else {
+    push( @files, @{ $dnsmconfig{"scripts"} });
+    &indexof($in{'file'}, @files) >= 0 || &error($text{'manual_escriptfile'});
+}
 
 $temp = &transname();
 &execute_command("cp ".quotemeta($in{'file'})." $temp");
@@ -44,13 +50,13 @@ $in{'data'} =~ s/\r//g;
 &print_tempfile(FILE, $in{'data'});
 &close_tempfile(FILE);
 &unlock_file($in{'file'});
-if ($config{'test_manual'}) {
+if ($config{'test_config'}) {
 	$err = &test_config();
 	if ($err) {
 		&execute_command("mv $temp '$in{'file'}'");
 		&error(&text('manual_etest', "<pre>$err</pre>"));
-		}
-	}
+    }
+}
 unlink($temp);
 &webmin_log("manual", undef, undef, { 'file' => $in{'file'} });
 #

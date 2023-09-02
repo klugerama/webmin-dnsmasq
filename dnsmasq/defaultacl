@@ -4,3 +4,5 @@ restart=1
 reload=1
 dump_logs=1
 view_logs=1
+edit_hosts=1
+edit_scripts=1
