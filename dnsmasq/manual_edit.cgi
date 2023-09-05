@@ -26,23 +26,20 @@ my $config_file = &read_file_lines( $config_filename );
 
 &ReadParse();
 
-# $access{'types'} eq '*' && $access{'virts'} eq '*' ||
-# 	&error($text{'manual_ecannot'});
-# &ui_print_header(undef, $text{'index_dns_config_edit'}, "");
 
-# check for errors in read config
+my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type;
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_config_edit"};
 my $ch = defined($in{"ch"}) ? $in{"ch"} : -1;
 my $line = defined($in{"line"}) ? $in{"line"} : -1;
 my $file = $in{"file"};
 my $type = $in{"type"} || "config";
 my @files = ();
 if ($type eq "config") {
-    push( @files, @{ $dnsmconfig{"configfiles"} } );
+    # check for errors in read config
     my $error_message = "<div>";
     if( $dnsmconfig{"error"}) {
         $error_message .= "<h2>" . @{$dnsmconfig{"error"}} . " errors found in configuration</h2><br/><br/>";
         foreach my $e ( @{$dnsmconfig{"error"}} ) {
-            # $error_message .= "File: " . $e->{"file"} . " line: " . $e->{"line"} . "<br/>";
             if ($line == -1) {
                 $line = $e->{"line"};
                 $file = $e->{"file"};
@@ -57,11 +54,13 @@ if ($type eq "config") {
     print &header_style();
 
     print $error_message;
+    push( @files, @{ $dnsmconfig{"configfiles"} } );
 }
-else {
-    push( @files, @{ $dnsmconfig{"scripts"} });
+elsif ($type eq "script") {
     &ui_print_header($text{"index_dns_scripts_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
     print &header_style();
+    $access{'edit_scripts'} || &error($text{'edit_scripts_ecannot'});
+    push( @files, @{ $dnsmconfig{"scripts"} });
 }
 $file = $files[0] if ($file eq "");
 
@@ -87,8 +86,7 @@ if ($line != -1) {
         . "  }, 5);\n"
         . "});\n"
 }
-print "\n"
-    . "function getPosition() {\n"
+print "function getPosition() {\n"
     . "  var line; var ch;\n"
     . "  for (var i in window) {\n"
     . "    if (i.startsWith(\"__cm_editor_\") && typeof window[i] == \"object\") {\n"
@@ -98,11 +96,8 @@ print "\n"
     . "  }\n"
     . "  \$('input[name=line]').attr('value', line + 1);\n"
     . "  \$('input[name=ch]').attr('value', ch + 1);\n"
-    . "}\n"
-    . "</script>\n";
-
-my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type;
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_config_edit"};
+    . "}\n";
+print "</script>\n";
 
 print "<form action=\"manual_edit.cgi\">\n";
 print "<input type=hidden name=\"type\" value=\"$type\">\n";

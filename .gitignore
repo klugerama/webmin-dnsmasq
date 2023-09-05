@@ -9,3 +9,6 @@ build.sh
 .vscode
 dnsmasq.wbm*
 dnsmasq/help/dnsmasq*.txt
+*.rpm
+*.deb
+

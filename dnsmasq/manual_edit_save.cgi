@@ -29,8 +29,6 @@ my $config_file = &read_file_lines( $config_filename );
 my $type = $in{"type"} || "config";
 my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type . "&file=" . $in{'file'} . "&line=" . $in{'line'} . "&ch=" . $in{'ch'};
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_config_edit"};
-# $access{'types'} eq '*' && $access{'virts'} eq '*' ||
-# 	&error($text{'manual_ecannot'});
 
 my @files = ();
 if ($type eq "config") {

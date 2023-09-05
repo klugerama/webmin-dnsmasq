@@ -20,6 +20,7 @@ acl_dump_logs=Can dump DNSmasq logs?
 acl_view_logs=Can view DNSmasq logs?
 acl_edit_hosts=Can edit /etc/hosts and other hosts files?
 acl_edit_scripts=Can edit scripts?
+edit_scripts_ecannot=You are not allowed to edit scripts
 
 stop_err=Failed to stop DNSmasq
 stop_ecannot=You are not allowed to stop DNSmasq
