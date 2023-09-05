@@ -79,7 +79,8 @@ sub show_dns_settings {
             "link" => "manual_edit.cgi?type=script",
             "title" => $text{"index_dns_scripts_edit"},
             "icon" => "manual.gif",
-            "page" => 10
+            "page" => 10,
+            "access" => "edit_scripts"
         },
         {
             "link" => "dnsmasq_control.cgi",
@@ -91,11 +92,13 @@ sub show_dns_settings {
             "link" => "view_log.cgi",
             "title" => $text{"index_dns_view_log"},
             "icon" => "logs.gif",
-            "page" => 12
+            "page" => 12,
+            "access" => "view_logs"
         },
     );
     local $i;
     for ($i = 0; $i < @buttons; $i++ ) {
+        next if ($buttons[$i]->{"access"} && !$access{$buttons[$i]->{"access"}});
         push(@links, $buttons[$i]->{"link"} );
         push(@titles, $buttons[$i]->{"title"} );
         push(@icons, "images/" . ($current_theme ? "theme/" : "") . $buttons[$i]->{"icon"} );
