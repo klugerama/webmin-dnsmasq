@@ -43,6 +43,8 @@ To edit an item in the list, click on any of the values to show an edit dialog.
 
 To enable one or more list item, click the checkbox to the left of the item and click `Enable`. More than one item at a time may be enabled or disabled by checking more than one box.
 
+For most list values, the order is not important. However, for those configuration options for which order is important, an additional column is shown on the right-hand side showing up and down arrows. Click one of these arrows to move the corresponding item up or down, respectively. The items above or below will be reordered appropriately.
+
 ### Manual configuration file editing
 Finally, you may directly edit the configuration file(s) by clicking `Edit config files` under the `DNS settings` tab.
 
