@@ -3104,7 +3104,7 @@ sub parse_config_file {
     my $is_extra_config = $_[3] ? $_[3] : 0;
 
     if ($is_extra_config == 0) { # initialize the config with all known options 
-                                       # (except those that can be specified multiple times)
+                                 # (except those that can be specified multiple times)
         $dnsmconfig_ref->{"configfiles"} = ();
         push ( @{ $dnsmconfig_ref->{"configfiles"} }, $config_filename);
         $dnsmconfig_ref->{"scripts"} = ();
@@ -3243,7 +3243,7 @@ sub parse_config_file {
                             }
                         }
                         when ("ignore-address") { # =<ipaddr>[/prefix]
-                            if ( $remainder && $remainder =~ /^\/($IPADDR(\/[0-9]{1,2})?)$/ ) {
+                            if ( $remainder && $remainder =~ /^($IPADDR(\/[0-9]{1,2})?)$/ ) {
                                 $valtemp{"ip"} = $1;
                             }
                         }
