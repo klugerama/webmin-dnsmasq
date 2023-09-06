@@ -17,6 +17,8 @@
 
 require './dnsmasq-lib.pl';
 
+$access{"view_logs"} || &error($text{"view_logs_ecannot"});
+
 # read config file
 my $config_filename = $config{config_file};
 my $config_file = &read_file_lines( $config_filename );
