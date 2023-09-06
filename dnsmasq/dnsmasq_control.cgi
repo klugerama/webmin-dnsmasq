@@ -27,6 +27,11 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
+my $show_buttons = 1;
+
+if ($in{"manual_check_for_update"} && $in{"manual_check_for_update"} eq "1") {
+    $show_buttons = 0;
+}
 if ($in{"do_cmd"}) {
     my $cmd = $in{"do_cmd"};
     my @req_test_cmds = ( "start", "restart", "reload" );
@@ -75,48 +80,61 @@ if ($error_check_action eq "redirect") {
 print &header_style();
 print $error_check_result;
 
-my $returnto = basename($0);
-my $apply_cgi = basename($0);
+if ($show_buttons == 1) {
+    my $returnto = basename($0);
+    my $apply_cgi = basename($0);
 
-my @actions = ( "start", "stop", "restart", "reload", "dump_logs" );
+    my @actions = ( "start", "stop", "restart", "reload", "dump_logs" );
 
-my %button = ();
-foreach my $action ( @actions ) {
-    %{$button{$action}} = ();
-    $button->{$action}->{"enabled"} = 1;
-    $button->{$action}->{"icon"} = "";
-    $button->{$action}->{"btn_class_extra"} = "";
+    my %button = ();
+    foreach my $action ( @actions ) {
+        %{$button{$action}} = ();
+        $button->{$action}->{"enabled"} = 1;
+        $button->{$action}->{"icon"} = "";
+        $button->{$action}->{"btn_class_extra"} = "";
+    }
+
+    if (&is_dnsmasq_running()) {
+        $button->{"stop"}->{"enabled"} = 0;
+        $button->{"restart"}->{"enabled"} = 0;
+        $button->{"reload"}->{"enabled"} = 0;
+        $button->{"dump_logs"}->{"enabled"} = 0;
+    }
+    else {
+        $button->{"start"}->{"enabled"} = 0;
+    }
+    $button->{"stop"}->{"icon"} = "fa fa-fw fa-stop";
+    $button->{"stop"}->{"btn_class_extra"} = "btn-danger";
+    $button->{"reload"}->{"icon"} = "fa fa-fw fa-refresh";
+    $button->{"reload"}->{"btn_class_extra"} = "";
+    $button->{"dump_logs"}->{"icon"} = "fa fa-fw fa-broom fa-1_25x";
+    $button->{"dump_logs"}->{"btn_class_extra"} = "";
+
+    print &ui_columns_start();
+    foreach my $action ( @actions ) {
+        # my $form = &ui_form_start($action . ".cgi?returnto=" . $returnto, "post");
+        my $form = &ui_form_start(basename($0), "post");
+        $form .= &ui_hidden("do_cmd", $action);
+        $form .= &ui_submit($text{"index_button_" . $action}, $action, $button->{$action}->{"enabled"}, undef, $button->{$action}->{"icon"}, $button->{$action}->{"btn_class_extra"});
+        $form .= &ui_form_end();
+        my @cols = ();
+        push(@cols, $form);
+        push(@cols, $text{$action . "_desc"});
+        print &ui_columns_row( \@cols );
+    }
+    print &ui_columns_end();
 }
 
-if (&is_dnsmasq_running()) {
-    $button->{"stop"}->{"enabled"} = 0;
-    $button->{"restart"}->{"enabled"} = 0;
-    $button->{"reload"}->{"enabled"} = 0;
-    $button->{"dump_logs"}->{"enabled"} = 0;
+if ($config{"check_for_updates"} eq "1" || ($in{"manual_check_for_update"} && $in{"manual_check_for_update"} eq "1") ) {
+    my $latest = &check_for_updated_version();
+    if ($latest && defined($latest->{"html_url"})) {
+        print "<p>" . &text("update_message", "<a href=\"" . $latest->{"html_url"} . "\" target=\"_blank\">" . $text{"click_here"} . "</a>") . "</p>";
+    }
+    else {
+        print "<p>" . &text("current_version_message", &get_current_version()) . "</p>";
+    }
+    print "<p>" . $text{"gh_message"} . "</p>";
 }
-else {
-    $button->{"start"}->{"enabled"} = 0;
-}
-$button->{"stop"}->{"icon"} = "fa fa-fw fa-stop";
-$button->{"stop"}->{"btn_class_extra"} = "btn-danger";
-$button->{"reload"}->{"icon"} = "fa fa-fw fa-refresh";
-$button->{"reload"}->{"btn_class_extra"} = "";
-$button->{"dump_logs"}->{"icon"} = "fa fa-fw fa-broom fa-1_25x";
-$button->{"dump_logs"}->{"btn_class_extra"} = "";
-
-print &ui_columns_start();
-foreach my $action ( @actions ) {
-    # my $form = &ui_form_start($action . ".cgi?returnto=" . $returnto, "post");
-    my $form = &ui_form_start(basename($0), "post");
-    $form .= &ui_hidden("do_cmd", $action);
-    $form .= &ui_submit($text{"index_button_" . $action}, $action, $button->{$action}->{"enabled"}, undef, $button->{$action}->{"icon"}, $button->{$action}->{"btn_class_extra"});
-    $form .= &ui_form_end();
-    my @cols = ();
-    push(@cols, $form);
-    push(@cols, $text{$action . "_desc"});
-    print &ui_columns_row( \@cols );
-}
-print &ui_columns_end();
 
 ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 

@@ -1606,6 +1606,60 @@ sub check_for_file_errors {
     return ($error_check_action, $error_check_result);
 }
 
+sub get_current_version {
+    my (%minfo, $version_str);
+    if (read_file("module.info", \%minfo) && exists($minfo{'version'})) {
+        $version_str = $minfo{'version'};
+    }
+    return $version_str;
+}
+
+sub check_for_updated_version {
+    my $version_str = &get_current_version();
+    return if (!$version_str);
+    my @version = split(/\./, $version_str . ".0.0.0"); # add some fake extras for comparison below
+    my $latest_release = get_GH_response("releases/latest");
+    #-------
+    # TODO this block is only necessary due to having only pre-releases in github; it should be removed
+    # once a release version is published
+    if ( $latest_release && $latest_release->{"message"} eq "Not Found" ) {
+        my $all_releases = get_GH_response("releases");
+        if (ref($all_releases) eq "ARRAY") {
+            my @sorted = sort { $b->{"id"} <=> $a->{"id"} } @{ $all_releases };
+            $latest_release = @sorted[0];
+        }
+    }
+    #-------
+    if ( $latest_release && $latest_release->{"tag_name"}) {
+        my $tag_name = $latest_release->{"tag_name"};
+        if ( $tag_name =~ /^(v)([0-9.]*)(.*)$/ ) {
+            my $latest_version_str = $2;
+            my @latest_version = split(/\./, $latest_version_str . ".0.0.0");
+            my $vidx = 0;
+            foreach my $v ( @version ) {
+                if (defined(@latest_version[$vidx]) && int(@latest_version[$vidx]) > int($v)) {
+                    return $latest_release;
+                }
+                $vidx++;
+            }
+        }
+    }
+}
+
+sub get_GH_response {
+    eval "use HTTP::Request";
+    eval "use LWP::UserAgent";
+    eval "use IO::Socket::SSL qw( SSL_VERIFY_NONE )";
+    eval "use JSON::PP";
+    # my $ua = LWP::UserAgent->new(ssl_opts => { SSL_verify_mode => SSL_VERIFY_NONE });
+    my $ua = LWP::UserAgent->new();
+    my ($target) = @_;
+    my $request = HTTP::Request->new("GET" => "https://api.github.com/repos/klugerama/webmin-dnsmasq/$target");
+    $request->header(Content_Type => 'application/json');
+    my $response = $ua->request($request);
+    return decode_json($response->content);
+}
+
 sub deserialize_string {
     my ($str) = @_;
     my @v = split(/,/, $str);
