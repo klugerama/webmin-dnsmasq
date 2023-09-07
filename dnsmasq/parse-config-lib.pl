@@ -143,10 +143,10 @@ our %dnsmconfigvals = (
     "dhcp-match"                => { "idx" => 111, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
     "dhcp-name-match"           => { "idx" => 112, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<name>[*]
     "tag-if"                    => { "idx" => 113, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
-    "dhcp-ignore"               => { "idx" => 114, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "," }, # =tag:<tag>[,tag:<tag>]
-    "dhcp-ignore-names"         => { "idx" => 115, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => ",", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
-    "dhcp-generate-names"       => { "idx" => 116, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "," }, # =tag:<tag>[,tag:<tag>]
-    "dhcp-broadcast"            => { "idx" => 117, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => ",", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
+    "dhcp-ignore"               => { "idx" => 114, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =tag:<tag>[,tag:<tag>]
+    "dhcp-ignore-names"         => { "idx" => 115, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
+    "dhcp-generate-names"       => { "idx" => 116, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =tag:<tag>[,tag:<tag>]
+    "dhcp-broadcast"            => { "idx" => 117, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
     "dhcp-boot"                 => { "idx" => 118, "valtype" => "var",     "section" => "t_b_p", "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
     "dhcp-sequential-ip"        => { "idx" => 119, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
     "dhcp-ignore-clid"          => { "idx" => 120, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
@@ -2238,7 +2238,7 @@ sub init_configfield_fields {
                 "valtype" => "string",
                 "default" => "",
                 "required" => 1,
-                "label" => $text{"p_label_hwaddr"},
+                "label" => $text{"p_label_val_hwaddr"},
                 "template" => $text{"tmpl_mac"}
             },
         },
@@ -2372,7 +2372,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_set_tags"},
-                "template" => "set:<" . $text{"tmpl_tag"} . ">[,set:<" . $text{"tmpl_tag"} . ">]"
+                "template" => "set:<" . $text{"tmpl_tag"} . ">[,set:<" . $text{"tmpl_tag"} . ">]",
+                "arr" => 1,
+                "sep" => ",",
             },
             "iftag" => {
                 "length" => 10,
@@ -2380,7 +2382,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_tags"},
-                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]",
+                "arr" => 1,
+                "sep" => ",",
             },
         },
         "dhcp_ignore" => {  # =tag:<tag>[,tag:<tag>]
@@ -2391,7 +2395,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_tags"},
-                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]",
+                "arr" => 1,
+                "sep" => ",",
             },
         },
         "dhcp_ignore_names" => {  # [=tag:<tag>[,tag:<tag>]]
@@ -2402,7 +2408,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_tags"},
-                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]",
+                "arr" => 1,
+                "sep" => ",",
             },
         },
         "dhcp_generate_names" => {  # =tag:<tag>[,tag:<tag>]
@@ -2413,7 +2421,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_tags"},
-                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]",
+                "arr" => 1,
+                "sep" => ",",
             },
         },
         "dhcp_broadcast" => {  # [=tag:<tag>[,tag:<tag>]]
@@ -2424,7 +2434,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_tags"},
-                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]"
+                "template" => "tag:<" . $text{"tmpl_tag"} . ">[,tag:<" . $text{"tmpl_tag"} . ">]",
+                "arr" => 1,
+                "sep" => ",",
             },
         },
         "dhcp_boot" => {  # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
