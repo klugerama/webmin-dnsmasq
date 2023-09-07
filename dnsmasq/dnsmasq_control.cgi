@@ -126,15 +126,17 @@ if ($show_buttons == 1) {
 }
 
 if ($config{"check_for_updates"} eq "1" || ($in{"manual_check_for_update"} && $in{"manual_check_for_update"} eq "1") ) {
-    my $latest = &check_for_updated_version();
-    if ($latest && defined($latest->{"html_url"})) {
-        print "<p>" . &text("update_message", "<a href=\"" . $latest->{"html_url"} . "\" target=\"_blank\">" . $text{"click_here"} . "</a>") . "</p>";
+    my $latest;
+    $latest = &check_for_updated_version($in{"manual_check_for_update"});
+    if ($latest) {
+        print "<p>" . &text("update_message", &get_current_version(), "<a href=\"" . $latest . "\" target=\"_blank\">" . $text{"click_here"} . "</a>") . "</p>";
     }
     else {
         print "<p>" . &text("current_version_message", &get_current_version()) . "</p>";
     }
     print "<p>" . $text{"gh_message"} . "</p>";
 }
+print &add_js();
 
 ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
