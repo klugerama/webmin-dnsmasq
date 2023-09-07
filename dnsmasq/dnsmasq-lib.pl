@@ -10,6 +10,7 @@ use URI::Escape;
 use File::Basename;
 use WebminCore;
 init_config();
+# our $module_config_directory;
 our %access = &get_module_acl();
 require 'parse-config-lib.pl';
 
@@ -46,12 +47,38 @@ sub radio_default_or_val {
     return ( \@radio_default_no, \@radioval );
 }
 
+sub config_post_save {
+    my ($newconfig, $oldconfig) = @_;
+    if ($oldconfig->{"check_for_updates"} ne "1" && $newconfig->{"check_for_updates"} eq "1") {
+        &check_for_updated_version(1);
+    }
+    elsif ($oldconfig->{"check_for_updates"} eq "1" && $newconfig->{"check_for_updates"} ne "1") {
+        my %tempconfig;
+        &lock_file("$module_config_directory/config");
+        &read_file("$module_config_directory/config", \%tempconfig);
+        delete($tempconfig{"dnsmasq_latest_url"});
+        &write_file("$module_config_directory/config", \%tempconfig);
+        &unlock_file("$module_config_directory/config");
+    }
+    # if ($oldconfig->{"check_for_updates"} ne $newconfig->{"check_for_updates"}) {
+    #     &check_for_updated_version(1);
+    # }
+}
+
 # Returns HTML for a link to put in the top-right corner of every page
 sub restart_button {
-    return undef if ($config{'restart_pos'} == 2);
+    # return undef if ($config{'restart_pos'} == 2);
+    my $buttons = "";
+    if ($config{"check_for_updates"} eq "1" || $config{"dnsmasq_latest_url"}) {
+        my $latest = &check_for_updated_version(undef, \%config);
+        if ($latest) {
+            # $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='hidden show-update-button'>" . $text{"update_module"} . "</a><br>\n";
+            $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='show-update-button'></a><br>\n";
+        }
+    }
     my $args = "returnto=".&urlize(&this_url());
     if (&is_dnsmasq_running()) {
-        return ($access{'restart'} ?
+        $buttons .= ($access{'restart'} ?
             "<a href='restart.cgi?" . $args . "'>" . $text{"index_button_restart"} . "</a><br>\n" : "").
             ($access{'stop'} ?
             "<a href='stop.cgi?" . $args . "'>" . $text{"index_button_stop"} . "</a>" : "");
@@ -59,10 +86,11 @@ sub restart_button {
         #     "<a href=\"stop.cgi?$args\">$text{"lib_buttsd"}</a>\n";
     }
     else {
-        return $access{'start'} ?
+        $buttons .= $access{'start'} ?
             "<a href='start.cgi?" . $args . "'>" . $text{"index_button_start"} . "</a>" : "";
         # return "<a href=\"start.cgi?$args\">$text{"lib_buttsd1"}</a>\n";
     }
+    return $buttons;
 }
 
 =head2 find_dnsmasq()
@@ -1615,6 +1643,8 @@ sub get_current_version {
 }
 
 sub check_for_updated_version {
+    my ($force_check) = @_;
+    return $config{"dnsmasq_latest_url"} if (!$force_check && $config{"dnsmasq_latest_url"});
     my $version_str = &get_current_version();
     return if (!$version_str);
     my @version = split(/\./, $version_str . ".0.0.0"); # add some fake extras for comparison below
@@ -1630,6 +1660,11 @@ sub check_for_updated_version {
         }
     }
     #-------
+    my $latest;
+    my %tempconfig;
+    &lock_file("$module_config_directory/config");
+    &read_file("$module_config_directory/config", \%tempconfig);
+    delete($tempconfig{"dnsmasq_latest_url"});
     if ( $latest_release && $latest_release->{"tag_name"}) {
         my $tag_name = $latest_release->{"tag_name"};
         if ( $tag_name =~ /^(v)([0-9.]*)(.*)$/ ) {
@@ -1638,12 +1673,16 @@ sub check_for_updated_version {
             my $vidx = 0;
             foreach my $v ( @version ) {
                 if (defined(@latest_version[$vidx]) && int(@latest_version[$vidx]) > int($v)) {
-                    return $latest_release;
+                    $latest = $tempconfig{"dnsmasq_latest_url"} = $latest_release->{"html_url"};
+                    last;
                 }
                 $vidx++;
             }
         }
     }
+    &write_file("$module_config_directory/config", \%tempconfig);
+    &unlock_file("$module_config_directory/config");
+    return $latest;
 }
 
 sub get_GH_response {
@@ -1777,8 +1816,29 @@ sub add_js {
              . "    \$(\".clickable_tr\").each(function(){\$(this).parent().addClass(\"ui_checked_columns\");});\n" # fixes styling for clickable table row checkboxes
              . "    \$(\".clickable_tr_selected\").each(function(){\$(this).removeClass(\"clickable_tr_selected\");\$(this).parent().addClass(\"hl-aw\");});\n" # fixes styling for clickable table row checkboxes
              . "    \$(\"input[dnsmclass=dnsm-type-int]\").each(function(){\$(this).prop(\"type\", \"number\");});\n" # fixes styling for clickable table row checkboxes
-             . "    \$(\"input[dummy_field]\").hide();"
+             . "    \$(\"input[dummy_field]\").hide();\n"
+             . "\n"
              . "  }, 0);\n";
+    $script .= "    \$.each(\$(\".show-update-button\"), function(){\n"
+             . "       var r = '" . $text{"update_module"} . "';\n"
+             . "       \$(this)\n"
+             . "         .data(\"toggle\", \"tooltip\")\n"
+             . "         .data(\"title\", r)\n"
+             . "         .attr(\"data-container\", \"body\")\n"
+             . "         .addClass(vars.h.class.button.tableHeader)\n"
+             . "         .removeClass(\"ui_link\")\n"
+            #  . "         .removeClass(\"hidden\")\n"
+             . "         .append('<i class=\"fa fa-update\"></i><span>' + \"&nbsp;</span>\");\n"
+             . "       \$(this).attr(\"aria-label\", r);\n"
+             . "       \$(this)\n"
+             . "         .contents()\n"
+             . "         .filter(function () {\n"
+             . "             return this.nodeType == 3;\n"
+             . "         })\n"
+             . "         .remove();\n"
+             . "       var l = \$(this);\n"
+             . "       l.tooltip({ container: \"body\", placement: l.is(\":last-child\") ? \"auto right\" : \"auto top\", trigger: \"hover\", delay: { show: vars.plugins.tooltip.delay.show, hide: vars.plugins.tooltip.delay.hide } });\n"
+             . "    });\n";
     $script .= "  if (!\$('#list-item-edit-modal').length) {\n"
              . "    var g='<div class=\"modal fade fade5 in\" id=\"list-item-edit-modal\" tabindex=\"-1\" role=\"dialog\" aria-hidden=\"true\">"
              . "      <div class=\"modal-dialog\">"
