@@ -66,8 +66,8 @@ print ui_tabs_end_tab('tab', 'tftp');
 
 print ui_tabs_end();
 
-# uses the index entry in /lang/en
+print &add_js();
 
-## if subroutines are not in an extra file put them here
+&ui_print_footer();
 
 ### END of index.cgi ###.

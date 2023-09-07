@@ -51,8 +51,9 @@ view_no_files=There are no files to view or edit.
 
 current_version_message=This is the most recent version of this module ($1).
 gh_message=<a href="https://github.com/klugerama/webmin-dnsmasq" target="_blank">Click here</a> to go to the module's project page
-update_message=A newer version of this module is available. $1 to go to the release page.
+update_message=Currently using module version $1. A newer version of this module is available. $2 to go to the release page.
 click_here=Click here
+update_module=Update module
 
 column_option=Option
 column_value=Value
