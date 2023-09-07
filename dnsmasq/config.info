@@ -8,4 +8,4 @@ dnsmasq_reload_files=Command to reload certain DNSmasq files,3,Use DNSmasq or HU
 dnsmasq_dump_log=Command to dump DNSMasq logs,3,Use DNSmasq or USR1 signal
 test_config=Test config file before applying changes?,1,1-Yes,0-No
 check_for_updates=Automatically check for updates from GitHub? (see info in "Service Control"),1,1-Yes,0-No
-check_for_update_manual=<a href="dnsmasq/dnsmasq_control.cgi?manual_check_for_update=1" class="btn btn-success" style="float: left;">Check for update</a>,11
+check_for_update_manual=<a href="dnsmasq/dnsmasq_control.cgi?manual_check_for_update=1" class="btn btn-success" style="float: left;"><i class="fa fa-fw fa-update"></i>&nbsp;Check for update</a>,11
