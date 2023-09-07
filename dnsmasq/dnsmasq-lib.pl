@@ -1203,7 +1203,7 @@ sub show_other_fields {
     my $col_ct = &get_max_columns(\@var_fields) + 2; # it will always have the label and radio buttons
     my @columns_arr = (3..$col_ct);
     for (@columns_arr) {
-        push( @tds, $td_left );
+        push( @tds, $td_label );
     }
     print &ui_columns_start( undef, 100, undef, undef, &ui_columns_header( [ $table_header ], [ 'class="table-title" colspan=' . $col_ct ] ), 0 );
     foreach my $configfield ( @var_fields ) {
