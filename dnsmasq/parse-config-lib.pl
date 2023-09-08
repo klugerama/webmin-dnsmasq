@@ -4312,14 +4312,14 @@ sub parse_config_file {
                                     my @usernames = &get_usernames_list();
                                     if (! grep { /^$val$/ } ( @usernames )) {
                                         $dnsmconfig_ref->{"errors"}++;
-                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_userbad"}, $configfield, $param, $temp{"idx"}));
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_userbad"}, $configfield, $param, $temp{"idx"}, $text{"err_userbad"}));
                                     }
                                 }
                                 when ("group") {
                                     my @groupnames = &get_groupnames_list();
                                     if (! grep { /^$val$/ } ( @groupnames )) {
                                         $dnsmconfig_ref->{"errors"}++;
-                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_groupbad"}, $configfield, $param, $temp{"idx"}));
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_groupbad"}, $configfield, $param, $temp{"idx"}, $text{"err_groupbad"}));
                                     }
                                 }
                                 when ("interface") {
@@ -4332,7 +4332,7 @@ sub parse_config_file {
                                         }
                                         if (! grep { /^$val$/ } ( @iface_names )) {
                                             $dnsmconfig_ref->{"errors"}++;
-                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_ifacebad"}, $configfield, $param, $temp{"idx"}));
+                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_ifacebad"}, $configfield, $param, $temp{"idx"}, $text{"err_ifacebad"}));
                                         }
                                     }
                                 }

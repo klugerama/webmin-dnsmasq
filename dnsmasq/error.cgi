@@ -67,7 +67,7 @@ foreach my $error ( @{$dnsmconfig{"error"}} ) {
     my $internalfield = &config_to_internal($configfield);
     my $fd = $dnsmconfigvals{"$configfield"};
     my $nav = %{%dnsmnav{$fd->{"section"}}}{$fd->{"page"}};
-    $link_target = $nav->{"cgi_name"} . "?forced_edit=1&bad_ifield=$internalfield&line=" . $error->{"line"};
+    $link_target = $nav->{"cgi_name"} . "?forced_edit=1&bad_ifield=$internalfield&line=" . $error->{"line"} . "&custom_error=" . $error->{"custom_error"};
     if ($nav->{"tab"}) {
         $link_target .= "&tab=" . $nav->{"tab"}->{$fd->{"tab"}};
     }

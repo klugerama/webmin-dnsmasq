@@ -423,6 +423,17 @@ sub find_config {
             : wantarray ? () : undef;
 }
 
+=head2 save_update(file, line, val, [action])
+=cut
+sub save_update {
+    my ($file, $line, $val) = @_;
+    my $action = $_[3] ? $_[3] : 0;
+    my $file_arr = &read_file_lines($file);
+    &update($line, $val, \@$file_arr, $action);
+    &flush_file_lines();
+    &update_last_config_change();
+}
+
 =head2 update(lineno, text, file_arr_ref, action)
     update the config file array
         lineno       - the line number (array index) to update; -1 to add
@@ -495,6 +506,7 @@ sub update_selected {
             }
         }
         &flush_file_lines();
+        &update_last_config_change();
     }
 }
 
@@ -539,6 +551,7 @@ sub update_booleans {
             }
         }
         &flush_file_lines();
+        &update_last_config_change();
     }
     return $result;
 }
@@ -582,6 +595,7 @@ sub update_simple_vals {
             }
         }
         &flush_file_lines();
+        &update_last_config_change();
     }
 }
 
@@ -687,10 +701,7 @@ sub add_to_list {
     if (@{$dnsmconfig{$configfield}} > 0) {
         $cfn = $dnsmconfig{$configfield}[0]->{"file"};
     }
-    my $cf = &read_file_lines($cfn);
-    &update(-1, "$configfield=$val", \@$cf, 0);
-    &flush_file_lines();
-
+    &save_update($cfn, -1, "$configfield=$val");
 }
 
 sub send_to_error {
@@ -1617,9 +1628,7 @@ sub check_for_file_errors {
                 my $f = $in{"file_" . $selid};
                 my $l = $in{"line_" . $selid};
                 my $a = $in{"disable_sel"} ? 1 : ($in{"delete_sel"} ? 2 : 0);
-                my $f_arr = &read_file_lines($f);
-                &update($l, undef, \@$f_arr, $a);
-                &flush_file_lines();
+                &save_update($f, $l, undef, $a);
             }
             $error_check_result = $redirect;
             $error_check_action = "redirect";
@@ -1632,7 +1641,10 @@ sub check_for_file_errors {
                 $error_check_result .= "    \$(\"a[dnsm_array_idx='" . $in{"bad_idx"} . "']\").first().trigger(\"click\");\n";
             }
             else {
-                $error_check_result .= "    \$(\"input[name*=" . $in{"bad_ifield"} . "]\").first().closest(\"form\").find(\"button[name=submit]\").trigger(\"click\");\n";
+                if (defined($in{"custom_error"}) && $in{"custom_error"} ne "") {
+                    $error_check_result .= "    showCustomValidationFailure('" . $in{"bad_ifield"} . "', '" . $in{"custom_error"} . "');\n";
+                }
+                $error_check_result .= "    \$(\"input[name*=" . $in{"bad_ifield"} . "]\").first()[0].reportValidity();\n";
             }
             $error_check_result .= "  }, 5);\n"
                     . "});\n"
@@ -1738,6 +1750,7 @@ sub deserialize_string {
 
 sub create_error {
     my ($file, $line, $desc, $configfield, $param, $idx) = @_;
+    my $custom_error = $_[6] ? $_[6] : 0;
     return {
                 "file" => $file,
                 "line" => $line,
@@ -1745,6 +1758,7 @@ sub create_error {
                 "configfield" => $configfield,
                 "param" => $param,
                 "idx" => defined($idx) ? $idx : -1,
+                "custom_error" => $custom_error
            };
 }
 
@@ -1901,6 +1915,12 @@ sub add_js {
              . "    \$( selector ).val(v);"
              . "  });"
              . "  \$(\"#\"+formid).submit();"
+             . "}\n";
+    $script .= "function showCustomValidationFailure(obj_name, msg) {"
+             . "  let i = \$(\"input[name*=\"+obj_name+\"]\").first();\n"
+             . "  let badval = i.val();\n"
+             . "  i[0].setCustomValidity(msg);\n"
+             . "  i[0].addEventListener(\"input\", function(event){ if (i.val()==badval){i[0].setCustomValidity(msg);}else{i[0].setCustomValidity(\"\");}});\n"
              . "}\n";
     $script .= "function replaceWithWrapper(selector, context, property, callback) {\n"
              . "    function findDescriptor(obj, prop){\n"
