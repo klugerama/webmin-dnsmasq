@@ -28,6 +28,7 @@ our $td_right = "style=\"text-align: right; width: auto;\"";
 
 $last_config_change_flag = $module_var_directory."/config-flag";
 $last_restart_time_flag = $module_var_directory."/restart-flag";
+$last_update_check_flag = $module_var_directory."/update-check-flag";
 
 sub radio_default_or_yes {
     my ($def) = @_;
@@ -60,17 +61,14 @@ sub config_post_save {
         &write_file("$module_config_directory/config", \%tempconfig);
         &unlock_file("$module_config_directory/config");
     }
-    # if ($oldconfig->{"check_for_updates"} ne $newconfig->{"check_for_updates"}) {
-    #     &check_for_updated_version(1);
-    # }
 }
 
 # Returns HTML for a link to put in the top-right corner of every page
 sub restart_button {
     # return undef if ($config{'restart_pos'} == 2);
     my $buttons = "";
-    if ($config{"check_for_updates"} eq "1" || $config{"dnsmasq_latest_url"}) {
-        my $latest = &check_for_updated_version(undef, \%config);
+    if (($config{"check_for_updates"} eq "1" && &needs_update_check()) || $config{"dnsmasq_latest_url"}) {
+        my $latest = &check_for_updated_version();
         if ($latest) {
             # $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='hidden show-update-button'>" . $text{"update_module"} . "</a><br>\n";
             $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='show-update-button'></a><br>\n";
@@ -368,6 +366,28 @@ sub needs_config_restart {
     my @cst = stat($last_config_change_flag);
     my @rst = stat($last_restart_time_flag);
     if (@cst && @rst && $cst[9] > $rst[9]) {
+        return 1;
+    }
+    return 0;
+}
+
+=head2 update_last_update_check_time()
+    Updates the flag file indicating when a module update check was performed
+=cut
+sub update_last_update_check_time {
+    &open_tempfile(FLAG, ">$last_update_check_flag", 0, 1);
+    &close_tempfile(FLAG);
+}
+
+=head2 needs_update_check()
+    Returns 1 if a module update check is needed
+=cut
+sub needs_update_check {
+    my @lup = stat($last_update_check_flag);
+    my $epoc = time();
+    my $freq = $config{"update_frequency"} || 1;
+    my $max_diff = 60 * 60 * $freq;
+    if (@lup && $epoc && ($epoc - $lup[9] > $max_diff)) {
         return 1;
     }
     return 0;
@@ -1682,6 +1702,7 @@ sub check_for_updated_version {
     }
     &write_file("$module_config_directory/config", \%tempconfig);
     &unlock_file("$module_config_directory/config");
+    &update_last_update_check_time();
     return $latest;
 }
 
@@ -1827,7 +1848,6 @@ sub add_js {
              . "         .attr(\"data-container\", \"body\")\n"
              . "         .addClass(vars.h.class.button.tableHeader)\n"
              . "         .removeClass(\"ui_link\")\n"
-            #  . "         .removeClass(\"hidden\")\n"
              . "         .append('<i class=\"fa fa-update\"></i><span>' + \"&nbsp;</span>\");\n"
              . "       \$(this).attr(\"aria-label\", r);\n"
              . "       \$(this)\n"

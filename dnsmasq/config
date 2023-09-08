@@ -8,3 +8,4 @@ dnsmasq_reload_files=systemctl reload dnsmasq
 dnsmasq_dump_log=/etc/init.d/dnsmasq dump-stats
 test_config=1
 check_for_updates=1
+update_frequency=24

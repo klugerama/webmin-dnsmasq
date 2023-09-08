@@ -127,7 +127,10 @@ if ($show_buttons == 1) {
 
 if ($config{"check_for_updates"} eq "1" || ($in{"manual_check_for_update"} && $in{"manual_check_for_update"} eq "1") ) {
     my $latest;
-    $latest = &check_for_updated_version($in{"manual_check_for_update"});
+    my $force = ($in{"manual_check_for_update"} && $in{"manual_check_for_update"} eq "1") ? 1 
+                : ($config{"check_for_updates"} eq "1" && &needs_update_check()) ? 1 
+                : 0;
+    $latest = &check_for_updated_version($force);
     if ($latest) {
         print "<p>" . &text("update_message", &get_current_version(), "<a href=\"" . $latest . "\" target=\"_blank\">" . $text{"click_here"} . "</a>") . "</p>";
     }
