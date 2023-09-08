@@ -53,7 +53,6 @@ elsif ($in{"new_server_domain"} ne "" || $in{"new_server_ip"} ne "") {
 }
 elsif ($in{"server_idx"} ne "") {
     my $item = $dnsmconfig{"server"}[$in{"server_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $newval = $item->{"val"}->{"is_local"} ? "local=" : "server=";
     if ($in{"server_domain"} ne "") {
         $newval .= "/" . $in{"server_domain"} . "/";
@@ -64,8 +63,7 @@ elsif ($in{"server_idx"} ne "") {
     if ($in{"server_source"} ne "") {
         $newval .= "," . $in{"server_source"};
     }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $newval);
 }
 elsif ($in{"new_rev_server_domain"} ne "" || $in{"new_rev_server_ip"} ne "") {
     my $newval = "";
@@ -82,7 +80,6 @@ elsif ($in{"new_rev_server_domain"} ne "" || $in{"new_rev_server_ip"} ne "") {
 }
 elsif ($in{"rev_server_idx"} ne "") {
     my $item = $dnsmconfig{"rev-server"}[$in{"rev_server_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $newval = "rev-server=";
     if ($in{"rev_server_domain"} ne "") {
         $newval .= "/" . $in{"rev_server_domain"} . "/";
@@ -93,30 +90,12 @@ elsif ($in{"rev_server_idx"} ne "") {
     if ($in{"rev_server_source"} ne "") {
         $newval .= "," . $in{"rev_server_source"};
     }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $newval);
 }
 else {
-    # my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
-    # if ($action ne "") {
-    #     @sel || &error($text{'selected_none'});
-
-    #     &update_selected("server", $action, \@sel, \%$dnsmconfig);
-    # }
-    # else {
-    #     $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
-    #     if ($action ne "") {
-    #         @sel || &error($text{'selected_none'});
-
-    #         &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
-    #     }
-    # }
     &do_selected_action( [ "server", "rev_server" ], \@sel, \%$dnsmconfig );
 }
 
-#
-# write file!!
-&flush_file_lines();
 #
 # re-load basic page
 &redirect( $returnto );

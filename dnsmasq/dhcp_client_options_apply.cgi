@@ -76,11 +76,9 @@ if ($in{'new_dhcp_option'} ne "") {
 }
 elsif ($in{"dhcp_option_idx"} ne "" && $in{"dhcp_option_option"} ne "") {
     my $item = $dnsmconfig{"dhcp-option"}[$in{"dhcp_option_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
-    my $val = "";
-    my $line = "dhcp-option=";
+    my $val = "dhcp-option=";
     if ($in{"dhcp_option_forced"} == 1) {
-        $line = "dhcp-option-force=";
+        $val = "dhcp-option-force=";
     }
     if ($in{"dhcp_option_tag"} ne "") {
         my $tag = $in{"dhcp_option_tag"};
@@ -114,8 +112,7 @@ elsif ($in{"dhcp_option_idx"} ne "" && $in{"dhcp_option_option"} ne "") {
     if ($in{"dhcp_option_value"} ne "") {
         $val .= "," . $in{"dhcp_option_value"};
     }
-    &update($item->{"line"}, $line . $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

@@ -41,29 +41,22 @@ if ($in{"submit"}) {
 
     if ($in{"auth_server_def"} == 1) {
         my $item = $dnsmconfig{"auth-server"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"auth_server_domain"}) {
         my $item = $dnsmconfig{"auth-server"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "auth-server=" . $in{"auth_server_domain"};
         if ($in{"auth_server_for"}) {
             $val .= "," . $in{"auth_server_for"};
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
     if ($in{"auth_zone_def"} == 1) {
         my $item = $dnsmconfig{"auth-zone"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"auth_zone_domain"}) {
         my $item = $dnsmconfig{"auth-zone"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "auth-zone=" . $in{"auth_zone_domain"};
         if ($in{"auth_zone_include"}) {
             my @auth_zone_include = split(/\0/, $in{'auth_zone_include'});
@@ -77,76 +70,60 @@ if ($in{"submit"}) {
                 $val .= ",exclude:" . $subnet;
             }
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
     if ($in{"auth_soa_def"} == 1) {
         my $item = $dnsmconfig{"auth-soa"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"auth_soa_serial"}) { #"serial", "hostmaster", "refresh", "retry", "expiry"
         my $item = $dnsmconfig{"auth-soa"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "auth-soa=" . $in{"auth_soa_serial"};
         foreach my $p ( "hostmaster", "refresh", "retry", "expiry" ) {
             if ($in{"auth_soa_$p"}) {
                 $val .= "," . $in{"auth_soa_$p"};
             }
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
     if ($in{"auth_sec_servers_def"} == 1) {
         my $item = $dnsmconfig{"auth-sec-servers"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"auth_sec_servers_val"}) { 
         my $item = $dnsmconfig{"auth-sec-servers"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "auth-sec-servers=";
         my @auth_sec_servers = split(/\0/, $in{'auth_sec_servers_val'});
         foreach my $domain (@auth_sec_servers) {
             $val .= "," . $domain;
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
     if ($in{"auth_peer_def"} == 1) {
         my $item = $dnsmconfig{"auth-peer"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"auth_peer_val"}) { 
         my $item = $dnsmconfig{"auth-peer"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "auth-peer=";
         my @auth_peer = split(/\0/, $in{'auth_peer_val'});
         foreach my $ip (@auth_peer) {
             $val .= "," . $ip;
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
 }
 elsif ($in{"auth_server_domain"} ne "") { # =<domain>,[<interface>|<ip-address>...]
     my $item = $dnsmconfig{"auth-server"};
-    my $file_arr = &read_file_lines($item->{"file"});
     my $newval = "auth-server=";
     $newval .= $in{"auth_server_domain"};
     if ($in{"auth_server_for"} ne "") {
         $newval .= "," . $in{"auth_server_for"};
     }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $newval);
 }
 elsif ($in{"auth_zone_domain"} ne "") { # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>]|<interface>.....][,exclude:<subnet>[/<prefix length>]|<interface>].....]
     my $item = $dnsmconfig{"auth-zone"};
-    my $file_arr = &read_file_lines($item->{"file"});
     my $newval = "auth-zone=";
     $newval .= $in{"auth_server_domain"};
     if ($in{"auth_server_include"} ne "") {
@@ -155,12 +132,10 @@ elsif ($in{"auth_zone_domain"} ne "") { # =<domain>[,<subnet>[/<prefix length>][
     if ($in{"auth_server_exclude"} ne "") {
         $newval .= ",exclude:" . $in{"auth_server_exclude"};
     }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $newval);
 }
 elsif ($in{"auth_soa_serial"} ne "") { # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
     my $item = $dnsmconfig{"auth-soa"};
-    my $file_arr = &read_file_lines($item->{"file"});
     my $newval = "auth-soa=";
     $newval .= $in{"auth_server_serial"};
     if ($in{"auth_server_hostmaster"} ne "") {
@@ -175,30 +150,12 @@ elsif ($in{"auth_soa_serial"} ne "") { # =<serial>[,<hostmaster>[,<refresh>[,<re
             }
         }
     }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $newval);
 }
 else {
-    # my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
-    # if ($action ne "") {
-    #     @sel || &error($text{'selected_none'});
-
-    #     &update_selected("server", $action, \@sel, \%$dnsmconfig);
-    # }
-    # else {
-    #     $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
-    #     if ($action ne "") {
-    #         @sel || &error($text{'selected_none'});
-
-    #         &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
-    #     }
-    # }
     &do_selected_action( [ "server", "rev_server" ], \@sel, \%$dnsmconfig );
 }
 
-#
-# write file!!
-&flush_file_lines();
 #
 # re-load basic page
 &redirect( $returnto );

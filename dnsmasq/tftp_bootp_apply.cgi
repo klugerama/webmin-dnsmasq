@@ -85,14 +85,11 @@ if ($in{"submit"}) {
 
     if ($in{"dhcp_boot_def"} == 1) {
         my $item = $dnsmconfig{"dhcp-boot"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"dhcp_boot_filename"}) { # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
         # "tag", "filename", "host", "address"
         my $item = $dnsmconfig{"dhcp-boot"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "dhcp-boot=";
         if ($in{"dhcp_boot_tag"}) {
             $val .= $in{"dhcp_boot_tag"} . ",";
@@ -104,19 +101,15 @@ if ($in{"submit"}) {
                 $val .= "," . $in{"dhcp_boot_address"};
             }
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
     if ($in{"pxe_service_def"} == 1) {
         my $item = $dnsmconfig{"pxe-service"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"pxe_service_csa"}) { # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
         # "tag", "csa", "menutext", "basename", "server"
         my $item = $dnsmconfig{"pxe-service"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "pxe-service=";
         if ($in{"pxe_service_tag"}) {
             $val .= $in{"pxe_service_tag"} . ",";
@@ -128,19 +121,15 @@ if ($in{"submit"}) {
         if ($in{"pxe_service_server"}) {
             $val .= "," . $in{"pxe_service_server"};
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
     if ($in{"pxe_prompt_def"} == 1) {
         my $item = $dnsmconfig{"pxe-prompt"};
-        my $file_arr = &read_file_lines($item->{"file"});
-        &update($item->{"line"}, $val, \@$file_arr, 1);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
     }
     elsif ($in{"pxe_prompt_prompt"}) { # =[tag:<tag>,]<prompt>[,<timeout>]
         # "tag", "prompt", "timeout"
         my $item = $dnsmconfig{"pxe-prompt"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "pxe-prompt=";
         if ($in{"pxe_prompt_tag"}) {
             $val .= $in{"pxe_prompt_tag"} . ",";
@@ -149,8 +138,7 @@ if ($in{"submit"}) {
         if ($in{"pxe_prompt_timeout"}) {
             $val .= "," . $in{"pxe_prompt_timeout"};
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
 }
 elsif ($in{"new_bootp_dynamic_val"} ne "") {
@@ -160,11 +148,9 @@ elsif ($in{"new_bootp_dynamic_val"} ne "") {
 }
 elsif ($in{"bootp_dynamic_idx"} ne "") {
     my $item = $dnsmconfig{"bootp-dynamic"}[$in{"bootp_dynamic_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $newval = "bootp-dynamic=";
     $newval .= $in{"bootp_dynamic_val"};
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $newval);
 }
 else {
     &do_selected_action( [ "bootp_dynamic" ], \@sel, \%$dnsmconfig );

@@ -79,19 +79,14 @@ if ($in{'new_dhcp_host_'} ne "") {
 }
 elsif ($in{"dhcp_host_idx"} ne "") {
     my $item = $dnsmconfig{"dhcp-host"}[$in{"dhcp_host_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "dhcp-host=" . &eval_input_fields();
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});
     &do_selected_action( [ "dhcp_host" ], \@sel, \%$dnsmconfig );
 }
 
-#
-# write file!!
-&flush_file_lines();
 #
 # re-load basic page
 &redirect( $returnto );

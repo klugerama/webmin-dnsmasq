@@ -49,10 +49,8 @@ elsif (@hosts_file_adds) {
 }
 elsif ($in{"addn_hosts"} ne "" && $in{"addn_hosts_idx"} ne "") {
     my $item = $dnsmconfig{"addn-hosts"}[$in{"addn_hosts_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "addn-hosts=" . $in{"addn_hosts"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif (@hostsdir_adds) {
 
@@ -65,10 +63,8 @@ elsif (@hostsdir_adds) {
 }
 elsif ($in{"hostsdir"} ne "" && $in{"hostsdir_idx"} ne "") {
     my $item = $dnsmconfig{"hostsdir"}[$in{"hostsdir_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "hostsdir=" . $in{"hostsdir"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif (@resolv_file_adds) {
 
@@ -81,10 +77,8 @@ elsif (@resolv_file_adds) {
 }
 elsif ($in{"resolv_file"} ne "" && $in{"resolv_file_idx"} ne "") {
     my $item = $dnsmconfig{"resolv-file"}[$in{"resolv_file_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "resolv-file=" . $in{"resolv_file"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 else {
     &do_selected_action( [ "addn_hosts", "hostsdir", "resolv_file" ], \@sel, \%$dnsmconfig );
@@ -93,7 +87,4 @@ else {
 # re-load basic page
 &redirect( $returnto );
 
-# 
-# sub-routines
-#
 ### END of dns_basic_apply.cgi ###.

@@ -31,7 +31,7 @@ my $returnto = $in{"returnto"};
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
 
 my $internalfield = $in{"internalfield"};
-my $selected=$dnsmconfig{$internalfield}[$in{idx}]{"line"};
+my $selected = $dnsmconfig{$internalfield}[$in{idx}]{"line"};
 if( $in{dir} eq "up" ) {
 	$dnsmconfig{$internalfield}[$in{idx}]{"line"}=$dnsmconfig{$internalfield}[$in{idx}-1]{"line"};
 	$dnsmconfig{$internalfield}[$in{idx}-1]{"line"}=$selected;
@@ -41,13 +41,13 @@ else {
 	$dnsmconfig{$internalfield}[$in{idx}+1]{"line"}=$selected;
 }
 foreach my $item (@{$dnsmconfig{$internalfield}}) {
-	$line = $item->{"full"};
-	&update( $item->{"line"}, $line, 
-		$config_file, ($item->{"used"}?0:1) );
+	# $line = $item->{"full"};
+	# &update( $item->{"line"}, $line, $config_file, ($item->{"used"}?0:1) );
+    &save_update($item->{"file"}, $item->{"line"}, $item->{"full"}, ($item->{"used"}?0:1));
 }
-#
-# write file!!
-&flush_file_lines();
+# #
+# # write file!!
+# &flush_file_lines();
 #
 # re-load basic page
 &redirect( $returnto );

@@ -43,7 +43,6 @@ if ($in{"submit"}) {
     if ($in{"rebind_domain_ok_val"}) {
         my @rebind_domain_ok_val = split(/\0/, $in{'rebind_domain_ok_val'});
         my $item = $dnsmconfig{"rebind-domain-ok"};
-        my $file_arr = &read_file_lines($item->{"file"});
         my $val = "rebind-domain-ok=";
         if (@rebind_domain_ok_val == 1) {
             $val .= @rebind_domain_ok_val[0];
@@ -54,8 +53,7 @@ if ($in{"submit"}) {
             }
             $val .= "/";
         }
-        &update($item->{"line"}, $val, \@$file_arr, 0);
-        &flush_file_lines();
+        &save_update($item->{"file"}, $item->{"line"}, $val);
     }
 }
 elsif ($in{'new_alias_from'} ne "") {
@@ -81,36 +79,28 @@ elsif ($in{'new_ignore_address_ip'} ne "") {
 }
 elsif ($in{"alias_idx"} ne "" && $in{"alias_from"} ne "") {
     my $item = $dnsmconfig{"alias"}[$in{"alias_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "alias=" . $in{"alias_from"};
     $val .= "," . $in{"alias_to"};
     if ($in{"alias_netmask"} ne "") {
         $val .= "," . $in{"alias_netmask"};
     }
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif ($in{"bogus_nxdomain_idx"} ne "" && $in{"bogus_nxdomain_ip"} ne "") {
     my $item = $dnsmconfig{"bogus-nxdomain"}[$in{"bogus_nxdomain_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "bogus-nxdomain=" . $in{"bogus_nxdomain_ip"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif ($in{"address_idx"} ne "" && $in{"address_domain"} ne "") {
     my $item = $dnsmconfig{"address"}[$in{"address_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "address=" . "/" . $in{"address_domain"};
     $val .= "/" . $in{"address_ip"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif ($in{"ignore_address_idx"} ne "" && $in{"ignore_address_ip"} ne "") {
     my $item = $dnsmconfig{"ignore-address"}[$in{"ignore_address_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "ignore-address=" . $in{"ignore_address_ip"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 else {
     &do_selected_action( [ "alias", "bogus_nxdomain", "address", "ignore_address" ], \@sel, \%$dnsmconfig );

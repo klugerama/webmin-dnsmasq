@@ -38,10 +38,8 @@ if ($in{"new_dhcp_userclass_userclass"} ne "") {
 }
 elsif ($in{"dhcp_userclass_idx"} ne "") {
     my $item = $dnsmconfig{"dhcp-userclass"}[$in{"dhcp_userclass_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "dhcp-userclass=set:" . $in{"dhcp_userclass_tag"} . "," . $in{"dhcp_userclass_userclass"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif ($in{"new_dhcp_vendorclass_vendorclass"} && $in{"new_dhcp_vendorclass_vendorclass"} ne "") {
     my $newval = "set:" . $in{"new_dhcp_vendorclass_tag"} . "," . $in{"new_dhcp_vendorclass_vendorclass"};
@@ -49,25 +47,13 @@ elsif ($in{"new_dhcp_vendorclass_vendorclass"} && $in{"new_dhcp_vendorclass_vend
 }
 elsif ($in{"dhcp_vendorclass_idx"} ne "") {
     my $item = $dnsmconfig{"dhcp-vendorclass"}[$in{"dhcp_vendorclass_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "dhcp-vendorclass=set:" . $in{"dhcp_vendorclass_tag"} . "," . $in{"dhcp_vendorclass_vendorclass"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});
     @sel || &error($text{'selected_none'});
 
-    # $action = ( $in{"enable_sel_userclass"} ? "enable" : ( $in{"disable_sel_userclass"} ? "disable" : ( $in{"delete_sel_userclass"} ? "delete" : "" ) ) );
-    # if ($action ne "") {
-    #     &update_selected("dhcp-userclass", $action, \@sel, \%$dnsmconfig);
-    # }
-    # else {
-    #     $action = ( $in{"enable_sel_vendorclass"} ? "enable" : ( $in{"disable_sel_vendorclass"} ? "disable" : ( $in{"delete_sel_vendorclass"} ? "delete" : "" ) ) );
-    #     if ($action ne "") {
-    #         &update_selected("dhcp-vendorclass", $action, \@sel, \%$dnsmconfig);
-    #     }
-    # }
     &do_selected_action( [ "dhcp_userclass", "dhcp_vendorclass" ], \@sel, \%$dnsmconfig );
 }
 

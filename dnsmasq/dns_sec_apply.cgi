@@ -39,7 +39,6 @@ if( ($in{resolv_std}) && ($in{resolv_file} !~ /^$FILE$/) ) {
 }
 # adjust everything to what we got
 my $result = "";
-my @sel = split(/\0/, $in{'sel'});
 
 if ($in{"new_server_domain"} ne "" || $in{"new_server_ip"} ne "") {
     my $newval = "";
@@ -56,7 +55,6 @@ if ($in{"new_server_domain"} ne "" || $in{"new_server_ip"} ne "") {
 }
 elsif ($in{"server_idx"} ne "") {
     my $item = $dnsmconfig{"server"}[$in{"server_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $newval = "server=";
     if ($in{"server_domain"} ne "") {
         $newval .= "/" . $in{"server_domain"} . "/";
@@ -67,31 +65,13 @@ elsif ($in{"server_idx"} ne "") {
     if ($in{"server_source"} ne "") {
         $newval .= "," . $in{"server_source"};
     }
-    &update($item->{"line"}, $newval, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $newval);
 }
 else {
-    # my $action = $in{"enable_sel_server"} ? "enable" : $in{"disable_sel_server"} ? "disable" : $in{"delete_sel_server"} ? "delete" : "";
-    # if ($action ne "") {
-    #     @sel || &error($text{'selected_none'});
-
-    #     &update_selected("server", $action, \@sel, \%$dnsmconfig);
-    # }
-    # else {
-    #     $action = $in{"enable_sel_rev_server"} ? "enable" : $in{"disable_sel_rev_server"} ? "disable" : $in{"delete_sel_rev_server"} ? "delete" : "";
-    #     if ($action ne "") {
-    #         @sel || &error($text{'selected_none'});
-
-    #         &update_selected("rev-server", $action, \@sel, \%$dnsmconfig);
-    #     }
-    # }
+    my @sel = split(/\0/, $in{'sel'});
     &do_selected_action( [ "server", "rev_server" ], \@sel, \%$dnsmconfig );
 }
 
-#
-# write file!!
-&flush_file_lines();
-#
 # re-load basic page
 &redirect( $returnto );
 

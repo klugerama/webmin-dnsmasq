@@ -51,10 +51,8 @@ elsif ($in{"new_ipset_domain"} ne "" && $in{"new_ipset_ipset"} ne "" ) {
 }
 elsif ($in{"ipset_idx"} ne "") {
     my $item = $dnsmconfig{"ipset"}[$in{"ipset_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "ipset=/" . $in{"ipset_domain"} . "/" . $in{"ipset_ipset"};
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif ($in{"new_connmark_allowlist_connmark"} ne "" ) {
     my $newval = $in{"new_connmark_allowlist_connmark"};
@@ -68,7 +66,6 @@ elsif ($in{"new_connmark_allowlist_connmark"} ne "" ) {
 }
 elsif ($in{"connmark_allowlist_idx"} ne "") {
     my $item = $dnsmconfig{"connmark_allowlist"}[$in{"connmark_allowlist_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "connmark-allowlist=" . $in{"connmark_allowlist_connmark"};
     if ($in{"connmark_allowlist_mask"}) {
         $val .= "/" . $in{"connmark_allowlist_mask"};
@@ -76,16 +73,12 @@ elsif ($in{"connmark_allowlist_idx"} ne "") {
     if ($in{"connmark_allowlist_pattern"}) {
         $val .= "," . $in{"connmark_allowlist_pattern"};
     }
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 else {
     &do_selected_action( [ "ipset", "connmark_allowlist" ], \@sel, \%$dnsmconfig );
 }
 
-#
-# write file!!
-&flush_file_lines();
 #
 # re-load basic page
 &redirect( $returnto . "?tab=" . $tab );

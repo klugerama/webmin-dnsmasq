@@ -40,7 +40,6 @@ my @conf_dir_adds = split(/\0/, $in{'new_conf_dir'});
 
 if ($in{"conf_dir_idx"} ne "" && ($in{"conf_dir_filter"} ne "" || $in{"conf_dir_exceptions"} ne "")) {
     my $item = $dnsmconfig{"conf_dir"}[$in{"conf_dir_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "conf-dir=" . $in{"conf_dir_dirname"};
     if ($in{"conf_dir_filter"} ne "") {
         $val .= "," . $in{"conf_dir_filter"};
@@ -48,8 +47,7 @@ if ($in{"conf_dir_idx"} ne "" && ($in{"conf_dir_filter"} ne "" || $in{"conf_dir_
     elsif ($in{"conf_dir_exceptions"} ne "") {
         $val .= "," . $in{"conf_dir_exceptions"};
     }
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 elsif (@conf_file_adds) {
     foreach my $conf_file_add (@conf_file_adds) {

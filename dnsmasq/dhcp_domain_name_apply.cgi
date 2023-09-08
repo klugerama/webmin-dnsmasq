@@ -42,7 +42,6 @@ if ($in{'new_domain_domain'} ne "") {
 }
 elsif ($in{"domain_idx"} ne "" && $in{"domain_domain"} ne "") {
     my $item = $dnsmconfig{"domain"}[$in{"domain_idx"}];
-    my $file_arr = &read_file_lines($item->{"file"});
     my $val = "domain=" . $in{"domain_domain"};
     if ($in{"domain_range"} ne "") {
         $val .= "," . $in{"domain_range"};
@@ -50,17 +49,10 @@ elsif ($in{"domain_idx"} ne "" && $in{"domain_domain"} ne "") {
             $val .= ",local";
         }
     }
-    &update($item->{"line"}, $val, \@$file_arr, 0);
-    &flush_file_lines();
+    &save_update($item->{"file"}, $item->{"line"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});
-    # my $action = $in{"enable_sel_domain"} ? "enable" : $in{"disable_sel_domain"} ? "disable" : $in{"delete_sel_domain"} ? "delete" : "";
-    # if ($action ne "") {
-    #     @sel || &error($text{'selected_none'});
-
-    #     &update_selected("domain", $action, \@sel, \%$dnsmconfig);
-    # }
     &do_selected_action( [ "domain" ], \@sel, \%$dnsmconfig );
 }
 
