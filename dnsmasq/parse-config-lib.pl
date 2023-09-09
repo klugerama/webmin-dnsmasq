@@ -359,6 +359,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "path",
+                "req_perms" => "read",
+                "must_exist" => 1,
                 "default" => "",
                 "template" => "<" . $text{"tmpl_path_to_file_or_directory"} . ">"
             }
@@ -368,6 +370,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "path",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -510,6 +514,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "file",
+                "req_perms" => "readwrite",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -1665,6 +1670,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "file",
+                "req_perms" => "readwrite",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -1996,6 +2002,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "path",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2007,6 +2015,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "path",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2018,6 +2028,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "path",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_dirname"},
@@ -2029,6 +2041,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "path",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_dirname"},
@@ -2675,6 +2689,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "file",
+                "req_perms" => "readwrite",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2705,6 +2720,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "file",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2717,6 +2734,8 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "file",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -3036,6 +3055,8 @@ sub init_configfield_fields {
             "filename" => {
                 "length" => 40,
                 "valtype" => "file",
+                "req_perms" => "read",
+                "must_exist" => 1,
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -3047,6 +3068,8 @@ sub init_configfield_fields {
             "dirname" => {
                 "length" => 40,
                 "valtype" => "dir",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_dirname"},
@@ -3074,6 +3097,8 @@ sub init_configfield_fields {
             "filename" => {
                 "length" => 40,
                 "valtype" => "file",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -4303,10 +4328,81 @@ sub parse_config_file {
                                     }
                                 }
                                 when ("file") {
+                                    if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
+                                        if (! -f $val) {
+                                            $dnsmconfig_ref->{"errors"}++;
+                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_filebad_exist"}, $configfield, $param, $temp{"idx"}));
+                                        }
+                                    }
+                                    else {
+                                        # if ($dnsmconf_ref->{"user"}->{"used"} == 1
+                                        #     || $dnsmconf_ref->{"group"}->{"used"} == 1) {
+                                        #     my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : getlogin || getpwuid($<);
+                                        #     my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
+                                        #     my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x $val ] && printf x; echo");
+                                        # }
+                                        if ($dnsmconf_ref->{"user"}->{"used"} != 1
+                                            && $dnsmconf_ref->{"group"}->{"used"} != 1 
+                                            && defined($pdef->{"req_perms"})) {
+                                            if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
+                                                || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)
+                                                || ($pdef->{"req_perms"} =~ /execute/ && ! -x $val)) {
+                                                $dnsmconfig_ref->{"errors"}++;
+                                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_filebad_perms_", $pdef->{"req_perms"}), $configfield, $param, $temp{"idx"}));
+                                            }
+                                        }
+                                    }
                                 }
                                 when ("path") {
+                                    if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
+                                        if (! -f $val && ! -d $val) {
+                                            $dnsmconfig_ref->{"errors"}++;
+                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_pathbad_exist"}, $configfield, $param, $temp{"idx"}));
+                                        }
+                                    }
+                                    else {
+                                        # if ($dnsmconf_ref->{"user"}->{"used"} == 1
+                                        #     || $dnsmconf_ref->{"group"}->{"used"} == 1) {
+                                        #     my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : getlogin || getpwuid($<);
+                                        #     my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
+                                        #     my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x $val ] && printf x; echo");
+                                        # }
+                                        if ($dnsmconf_ref->{"user"}->{"used"} != 1
+                                            && $dnsmconf_ref->{"group"}->{"used"} != 1 
+                                            && defined($pdef->{"req_perms"})) {
+                                            if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
+                                                || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)
+                                                || ($pdef->{"req_perms"} =~ /execute/ && ! -x $val)) {
+                                                $dnsmconfig_ref->{"errors"}++;
+                                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_pathbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $temp{"idx"}));
+                                            }
+                                        }
+                                    }
                                 }
                                 when ("dir") {
+                                    if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
+                                        if (! -d $val) {
+                                            $dnsmconfig_ref->{"errors"}++;
+                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_dirbad_exist"}, $configfield, $param, $temp{"idx"}));
+                                        }
+                                    }
+                                    else {
+                                        # if ($dnsmconf_ref->{"user"}->{"used"} == 1
+                                        #     || $dnsmconf_ref->{"group"}->{"used"} == 1) {
+                                        #     my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : getlogin || getpwuid($<);
+                                        #     my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
+                                        #     my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x $val ] && printf x; echo");
+                                        # }
+                                        if ($dnsmconf_ref->{"user"}->{"used"} != 1
+                                            && $dnsmconf_ref->{"group"}->{"used"} != 1 
+                                            && defined($pdef->{"req_perms"})) {
+                                            if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
+                                                || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)) {
+                                                $dnsmconfig_ref->{"errors"}++;
+                                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_dirbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $temp{"idx"}));
+                                            }
+                                        }
+                                    }
                                 }
                                 when ("user") {
                                     my @usernames = &get_usernames_list();

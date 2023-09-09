@@ -1687,7 +1687,7 @@ sub check_for_updated_version {
     if ( $latest_release && $latest_release->{"message"} eq "Not Found" ) {
         my $all_releases = get_GH_response("releases");
         if (ref($all_releases) eq "ARRAY") {
-            my @sorted = sort { $b->{"id"} <=> $a->{"id"} } @{ $all_releases };
+            my @sorted = sort { $b->{"published_at"} <=> $a->{"published_at"} } @{ $all_releases };
             $latest_release = @sorted[0];
         }
     }

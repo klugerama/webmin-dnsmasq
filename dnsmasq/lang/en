@@ -50,7 +50,7 @@ view_filter=Only show lines with text $1
 view_no_files=There are no files to view or edit.
 
 current_version_message=This is the most recent version of this module ($1).
-gh_message=<a href="https://github.com/klugerama/webmin-dnsmasq" target="_blank">Click here</a> to go to the module's project page
+gh_message=<a href="https://github.com/klugerama/webmin-dnsmasq" target="_blank">Click here</a> to go to the module project page
 update_message=Currently using module version $1. A newer version of this module is available. $2 to go to the release page.
 click_here=Click here
 update_module=Update module
@@ -84,8 +84,12 @@ err_numhigh=Value is too high
 err_ipbad=Not a valid IP address
 err_netmaskbad=Not a valid netmask
 err_timebad=Not a valid time
-err_filebad=Not a valid file name
-err_pathbad=Not a valid path
+err_filebad_exist=Not a valid file
+err_filebad_perms_=File permissions invalid - needs $1
+err_pathbad_exist=Not a valid path
+err_pathbad_perms_=Path permissions invalid - needs $1
+err_dirbad_exist=Not a valid directory
+err_dirbad_perms_=Directory permissions invalid - needs $1
 err_hostbad=Not a valid host name
 err_ifacebad=Not a valid interface
 err_domainbad=Not a valid domain
