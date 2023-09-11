@@ -3129,7 +3129,7 @@ our $IPADDR = "(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]
 # our $IPV6ADDR = "[0-9a-fA-F\:]*";
 our $IPV6ADDR = "[0-9a-fA-F]{1,4}\:+[0-9a-fA-F\:]*";
 our $MAC = "(?:[0-9a-fA-F]{2})(?:[:-](?:[0-9a-fA-F]{2}|\\*)){5}";
-our $TIME = "[0-9]{1,3}[mh]";
+our $TIME = "[0-9]{1,3}[mhdw]";
 our $FILE = "[0-9a-zA-Z\_\.\/\-]+";
 our $NUMBER="[0-9]+";
 my $TAG = "(set|tag):([!0-9a-zA-Z\_\.\-]*)";
@@ -3710,7 +3710,7 @@ sub parse_config_file {
                                         $remainder = $3;
                                     }
                                 }
-                                if ($remainder && $remainder =~ /^($TIME)/ ) {
+                                if ($remainder && $remainder =~ /^(.*)/ ) {
                                     # ...time (optionally)
                                     $valtemp{"leasetime"} = $1;
                                     $valtemp{"time-used"} = ($1 =~ /^\d/);
@@ -3762,13 +3762,13 @@ sub parse_config_file {
                                     $remainder = $3;
                                     last if ($current++ >= $max_iterations);
                                 }
-                                if ($remainder && $remainder =~ /^([0-9]{1,3})\,[\s]*($TIME)/ ) {
+                                if ($remainder && $remainder =~ /^([0-9]{1,3})\,[\s]*(.*)/ ) {
                                     # ...prefix-length, time (optionally)
                                     $valtemp{"prefix-length"} = $1;
                                     $valtemp{"leasetime"}=$2;
                                     $valtemp{"time-used"}=($2 =~ /^\d/);
                                 }
-                                elsif ($remainder && $remainder =~ /^($TIME)/ ) {
+                                elsif ($remainder && $remainder =~ /^(.*)/ ) {
                                     # ...time (optionally)
                                     $valtemp{"leasetime"}=$1;
                                     $valtemp{"time-used"}=($1 =~ /^\d/);
