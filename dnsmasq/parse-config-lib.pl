@@ -258,6 +258,21 @@ our %dnsmnav = (
                 "3" => "conf_dir",
             }
         },
+        # below entries are never used, but are included for completeness
+        "9" => {
+            "cgi_name" => "manual_edit.cgi",
+            "cgi_params" => "type=config",
+        },
+        "10" => {
+            "cgi_name" => "manual_edit.cgi",
+            "cgi_params" => "type=script",
+        },
+        "11" => {
+            "cgi_name" => "dnsmasq_control.cgi",
+        },
+        "12" => {
+            "cgi_name" => "view_log.cgi",
+        },
     },
     "dhcp" => {
         "1" => {
