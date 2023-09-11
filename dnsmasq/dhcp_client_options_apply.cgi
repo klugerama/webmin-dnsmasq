@@ -33,7 +33,7 @@ my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 # adjust everything to what we got
 
 # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-if ($in{'new_dhcp_option'} ne "") {
+if ($in{'new_dhcp_option_option'} ne "") {
     my $val = "";
     if ($in{"new_dhcp_option_tag"} ne "") {
         my $tag = $in{"new_dhcp_option_tag"};
@@ -63,7 +63,7 @@ if ($in{'new_dhcp_option'} ne "") {
         }
         $val .= (($val) ? "," : "") . $vendor;
     }
-    $val .= $in{"new_dhcp_option_dhcp_option"};
+    $val .= $in{"new_dhcp_option_option"};
     if ($in{"new_dhcp_option_value"} ne "") {
         $val .= "," . $in{"new_dhcp_option_value"};
     }
@@ -76,10 +76,14 @@ if ($in{'new_dhcp_option'} ne "") {
 }
 elsif ($in{"dhcp_option_idx"} ne "" && $in{"dhcp_option_option"} ne "") {
     my $item = $dnsmconfig{"dhcp-option"}[$in{"dhcp_option_idx"}];
-    my $val = "dhcp-option=";
+    # ------
+    # don't change this - we have to check to see if $val is empty later
+    my $val = "";
+    my $line = "dhcp-option=";
     if ($in{"dhcp_option_forced"} == 1) {
-        $val = "dhcp-option-force=";
+        $line = "dhcp-option-force=";
     }
+    # ------
     if ($in{"dhcp_option_tag"} ne "") {
         my $tag = $in{"dhcp_option_tag"};
         if ( $tag !~ /^tag:/ ) {
@@ -112,7 +116,7 @@ elsif ($in{"dhcp_option_idx"} ne "" && $in{"dhcp_option_option"} ne "") {
     if ($in{"dhcp_option_value"} ne "") {
         $val .= "," . $in{"dhcp_option_value"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"line"}, $line . $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});
