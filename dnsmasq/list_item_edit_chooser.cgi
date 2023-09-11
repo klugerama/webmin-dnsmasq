@@ -44,7 +44,7 @@ sub formtable_ip4 {
     my ($fieldname_prefix) = @_;
     
     my $formtable = "";
-    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_4_input_form\" onSubmit=\"event.preventDefault(); save".$internalfield."('".$internalfield."_4_input_form'); event.stopImmediatePropagation(); return false;\"");
+    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_4_input_form\" onSubmit=\"save_".$internalfield."('".$internalfield."_4_input_form');\"");
     $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 4);
     if ($action eq "edit") {
         $item = $dnsmconfig{$configfield}[$idx];
@@ -66,7 +66,7 @@ sub formtable_ip6 {
     my ($fieldname_prefix) = @_;
     
     my $formtable = "";
-    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_6_input_form\" onSubmit=\"event.preventDefault(); save".$internalfield."('".$internalfield."_6_input_form'); event.stopImmediatePropagation(); return false;\"");
+    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_6_input_form\" onSubmit=\"save_".$internalfield."('".$internalfield."_6_input_form');\"");
     $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 6);
     if ($action eq "edit") {
         $item = $dnsmconfig{$configfield}[$idx];
