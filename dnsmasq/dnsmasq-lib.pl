@@ -1401,6 +1401,14 @@ sub show_field_table {
             elsif ($valtype eq "bool") {
                 $val = &ui_checkbox("boolval", "1", "", $val, undef, 1)
             }
+            my $extra_url_params = ($in{"bad_ifield"} 
+                                    && $in{"bad_idx"} eq $item->{"idx"} 
+                                    && $in{"show_validation"} 
+                                    ? "show_validation=" . $in{"show_validation"} 
+                                        . ($in{"custom_error"} 
+                                           ? "&custom_error=" . $in{"custom_error"} 
+                                           : "") 
+                                    : "");
             if ($count == 0) {
                 if ($valtype eq "interface") {
                     # edit_interface_chooser_link(text, input, current_value, idx, formid, [addmode])
@@ -1412,7 +1420,7 @@ sub show_field_table {
                 }
                 else {
                     # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"});
+                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, $extra_url_params);
                 }
             }
             else {
@@ -1424,7 +1432,7 @@ sub show_field_table {
                     ($edit_link) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "dir" ? 1 : 0), $val, $count, $formid);
                 }
                 else {
-                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"});
+                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, ($in{"bad_ifield"} && $in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : ""));
                 }
             }
             push ( @cols, $edit_link );
@@ -1638,13 +1646,14 @@ sub check_for_file_errors {
                     . "\$(document).ready(function() {\n"
                     . "  setTimeout(function() {\n";
             if (defined($in{"bad_idx"})) {
+                # list item; show edit dialog modal
                 $error_check_result .= "    \$(\"a[dnsm_array_idx='" . $in{"bad_idx"} . "']\").first().trigger(\"click\");\n";
             }
             else {
                 if (defined($in{"custom_error"}) && $in{"custom_error"} ne "") {
-                    $error_check_result .= "    showCustomValidationFailure('" . $in{"bad_ifield"} . "', '" . $in{"custom_error"} . "');\n";
+                    $error_check_result .= "    showCustomValidationFailure('" . $in{"bad_ifield"} . "_" . $in{"bad_param"} . "', '" . $in{"custom_error"} . "');\n";
                 }
-                $error_check_result .= "    \$(\"input[name*=" . $in{"bad_ifield"} . "]\").first()[0].reportValidity();\n";
+                $error_check_result .= "    \$(\"input[name*=" . $in{"bad_ifield"} . "_" . $in{"bad_param"} . "]\").first()[0].reportValidity();\n";
             }
             $error_check_result .= "  }, 5);\n"
                     . "});\n"
@@ -1917,7 +1926,7 @@ sub add_js {
              . "  \$(\"#\"+formid).submit();"
              . "}\n";
     $script .= "function showCustomValidationFailure(obj_name, msg) {"
-             . "  let i = \$(\"input[name*=\"+obj_name+\"]\").first();\n"
+             . "  let i = \$(\"input[name*=\"+obj_name+\"]\").last();\n"
              . "  let badval = i.val();\n"
              . "  i[0].setCustomValidity(msg);\n"
              . "  i[0].addEventListener(\"input\", function(event){ if (i.val()==badval){i[0].setCustomValidity(msg);}else{i[0].setCustomValidity(\"\");}});\n"

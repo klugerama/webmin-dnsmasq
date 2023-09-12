@@ -222,6 +222,14 @@ else {
     push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
     print &ui_form_end( \@form_buttons );
 }
+if ($in{"show_validation"}) {
+    print "<script type='text/javascript'>\n";
+    if (defined($in{"custom_error"}) && $in{"custom_error"} ne "") {
+        print "    showCustomValidationFailure('" . $in{"bad_ifield"} . "_" . $in{"bad_param"} . "', '" . $in{"custom_error"} . "');\n";
+    }
+    print "    \$(\"input[name=" . $in{"show_validation"} . "]\").last()[0].reportValidity();\n"
+        . "</script>\n";
+}
 # elsif ($internalfield eq "") {
 #     print &ui_columns_row( [ $text{""}, &ui_textbox($fieldname_prefix . "fieldname", $val{""}, 10) ], \@tds );
 # }

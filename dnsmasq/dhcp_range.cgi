@@ -96,10 +96,10 @@ sub show_ip_range_list {
         foreach my $val ( @vals ) {
             # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, "ipversion=ip" . $ipver);
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, ($in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : "") . "&ipversion=ip" . $ipver);
             }
             else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, "ipversion=ip" . $ipver);
+                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, ($in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : "") . "&ipversion=ip" . $ipver);
             }
             push( @cols, $edit_link );
         }

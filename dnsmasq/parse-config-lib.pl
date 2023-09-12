@@ -21,6 +21,7 @@ use experimental qw( switch );
 #   dir ------- directory
 #   path ------ file or directory
 #   bool ------ boolean (option exists or it doesn't); cannot have any other value
+#   ip -------- IP address (v4 or v6)
 #   var ------- various and/or multiple values
 # arr:
 #   1 --------- option may be specified multiple times
@@ -529,7 +530,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "file",
-                "req_perms" => "readwrite",
+                "req_perms" => "read,write",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -784,7 +785,9 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
-                "valtype" => "string",
+                "valtype" => "file",
+                "must_exist" => 1,
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
@@ -1498,7 +1501,8 @@ sub init_configfield_fields {
             "param_order" => [ "val" ],
             "val" => {
                 "length" => 15,
-                "valtype" => "string",
+                "valtype" => "file",
+                "req_perms" => "write",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -1889,6 +1893,7 @@ sub init_configfield_fields {
                 "required" => 0,
                 "label" => $text{"p_label_val_leasetime"},
                 "template" => "<" . $text{"tmpl_leasetime"} . ">",
+                "pattern" => "(\\d{1,5}[mhdw]?|infinite)",
             },
             "static" => {
                 "valtype" => "bool",
@@ -2004,7 +2009,8 @@ sub init_configfield_fields {
                 "default" => 0,
                 "required" => 0,
                 "label" => $text{"p_label_val_leasetime"},
-                "template" => "<" . $text{"tmpl_leasetime"} . ">"
+                "template" => "<" . $text{"tmpl_leasetime"} . ">",
+                "pattern" => "(\\d{1,5}[mhdw]?|infinite)",
             },
             "ignore" => {
                 "valtype" => "bool",
@@ -2704,7 +2710,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 15,
                 "valtype" => "file",
-                "req_perms" => "readwrite",
+                "req_perms" => "read,write",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2736,7 +2742,7 @@ sub init_configfield_fields {
                 "length" => 15,
                 "valtype" => "file",
                 "must_exist" => 1,
-                "req_perms" => "read",
+                "req_perms" => "read,execute",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2750,7 +2756,7 @@ sub init_configfield_fields {
                 "length" => 15,
                 "valtype" => "file",
                 "must_exist" => 1,
-                "req_perms" => "read",
+                "req_perms" => "read,execute",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -3129,7 +3135,7 @@ our $IPADDR = "(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]
 # our $IPV6ADDR = "[0-9a-fA-F\:]*";
 our $IPV6ADDR = "[0-9a-fA-F]{1,4}\:+[0-9a-fA-F\:]*";
 our $MAC = "(?:[0-9a-fA-F]{2})(?:[:-](?:[0-9a-fA-F]{2}|\\*)){5}";
-our $TIME = "[0-9]{1,3}[mhdw]";
+our $TIME = "(\\d{1,5}[mhdw]?|infinite)";
 our $FILE = "[0-9a-zA-Z\_\.\/\-]+";
 our $NUMBER="[0-9]+";
 my $TAG = "(set|tag):([!0-9a-zA-Z\_\.\-]*)";
@@ -4315,152 +4321,6 @@ sub parse_config_file {
                         $dnsmconfig_ref->{"$configfield"} = { %temp };
                     }
                 }
-                if ($temp{"used"}) {
-                    foreach my $param ( @{$fdef->{"param_order"}} ) {
-                        my $pdef = \%{ $fdef->{"$param"} };
-                        my $val = ($param eq "val" ? $temp{"val"} : $temp{"val"}{$param});
-                        if (defined($pdef->{"required"}) && $pdef->{"required"} == 1 && (!$val)) {
-                            $dnsmconfig_ref->{"errors"}++;
-                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_valreq"}, $configfield, $param, $temp{"idx"}));
-                        }
-                        elsif (defined($val) && $val ne "") {
-                            # file, path, dir, user, group, int, string, interface, ip, time
-                            given ($pdef->{"valtype"}) {
-                                when ("int") {
-                                    if (!&is_integer($val)) {
-                                        $dnsmconfig_ref->{"errors"}++;
-                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_numbad"}, $configfield, $param, $temp{"idx"}));
-                                    }
-                                    else {
-                                        if (defined($pdef->{"max"}) && $val > $pdef->{"max"}) {
-                                            $dnsmconfig_ref->{"errors"}++;
-                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_numhigh"} . "(>" . $pdef->{"max"} . ")", $configfield, $param, $temp{"idx"}));
-                                        }
-                                        elsif (defined($pdef->{"min"}) && $val < $pdef->{"min"}) {
-                                            $dnsmconfig_ref->{"errors"}++;
-                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_numlow"} . "(<" . $pdef->{"min"} . ")", $configfield, $param, $temp{"idx"}));
-                                        }
-                                    }
-                                }
-                                when ("file") {
-                                    if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
-                                        if (! -f $val) {
-                                            $dnsmconfig_ref->{"errors"}++;
-                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_filebad_exist"}, $configfield, $param, $temp{"idx"}));
-                                        }
-                                    }
-                                    else {
-                                        # if ($dnsmconf_ref->{"user"}->{"used"} == 1
-                                        #     || $dnsmconf_ref->{"group"}->{"used"} == 1) {
-                                        #     my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : getlogin || getpwuid($<);
-                                        #     my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
-                                        #     my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x $val ] && printf x; echo");
-                                        # }
-                                        if ($dnsmconf_ref->{"user"}->{"used"} != 1
-                                            && $dnsmconf_ref->{"group"}->{"used"} != 1 
-                                            && defined($pdef->{"req_perms"})) {
-                                            if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
-                                                || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)
-                                                || ($pdef->{"req_perms"} =~ /execute/ && ! -x $val)) {
-                                                $dnsmconfig_ref->{"errors"}++;
-                                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_filebad_perms_", $pdef->{"req_perms"}), $configfield, $param, $temp{"idx"}));
-                                            }
-                                        }
-                                    }
-                                }
-                                when ("path") {
-                                    if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
-                                        if (! -f $val && ! -d $val) {
-                                            $dnsmconfig_ref->{"errors"}++;
-                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_pathbad_exist"}, $configfield, $param, $temp{"idx"}));
-                                        }
-                                    }
-                                    else {
-                                        # if ($dnsmconf_ref->{"user"}->{"used"} == 1
-                                        #     || $dnsmconf_ref->{"group"}->{"used"} == 1) {
-                                        #     my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : getlogin || getpwuid($<);
-                                        #     my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
-                                        #     my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x $val ] && printf x; echo");
-                                        # }
-                                        if ($dnsmconf_ref->{"user"}->{"used"} != 1
-                                            && $dnsmconf_ref->{"group"}->{"used"} != 1 
-                                            && defined($pdef->{"req_perms"})) {
-                                            if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
-                                                || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)
-                                                || ($pdef->{"req_perms"} =~ /execute/ && ! -x $val)) {
-                                                $dnsmconfig_ref->{"errors"}++;
-                                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_pathbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $temp{"idx"}));
-                                            }
-                                        }
-                                    }
-                                }
-                                when ("dir") {
-                                    if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
-                                        if (! -d $val) {
-                                            $dnsmconfig_ref->{"errors"}++;
-                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_dirbad_exist"}, $configfield, $param, $temp{"idx"}));
-                                        }
-                                    }
-                                    else {
-                                        # if ($dnsmconf_ref->{"user"}->{"used"} == 1
-                                        #     || $dnsmconf_ref->{"group"}->{"used"} == 1) {
-                                        #     my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : getlogin || getpwuid($<);
-                                        #     my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
-                                        #     my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x $val ] && printf x; echo");
-                                        # }
-                                        if ($dnsmconf_ref->{"user"}->{"used"} != 1
-                                            && $dnsmconf_ref->{"group"}->{"used"} != 1 
-                                            && defined($pdef->{"req_perms"})) {
-                                            if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
-                                                || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)) {
-                                                $dnsmconfig_ref->{"errors"}++;
-                                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_dirbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $temp{"idx"}));
-                                            }
-                                        }
-                                    }
-                                }
-                                when ("user") {
-                                    my @usernames = &get_usernames_list();
-                                    if (! grep { /^$val$/ } ( @usernames )) {
-                                        $dnsmconfig_ref->{"errors"}++;
-                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_userbad"}, $configfield, $param, $temp{"idx"}, $text{"err_userbad"}));
-                                    }
-                                }
-                                when ("group") {
-                                    my @groupnames = &get_groupnames_list();
-                                    if (! grep { /^$val$/ } ( @groupnames )) {
-                                        $dnsmconfig_ref->{"errors"}++;
-                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_groupbad"}, $configfield, $param, $temp{"idx"}, $text{"err_groupbad"}));
-                                    }
-                                }
-                                when ("interface") {
-                                    if (&foreign_available("net") && defined(net::active_interfaces)) {
-                                        &foreign_require("net", "net-lib.pl");
-                                        my @ifaces = net::active_interfaces();
-                                        my @iface_names = ();
-                                        foreach my $i ( @ifaces ) {
-                                            push( @iface_names, $i->{"fullname"});
-                                        }
-                                        if (! grep { /^$val$/ } ( @iface_names )) {
-                                            $dnsmconfig_ref->{"errors"}++;
-                                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_ifacebad"}, $configfield, $param, $temp{"idx"}, $text{"err_ifacebad"}));
-                                        }
-                                    }
-                                }
-                                when ("ip") {
-                                    if (!(&check_ipaddress($val) || &check_ip6address($val))) {
-                                        $dnsmconfig_ref->{"errors"}++;
-                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_ipbad"}, $configfield, $param, $temp{"idx"}));
-                                    }
-                                }
-                                when ("time") {
-                                }
-                                default {
-                                }
-                            }
-                        }
-                    }
-                }
                 foreach my $set_tag ( @line_set_tags ) {
                     if (! grep { /^$set_tag$/ } ( @{ $dnsmconfig_ref->{"set_tags"} } ) ) {
                         # print "setting tag: $set_tag<br/>";
@@ -4480,6 +4340,219 @@ sub parse_config_file {
             push( @{ $dnsmconfig_ref->{"configfiles"} }, $addn_hosts->{"val"} ) if ($addn_hosts->{"used"} && ! grep(/^$addn_hosts->{"val"}/, @{ $dnsmconfig_ref->{"configfiles"} } ));
         }
     }
+    if ($is_extra_config == 0) { # everything should be read in by this point; validate processed values
+        my $current_user = getlogin || getpwuid($<);
+        foreach my $configfield ( keys %dnsmconfigvals ) {
+            if ( grep { /^$configfield$/ } ( @confarrs ) ) {
+                foreach my $item ( @{$dnsmconfig_ref->{"$configfield"}} ) {
+                    &validate_value($configfield, $item, $dnsmconfig_ref, $current_user);
+                }
+            }
+            else {
+                my $item = $dnsmconfig_ref->{"$configfield"};
+                &validate_value($configfield, $item, $dnsmconfig_ref, $current_user);
+            }
+        }
+    }
 } #end of sub parse_config_file
 
+sub validate_value {
+    my ($configfield, $item, $dnsmconfig_ref, $current_user) = @_;
+    my $internalfield = &config_to_internal($configfield);
+    my $fdef = $configfield_fields{$internalfield};
+    # webmin_debug_log("VALIDATE", ("configfield: $configfield -- item is " . ref($item) . " -- var_dump " . &var_dump( $item, 0 )));
+    if ($item->{"used"}) {
+        # webmin_debug_log("----VALIDATE", "configfield: $configfield");
+        foreach my $param ( @{$fdef->{"param_order"}} ) {
+            my $config_filename = $item->{"file"};
+            my $lineno = $item->{"line"};
+            my $idx = $item->{"idx"};
+            my $pdef = \%{ $fdef->{"$param"} };
+            my $val = ($param eq "val" ? $item->{"val"} : $item->{"val"}->{$param});
+            if (defined($pdef->{"required"}) && $pdef->{"required"} == 1 && (!$val)) {
+                $dnsmconfig_ref->{"errors"}++;
+                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_valreq"}, $configfield, $param, $idx));
+            }
+            elsif (defined($val) && $val ne "") {
+                # webmin_debug_log("--------FIELD", "configfield: $configfield file $config_filename line: $line val $val");
+                # file, path, dir, user, group, int, string, interface, ip, time
+                given ($pdef->{"valtype"}) {
+                    when ("int") {
+                        if (!&is_integer($val)) {
+                            $dnsmconfig_ref->{"errors"}++;
+                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_numbad"}, $configfield, $param, $idx));
+                        }
+                        else {
+                            if (defined($pdef->{"max"}) && $val > $pdef->{"max"}) {
+                                $dnsmconfig_ref->{"errors"}++;
+                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_numhigh"} . "(>" . $pdef->{"max"} . ")", $configfield, $param, $idx));
+                            }
+                            elsif (defined($pdef->{"min"}) && $val < $pdef->{"min"}) {
+                                $dnsmconfig_ref->{"errors"}++;
+                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_numlow"} . "(<" . $pdef->{"min"} . ")", $configfield, $param, $idx));
+                            }
+                        }
+                    }
+                    when ("file") {
+                        if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
+                            if (! -e $val || ! -f $val) {
+                                $dnsmconfig_ref->{"errors"}++;
+                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_filebad_exist"}, $configfield, $param, $idx, $text{"err_filebad_exist"}));
+                            }
+                        }
+                        if (defined($pdef->{"req_perms"})) {
+                            if (($internalfield eq "dhcp_script" || $internalfield eq "dhcp_luascript") 
+                            && $dnsmconf_ref->{"dhcp-scriptuser"}->{"used"} == 1) {
+                                if ($current_user eq "root") {
+                                    my $uid = $dnsmconf_ref->{"dhcp-scriptuser"}->{"val"};
+                                    my $perms = qx(sudo -u $uid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x \$(realpath \"$val\") ] && printf x; echo");
+                                    if (($pdef->{"req_perms"} =~ /read/ && $perms !~ /r/ )
+                                        || ($pdef->{"req_perms"} =~ /write/ && $perms !~ /w/ )
+                                        || ($pdef->{"req_perms"} =~ /execute/ && $perms !~ /x/ )) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_filebad_perms_", $pdef->{"req_perms"}), $configfield, $param, $idx, &text("err_filebad_perms_", $pdef->{"req_perms"})));
+                                    }
+                                }
+                                # if the current user is not root, but dnsmasq is configured to run the script as a different non-root user,
+                                # there's no easy way to check permissions on the file so give up validation
+                            }
+                            elsif ($dnsmconf_ref->{"user"}->{"used"} == 1
+                                || $dnsmconf_ref->{"group"}->{"used"} == 1) {
+                                if ($current_user eq "root") {
+                                    my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : $current_user;
+                                    my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
+                                    my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x \$(realpath \"$val\") ] && printf x; echo");
+                                    if (($pdef->{"req_perms"} =~ /read/ && $perms !~ /r/ )
+                                        || ($pdef->{"req_perms"} =~ /write/ && $perms !~ /w/ )
+                                        || ($pdef->{"req_perms"} =~ /execute/ && $perms !~ /x/ )) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_filebad_perms_", $pdef->{"req_perms"}), $configfield, $param, $idx, &text("err_filebad_perms_", $pdef->{"req_perms"})));
+                                    }
+                                }
+                                # if the current user is not root, but dnsmasq is configured to run as a different non-root user,
+                                # there's no easy way to check permissions on the file so give up validation
+                            }
+                            else {
+                                if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
+                                    || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)
+                                    || ($pdef->{"req_perms"} =~ /execute/ && ! -x $val)) {
+                                    $dnsmconfig_ref->{"errors"}++;
+                                    push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_filebad_perms_", $pdef->{"req_perms"}), $configfield, $param, $idx, &text("err_filebad_perms_", $pdef->{"req_perms"})));
+                                }
+                            }
+                        }
+                    }
+                    when ("path") {
+                        if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
+                            if (! -e $val || (! -f $val && ! -d $val)) {
+                                $dnsmconfig_ref->{"errors"}++;
+                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_pathbad_exist"}, $configfield, $param, $idx, $text{"err_pathbad_exist"}));
+                            }
+                        }
+                        else {
+                            if (defined($pdef->{"req_perms"})) {
+                                if ($current_user eq "root" 
+                                    && ($dnsmconf_ref->{"user"}->{"used"} == 1
+                                    || $dnsmconf_ref->{"group"}->{"used"} == 1)) {
+                                    my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : $current_user;
+                                    my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
+                                    my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; [ -x \$(realpath \"$val\") ] && printf x; echo");
+                                    if (($pdef->{"req_perms"} =~ /read/ && $perms !~ /r/ )
+                                        || ($pdef->{"req_perms"} =~ /write/ && $perms !~ /w/ )
+                                        || ($pdef->{"req_perms"} =~ /execute/ && $perms !~ /x/ )) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_pathbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $idx, &text("err_pathbad_perms_", $pdef->{"req_perms"})));
+                                    }
+                                }
+                                elsif ($dnsmconf_ref->{"user"}->{"used"} != 1
+                                    && $dnsmconf_ref->{"group"}->{"used"} != 1 ) {
+                                    if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
+                                        || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)
+                                        || ($pdef->{"req_perms"} =~ /execute/ && ! -x $val)) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_pathbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $idx, &text("err_pathbad_perms_", $pdef->{"req_perms"})));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    when ("dir") {
+                        if (defined($pdef->{"must_exist"}) && $pdef->{"must_exist"} eq "1") {
+                            if (! -e $val || ! -d $val) {
+                                $dnsmconfig_ref->{"errors"}++;
+                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_dirbad_exist"}, $configfield, $param, $idx, $text{"err_dirbad_exist"}));
+                            }
+                        }
+                        else {
+                            if (defined($pdef->{"req_perms"})) {
+                                if ($current_user eq "root"
+                                    && ($dnsmconf_ref->{"user"}->{"used"} == 1
+                                    || $dnsmconf_ref->{"group"}->{"used"} == 1)) {
+                                    my $uid = $dnsmconf_ref->{"user"}->{"used"} == 1 ? $dnsmconf_ref->{"user"}->{"val"} : $current_user;
+                                    my $gid = $dnsmconf_ref->{"group"}->{"used"} == 1 ? "-g " . $dnsmconf_ref->{"group"}->{"val"} : "";
+                                    my $perms = qx(sudo -u $uid $gid /bin/sh -c "/bin/bash -c "[ -r $val ] && printf r; [ -w $val ] && printf w; echo");
+                                    if (($pdef->{"req_perms"} =~ /read/ && $perms !~ /r/ )
+                                        || ($pdef->{"req_perms"} =~ /write/ && $perms !~ /w/ )) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_dirbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $idx, &text("err_dirbad_perms_", $pdef->{"req_perms"})));
+                                    }
+                                }
+                                if ($dnsmconf_ref->{"user"}->{"used"} != 1
+                                    && $dnsmconf_ref->{"group"}->{"used"} != 1 ) {
+                                    if (($pdef->{"req_perms"} =~ /read/ && ! -r $val)
+                                        || ($pdef->{"req_perms"} =~ /write/ && ! -w $val)) {
+                                        $dnsmconfig_ref->{"errors"}++;
+                                        push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_dirbad_perms_", $pdef->{"req_perms"}), $configfield, $param, $idx, &text("err_dirbad_perms_", $pdef->{"req_perms"})));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    when ("user") {
+                        my @usernames = &get_usernames_list();
+                        if (! grep { /^$val$/ } ( @usernames )) {
+                            $dnsmconfig_ref->{"errors"}++;
+                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_userbad"}, $configfield, $param, $idx, $text{"err_userbad"}));
+                        }
+                    }
+                    when ("group") {
+                        my @groupnames = &get_groupnames_list();
+                        if (! grep { /^$val$/ } ( @groupnames )) {
+                            $dnsmconfig_ref->{"errors"}++;
+                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_groupbad"}, $configfield, $param, $idx, $text{"err_groupbad"}));
+                        }
+                    }
+                    when ("interface") {
+                        if (&foreign_available("net") && defined(net::active_interfaces)) {
+                            &foreign_require("net", "net-lib.pl");
+                            my @ifaces = net::active_interfaces();
+                            my @iface_names = ();
+                            foreach my $i ( @ifaces ) {
+                                push( @iface_names, $i->{"fullname"});
+                            }
+                            if (! grep { /^$val$/ } ( @iface_names )) {
+                                $dnsmconfig_ref->{"errors"}++;
+                                push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_ifacebad"}, $configfield, $param, $idx, $text{"err_ifacebad"}));
+                            }
+                        }
+                    }
+                    when ("ip") {
+                        if (!(&check_ipaddress($val) || &check_ip6address($val))) {
+                            $dnsmconfig_ref->{"errors"}++;
+                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_ipbad"}, $configfield, $param, $idx));
+                        }
+                    }
+                    when ("time") {
+                        if ($val !~ /^($TIME)$/ ) {
+                            $dnsmconfig_ref->{"errors"}++;
+                            push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_timebad"}, $configfield, $param, $idx));
+                        }
+                    }
+                    default {
+                    }
+                }
+            }
+        }
+    }
+}
 1;
