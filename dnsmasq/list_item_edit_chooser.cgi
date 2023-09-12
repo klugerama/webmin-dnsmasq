@@ -44,7 +44,7 @@ sub formtable_ip4 {
     my ($fieldname_prefix) = @_;
     
     my $formtable = "";
-    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_4_input_form\" onSubmit=\"event.preventDefault(); save".$internalfield."('".$internalfield."_4_input_form'); event.stopImmediatePropagation(); return false;\"");
+    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_4_input_form\" onSubmit=\"save_".$internalfield."('".$internalfield."_4_input_form');\"");
     $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 4);
     if ($action eq "edit") {
         $item = $dnsmconfig{$configfield}[$idx];
@@ -57,7 +57,7 @@ sub formtable_ip4 {
     $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
     push( @form_buttons, &ui_button( $text{"cancel_button"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_4", undef, "style='height: 33px; display:inline !important; float:right;'" ) );
+    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_4", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -66,7 +66,7 @@ sub formtable_ip6 {
     my ($fieldname_prefix) = @_;
     
     my $formtable = "";
-    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_6_input_form\" onSubmit=\"event.preventDefault(); save".$internalfield."('".$internalfield."_6_input_form'); event.stopImmediatePropagation(); return false;\"");
+    $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_6_input_form\" onSubmit=\"save_".$internalfield."('".$internalfield."_6_input_form');\"");
     $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 6);
     if ($action eq "edit") {
         $item = $dnsmconfig{$configfield}[$idx];
@@ -79,7 +79,7 @@ sub formtable_ip6 {
     $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
     push( @form_buttons, &ui_button( $text{"cancel_button"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_6", undef, "style='height: 33px; display:inline !important; float:right;'" ) );
+    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_6", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -94,6 +94,12 @@ sub generate_param_rows {
         next if ($ipversionfilter && ($paramdefinition->{"ipversion"} eq "$ipversionfilter" || $paramdefinition->{"ipversion"} == $ipversionfilter));
         my $tmpl = $ipversionfilter == 4 && $paramdefinition->{"template6"} ? $paramdefinition->{"template6"} : $paramdefinition->{"template"};
         my $label = $paramdefinition->{"label"} || $text{"p_label_" . $internalfield . "_" . $param};
+        my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
+        my $validation = "";
+        $validation .= $paramdefinition->{"pattern"} ? " pattern='" . $paramdefinition->{"pattern"} . "'" : "";
+        $validation .= $paramdefinition->{"min"} ? " min='" . $paramdefinition->{"min"} . "'" : "";
+        $validation .= $paramdefinition->{"max"} ? " max='" . $paramdefinition->{"max"} . "'" : "";
+        $validation .= $paramdefinition->{"required"} == 1 ? " required" : " optional";
         if ($paramdefinition->{"required"}) {
             $label .= "&nbsp;<span color='red'>*</span>&nbsp;";
         }
@@ -103,11 +109,11 @@ sub generate_param_rows {
         }
         else {
             if ( $paramdefinition->{"arr"} == 1 ) {
-                $input = &ui_textbox($fieldname_prefix . $param, join($paramdefinition->{"sep"}, @{$val{$param}}), $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($paramdefinition->{"required"} ? " required" : " optional"));
+                $input = &ui_textbox($fieldname_prefix . $param, join($paramdefinition->{"sep"}, @{$val{$param}}), $paramdefinition->{"length"}, undef, undef, $input_guidance . $validation);
             }
             else {
                 # $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}) ];
-                $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}, undef, undef, "placeholder=\"$tmpl\" title=\"$tmpl\"" . ($paramdefinition->{"required"} ? " required" : " optional"));
+                $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}, undef, undef, $input_guidance . $validation);
             }
         }
         $rows .= &ui_columns_row( [ $label, $input ], \@tds );
@@ -118,6 +124,16 @@ sub generate_param_rows {
 # my $headstuff = $base_headstuff;
 my $headstuff = "<script type='text/javascript'>\n"
     . "  \$( \".opener_hidden\" ).prop(\"style\", \"display: none;\");\n"
+    . "  function check_" . $internalfield . "(formname) {\n"
+    . "    if (!\$(\"#\"+formname)[0].checkValidity()) {\n"
+    . "      \$(\"#\"+formname)[0].reportValidity();\n"
+    . "      event.preventDefault();\n"
+    . "      event.stopImmediatePropagation();\n"
+    . "      despinnerfy_buttons();\n"
+    . "      return false;\n"
+    . "    }\n"
+    . "    return true;\n"
+    . "  }\n"
     . "  function save_" . $internalfield . "(formname) {\n"
     . "    event.preventDefault();\n"
     . "    let vals=[];\n"
@@ -203,8 +219,16 @@ else {
     print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
     push( @form_buttons, &ui_button( $text{"cancel_button"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='height: 33px; display:inline !important; float:right;'" ) );
+    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
     print &ui_form_end( \@form_buttons );
+}
+if ($in{"show_validation"}) {
+    print "<script type='text/javascript'>\n";
+    if (defined($in{"custom_error"}) && $in{"custom_error"} ne "") {
+        print "    showCustomValidationFailure('" . $in{"bad_ifield"} . "_" . $in{"bad_param"} . "', '" . $in{"custom_error"} . "');\n";
+    }
+    print "    \$(\"input[name=" . $in{"show_validation"} . "]\").last()[0].reportValidity();\n"
+        . "</script>\n";
 }
 # elsif ($internalfield eq "") {
 #     print &ui_columns_row( [ $text{""}, &ui_textbox($fieldname_prefix . "fieldname", $val{""}, 10) ], \@tds );
