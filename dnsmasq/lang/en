@@ -78,6 +78,7 @@ err_help=Try going back and retyping the offending information
 err_configbad=Configuration file has an error
 err_has_errors_=$1 errors found in configuration
 err_goto=Error Page
+err_unknown_=$1: unknown option
 err_numbad=Not a valid number
 err_numlow=Value is too low
 err_numhigh=Value is too high

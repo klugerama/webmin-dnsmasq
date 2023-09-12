@@ -1757,6 +1757,8 @@ sub deserialize_string {
     return $var;
 }
 
+=head2 create_error(file, line, desc, configfield, param, idx, [custom_error])
+=cut
 sub create_error {
     my ($file, $line, $desc, $configfield, $param, $idx) = @_;
     my $custom_error = $_[6] ? $_[6] : 0;

@@ -46,9 +46,6 @@ if ($type eq "config") {
             }
         }
     }
-    elsif ( $dnsmconfig{"errors"} > 0) {
-        $error_message .= "<h2>" . $dnsmconfig->{"errors"} . " errors found in configuration</h2><br/><br/>";
-    }
     $error_message .= "</div>";
     &ui_print_header($text{"index_dns_config_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
     print &header_style();
