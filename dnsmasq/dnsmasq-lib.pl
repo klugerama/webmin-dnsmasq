@@ -1717,6 +1717,9 @@ sub check_for_updated_version {
                     $latest = $tempconfig{"dnsmasq_latest_url"} = $latest_release->{"html_url"};
                     last;
                 }
+                elsif (defined(@latest_version[$vidx]) && int(@latest_version[$vidx]) < int($v)) {
+                    last;
+                }
                 $vidx++;
             }
         }
