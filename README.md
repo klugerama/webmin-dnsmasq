@@ -152,3 +152,5 @@ For the above options, DNSMasq will reread the specified files and directories u
 * reload /etc/hosts (unless `no-hosts` is enabled)
 * call the DHCP lease change script for all existing DHCP leases
 * reread /etc/resolv.conf (if `no-poll` is enabled)
+
+This can be done (sending a SIGHUP to DNSMasq) in the `Service Control` page under `DNS settings` and clicking 
