@@ -19,7 +19,7 @@ require './dnsmasq-lib.pl';
 
 if (!$access{"view_logs"}) {
     &ui_print_header(undef, $text{'index_dns_view_log'}, "", "intro", 1, 0, 0, &restart_button());
-    &error($text{"view_logs_ecannot"});
+    &error($text{"acl_view_logs_ecannot"});
     &ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 }
 

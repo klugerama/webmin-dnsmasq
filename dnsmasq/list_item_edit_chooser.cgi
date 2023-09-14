@@ -26,7 +26,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 our $action = $in{"action"};
 our $formid = $in{"formid"};
-our $idx = $in{"idx"};
+our $cfg_idx = $in{"cfg_idx"};
 my $title = $in{"title"};
 $title =~ s/\+/ /g;
 our $internalfield = $in{"internalfield"};
@@ -47,17 +47,17 @@ sub formtable_ip4 {
     $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_4_input_form\" onSubmit=\"save_".$internalfield."('".$internalfield."_4_input_form');\"");
     $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 4);
     if ($action eq "edit") {
-        $item = $dnsmconfig{$configfield}[$idx];
+        $item = $dnsmconfig{$configfield}[$cfg_idx];
         %val = %{ $item->{"val"} };
-        $formtable .= &ui_hidden($fieldname_prefix . "idx", $idx);
+        $formtable .= &ui_hidden($fieldname_prefix . "idx", $cfg_idx);
     }
     $formtable .= &ui_columns_start( [ undef, undef ], 100);
     $formtable .= &generate_param_rows(6);
     $formtable .= &ui_columns_end();
     $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"cancel_button"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_4", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_4", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -69,17 +69,17 @@ sub formtable_ip6 {
     $formtable .= &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_6_input_form\" onSubmit=\"save_".$internalfield."('".$internalfield."_6_input_form');\"");
     $formtable .= &ui_hidden($fieldname_prefix . "ipversion", 6);
     if ($action eq "edit") {
-        $item = $dnsmconfig{$configfield}[$idx];
+        $item = $dnsmconfig{$configfield}[$cfg_idx];
         %val = %{ $item->{"val"} };
-        $formtable .= &ui_hidden($fieldname_prefix . "idx", $idx);
+        $formtable .= &ui_hidden($fieldname_prefix . "idx", $cfg_idx);
     }
     $formtable .= &ui_columns_start( [ undef, undef ], 100);
     $formtable .= &generate_param_rows(4);
     $formtable .= &ui_columns_end();
     $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"cancel_button"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit_6", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_6", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -197,9 +197,9 @@ if ($internalfield eq "dhcp_range") {
 else {
     print &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_input_form\" onsubmit=\"save_".$internalfield."('".$internalfield."_input_form');\"");
     if ($action eq "edit") {
-        $item = $dnsmconfig{$configfield}[$idx];
+        $item = $dnsmconfig{$configfield}[$cfg_idx];
         %val = %{ $item->{"val"} };
-        print &ui_hidden($fieldname_prefix . "idx", $idx);
+        print &ui_hidden($fieldname_prefix . "idx", $cfg_idx);
     }
     print &ui_columns_start( undef, 100, undef, undef, $title_header);
     my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_chooser.cgi");
@@ -218,8 +218,8 @@ else {
     print &ui_table_end();
     print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"cancel_button"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
     print &ui_form_end( \@form_buttons );
 }
 if ($in{"show_validation"}) {

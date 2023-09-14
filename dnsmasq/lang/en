@@ -14,34 +14,33 @@ index_econf=The DNSMasq configuration file $1 does not exist. If you have DNSMas
 
 acl_start=Can start DNSmasq?
 acl_stop=Can stop DNSmasq?
-acl_restart=Can apply DNSmasq configuration?
+acl_restart=Can restart DNSmasq?
 acl_reload=Can reload DNSmasq configuration?
 acl_dump_logs=Can dump DNSmasq logs?
 acl_view_logs=Can view DNSmasq logs?
 acl_edit_hosts=Can edit /etc/hosts and other hosts files?
 acl_edit_scripts=Can edit scripts?
+acl_manual_edit=Can edit configuration files manually?
+acl_change_perms=Can change file/directory permissions?
 
-edit_scripts_ecannot=You are not allowed to edit scripts
-
-stop_err=Failed to stop DNSmasq
-stop_ecannot=You are not allowed to stop DNSmasq
+acl_start_ecannot=You are not allowed to start DNSmasq
+acl_stop_ecannot=You are not allowed to stop DNSmasq
+acl_restart_ecannot=You are not allowed to restart DNSmasq
+acl_reload_ecannot=You are not allowed to reload DNSmasq
+acl_dump_logs_ecannot=You are not allowed to dump DNSmasq logs
+acl_view_logs_ecannot=You are not allowed to view DNSmasq logs
+acl_edit_scripts_ecannot=You are not allowed to edit scripts
+acl_manual_edit_ecannot=You are not allowed to manually edit files
+acl_change_perms_ecannot=You are not allowed to change file/directory permissions
 
 start_err=Failed to start DNSmasq
-start_ecannot=You are not allowed to start DNSmasq
 start_ecmd=$1 failed : $2
 start_eunknown=Unknown reason
 start_eafter=DNSmasq does not appear to be running
-
+stop_err=Failed to stop DNSmasq
 restart_err=Failed to restart DNSmasq
-restart_ecannot=You are not allowed to restart DNSmasq
-
 reload_err=Failed to reload configuration
-reload_ecannot=You are not allowed to reload DNSmasq
-
 dump_logs_err=Failed to dump DNSmasq logs
-dump_logs_ecannot=You are not allowed to dump DNSmasq logs
-
-view_logs_ecannot=You are not allowed to view DNSmasq logs
 
 view_header=Last $1 lines of $2
 view_empty=Log file is empty
@@ -49,7 +48,7 @@ view_refresh=Refresh
 view_filter=Only show lines with text $1
 view_no_files=There are no files to view or edit.
 
-current_version_message=This is the most recent version of this module ($1).
+current_version_message=This is the most recent version ($1) of this module.
 gh_message=<a href="https://github.com/klugerama/webmin-dnsmasq" target="_blank">Click here</a> to go to the module project page
 update_message=Currently using module version $1. A newer version of this module is available. $2 to go to the release page.
 click_here=Click here
@@ -61,14 +60,22 @@ enabled=Enabled
 disabled=Disabled
 default=Default
 description_expand=Description...
-save_button=Save
-submit_button=Submit
-cancel_button=Cancel
-# undo_button=Undo
+
+button_save=Save
+# button_submit=Submit
+button_cancel=Cancel
+button_manual_edit=Manual Edit
+button_fix_permissions=Fix Permissions
+# button_undo=Undo
+button_enable_sel=Enable
+button_disable_sel=Disable
+button_delete_sel=Delete
+
 restarting=Trying to restart DNSmasq. Script messages are:
 selected_none=Nothing selected
-error_heading=Configuration Error
-errors_heading=Configuration Errors
+configuration_error_heading=Configuration Error
+configuration_errors_heading=Configuration Errors
+error=Error
 err_file=File
 err_line=Line
 err_configfield=Value name
@@ -101,9 +108,6 @@ err_valreq=Value is required
 yes=Yes
 no=No
 with_selected=With selected:
-enable_sel=Enable
-disable_sel=Disable
-delete_sel=Delete
 add_=Add $1
 create_=Create $1
 edit_=Edit $1

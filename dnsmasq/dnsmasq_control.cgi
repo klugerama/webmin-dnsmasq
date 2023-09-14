@@ -43,7 +43,7 @@ if ($in{"do_cmd"}) {
 
     &error_setup($text{'$cmd_err'});
     my $err;
-    $access{$cmd} || &error($text{'$cmd_ecannot'});
+    $access{$cmd} || &error($text{'acl_'.$cmd.'_ecannot'});
     given ( $cmd ) {
         when ("start") {
             $err = &start_dnsmasq();
@@ -52,8 +52,8 @@ if ($in{"do_cmd"}) {
             $err = &stop_dnsmasq();
         }
         when ("restart") {
-            $access{'stop'} || &error($text{'stop_ecannot'});
-            $access{'start'} || &error($text{'start_ecannot'});
+            $access{'stop'} || &error($text{'acl_stop_ecannot'});
+            $access{'start'} || &error($text{'acl_start_ecannot'});
             $err = &restart_dnsmasq();
         }
         when ("reload") {
