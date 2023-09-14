@@ -16,7 +16,6 @@
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
 require 'dnsmasq-lib.pl';
-
 ## put in ACL checks here if needed
 
 my $config_filename = $config{config_file};
@@ -26,7 +25,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-&ui_print_header($text{"errors_heading"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header($text{"configuration_errors_heading"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_style();
 
 # output as web page
@@ -37,7 +36,7 @@ my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings"};
 
 ## Insert Output code here
 
-# print "<h2 style=\"color: red;\">".$text{"error_heading"}."</h2>";
+# print "<h2 style=\"color: red;\">".$text{"configuration_error_heading"}."</h2>";
 # print "<br><br>";
 
 print &ui_form_start($returnto, "post");
@@ -57,36 +56,46 @@ my @column_headers = ( "" );
 foreach my $key ( @error_fields ) {
     push ( @column_headers, $text{"err_" . $key} );
 }
-push ( @column_headers, "" );
+push ( @column_headers, "" ); # for the manual edit button
 print &ui_columns_start( \@column_headers, );
 $count = 0;
+my @fs = ( "file", "path", "dir" );
 foreach my $error ( @{$dnsmconfig{"error"}} ) {
     my @cols;
     my $link_target = "";
     my $configfield = $error->{"configfield"};
     my $internalfield = &config_to_internal($configfield);
+    my $param = $error->{"param"};
     my $fd = $dnsmconfigvals{"$configfield"};
+    my $fdef = $configfield_fields{$internalfield};
+    my $pdef = \%{ $fdef->{"$param"} };
+    my $type = $pdef->{"valtype"};
     my $nav = %{%dnsmnav{$fd->{"section"}}}{$fd->{"page"}};
     $link_target = $nav->{"cgi_name"} . "?" . ($nav->{"cgi_params"} ? $nav->{"cgi_params"} . "&" : "") . "forced_edit=1&bad_ifield=$internalfield&line=" . $error->{"line"} . "&show_validation=" . $internalfield . "_" . $error->{"param"} . "&custom_error=" . $error->{"custom_error"};
     if ($nav->{"tab"}) {
         $link_target .= "&tab=" . $nav->{"tab"}->{$fd->{"tab"}};
     }
-    if ($error->{"idx"} ne "-1") {
-        $link_target .= "&bad_idx=" . $error->{"idx"};
+    if ($error->{"cfg_idx"} ne "-1") {
+        $link_target .= "&cfg_idx=" . $error->{"cfg_idx"};
     }
     foreach my $key ( @error_fields ) {
         my $link = "<a href=\"" . $link_target . "\">" . $error->{$key} . "</a>";
         push ( @cols, $link );
     }
-    push ( @cols, "<a href=\"manual_edit.cgi?file=" . $error->{"file"} . "&line=" . $error->{"line"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>Manual Edit</a>" );
+    my $buttons = "<a href=\"manual_edit.cgi?file=" . $error->{"file"} . "&line=" . $error->{"line"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $text{"button_manual_edit"} . "</a>";
+    webmin_debug_log("--------ERROR", "configfield: $configfield type: $type param: $param error_type: ". $error->{"error_type"} . " ERR_FILE_PERMS: " . ERR_FILE_PERMS());
+    if ((grep { /^$type$/ } ( @fs )) && $error->{"error_type"} == ERR_FILE_PERMS() && $access{"change_perms"}) {
+        $buttons .= "<a href=\"$returnto" . ($returnto =~ /\?/ ? "&" : "?") . "forced_edit=1&fix_perms=1&ifield=" . $internalfield . "&cfg_idx=" . $error->{"cfg_idx"} . "&param=" . $param . "&foruser=" . $error->{"foruser"} . "&forgroup=" . $error->{"forgroup"} . "&perms_failed=" . $error->{"perms_failed"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $text{"button_fix_permissions"} . "</a>";
+    }
+    push ( @cols, $buttons );
     print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $count, 1 );
     $count++;
 }
 print &ui_columns_end();
 print &ui_links_row(\@list_link_buttons);
 print "<p>" . $text{"with_selected"} . "</p>";
-print &ui_submit($text{"disable_sel"}, "disable_sel");
-print &ui_submit($text{"delete_sel"}, "delete_sel");
+print &ui_submit($text{"button_disable_sel"}, "button_disable_sel");
+print &ui_submit($text{"button_delete_sel"}, "button_delete_sel");
 print &ui_form_end();
 
 print &add_js();

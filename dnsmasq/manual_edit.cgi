@@ -35,6 +35,10 @@ my $file = $in{"file"};
 my $type = $in{"type"} || "config";
 my @files = ();
 if ($type eq "config") {
+    &ui_print_header($text{"index_dns_config_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+    print &header_style();
+    $access{'manual_edit'} || &error($text{'acl_manual_edit_ecannot'});
+
     # check for errors in read config
     my $error_message = "<div>";
     if( $dnsmconfig{"error"}) {
@@ -47,16 +51,13 @@ if ($type eq "config") {
         }
     }
     $error_message .= "</div>";
-    &ui_print_header($text{"index_dns_config_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-    print &header_style();
-
     print $error_message;
     push( @files, @{ $dnsmconfig{"configfiles"} } );
 }
 elsif ($type eq "script") {
     &ui_print_header($text{"index_dns_scripts_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
     print &header_style();
-    $access{'edit_scripts'} || &error($text{'edit_scripts_ecannot'});
+    $access{'edit_scripts'} || &error($text{'acl_edit_scripts_ecannot'});
     push( @files, @{ $dnsmconfig{"scripts"} });
 }
 $file = $files[0] if ($file eq "");
@@ -118,7 +119,7 @@ $data = &read_file_lines($file, 1);
 $data = join("\n", @{$data});
 
 print &ui_textarea("data", $data, 20, 80, undef, undef, "style='width:100%'"),"<br>\n";
-print &ui_form_end([ [ "save", $text{'save_button'} ] ]);
+print &ui_form_end([ [ "save", $text{'button_save'} ] ]);
 
 &ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 

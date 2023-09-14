@@ -52,6 +52,18 @@ sub acl_security_form {
         $_[0]->{'edit_scripts'} ? 'checked' : '', $text{"yes"};
     printf "<input type=radio name=edit_scripts value=0 %s> %s</td> </tr>\n",
         $_[0]->{'edit_scripts'} ? '' : 'checked', $text{"no"};
+
+    print "<tr> <td><b>".$text{"acl_manual_edit"}."</b></td>\n";
+    printf "<td><input type=radio name=manual_edit value=1 %s> %s\n",
+        $_[0]->{'manual_edit'} ? 'checked' : '', $text{"yes"};
+    printf "<input type=radio name=manual_edit value=0 %s> %s</td> </tr>\n",
+        $_[0]->{'manual_edit'} ? '' : 'checked', $text{"no"};
+
+    print "<tr> <td><b>".$text{"acl_change_perms"}."</b></td>\n";
+    printf "<td><input type=radio name=change_perms value=1 %s> %s\n",
+        $_[0]->{'change_perms'} ? 'checked' : '', $text{"yes"};
+    printf "<input type=radio name=change_perms value=0 %s> %s</td> </tr>\n",
+        $_[0]->{'change_perms'} ? '' : 'checked', $text{"no"};
 }
 
 # acl_security_save(&options)
@@ -65,5 +77,7 @@ sub acl_security_save {
     $_[0]->{'view_logs'} = $in{'view_logs'};
     $_[0]->{'edit_hosts'} = $in{'edit_hosts'};
     $_[0]->{'edit_scripts'} = $in{'edit_scripts'};
+    $_[0]->{'manual_edit'} = $in{'manual_edit'};
+    $_[0]->{'change_perms'} = $in{'change_perms'};
 }
 

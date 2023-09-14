@@ -6,3 +6,5 @@ dump_logs=1
 view_logs=1
 edit_hosts=1
 edit_scripts=1
+manual_edit=1
+change_perms=0

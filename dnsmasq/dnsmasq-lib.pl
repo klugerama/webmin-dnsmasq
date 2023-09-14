@@ -5,10 +5,13 @@
 #
 
 BEGIN { push(@INC, ".."); };
-use POSIX 'ceil';
+use POSIX qw(ceil getgroups cuserid);
 use URI::Escape;
 use File::Basename;
 use WebminCore;
+
+use constant ERR_FILE_PERMS => 1;
+
 init_config();
 # our $module_config_directory;
 our %access = &get_module_acl();
@@ -25,6 +28,7 @@ our @defaultorval = ( \@radiodefaultno, \@radioval );
 our $td_left = "style=\"text-align: left; width: auto;\"";
 our $td_label = "style=\"text-align: left; width: auto; word-break: break-word; overflow-wrap: break-word;\"";
 our $td_right = "style=\"text-align: right; width: auto;\"";
+
 
 $last_config_change_flag = $module_var_directory."/config-flag";
 $last_restart_time_flag = $module_var_directory."/restart-flag";
@@ -823,15 +827,15 @@ sub get_mover_buttons {
         $mover = "<img src=images/gap.gif>";
     }
     else {	
-        $mover = "</a><a href='$url" . $sep . "idx=$current_index&t=".$total."&dir=down'><img src=images/down.gif border=0/></a>";
-        # $mover = "<span onclick=\"location.href='$url" . $sep . "idx=$current_index&t=".$total."&dir=down';return false;\"><img src=images/down.gif border=0/></span>";
+        $mover = "</a><a href='$url" . $sep . "cfg_idx=$current_index&t=".$total."&dir=down'><img src=images/down.gif border=0/></a>";
+        # $mover = "<span onclick=\"location.href='$url" . $sep . "cfg_idx=$current_index&t=".$total."&dir=down';return false;\"><img src=images/down.gif border=0/></span>";
     }
     if( $current_index == 0 ) {
         $mover .= "<img src=images/gap.gif>";
     }
     else {
-        $mover .= "<a href='$url" . $sep . "idx=$current_index&t=".$total."&dir=up'><img src=images/up.gif border=0/></a>";
-        # $mover .= "<span onclick=\"location.href='$url" . $sep . "idx=$current_index&t=".$total."&dir=up';return false;\"><img src=images/up.gif border=0/></span>";
+        $mover .= "<a href='$url" . $sep . "cfg_idx=$current_index&t=".$total."&dir=up'><img src=images/up.gif border=0/></a>";
+        # $mover .= "<span onclick=\"location.href='$url" . $sep . "cfg_idx=$current_index&t=".$total."&dir=up';return false;\"><img src=images/up.gif border=0/></span>";
     }
     return $mover;
 }
@@ -863,20 +867,20 @@ sub add_file_chooser_button {
     return ($file_chooser_button, $hidden_input_fields);
 }
 
-=head2 edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
+=head2 edit_file_chooser_link(text, input, type, current_value, cfg_idx, formid, [chroot], [addmode])
     Return HTML for a link that pops up a file chooser when clicked, and places
     the selected filename into hidden HTML text field. The parameters are :
         text - Text to appear in the link.
         input - Name of the form field to store the filename in.
         type - 0 for file or directory chooser, or 1 for directory only.
         current_value - Current filename/directory
-        idx - Index of the item to edit
+        cfg_idx - Index of the item to edit
         formid - Id of the form containing the button.
         chroot - If set, the chooser will be limited to this directory.
         addmode - If set to 1, the selected filename will be appended to the text box instead of replacing its contents.
 =cut
 sub edit_file_chooser_link {
-    my ($link_text, $input, $type, $current_value, $idx, $formid)  = @_;
+    my ($link_text, $input, $type, $current_value, $cfg_idx, $formid)  = @_;
     my $chroot = defined($_[6]) ? $_[6] : "/";
     my $add    = int($_[7]);
     my $link   = "chooser.cgi?add=$add&type=$type&chroot=$chroot&file=\"+encodeURIComponent(ifield.value)";
@@ -888,7 +892,7 @@ sub edit_file_chooser_link {
     my $file_edit_link = "<a href=\"#\" onclick='event.preventDefault();"
         . $formid."_".$input."_temp = \"".$current_value."\";"
         . "\$(\"input[name=" . $input. "]\").val(\"".$current_value."\");"
-        . "\$(\"input[name=" . $input. "_idx]\").val($idx);"
+        . "\$(\"input[name=" . $input. "_idx]\").val($cfg_idx);"
         . "\$(\"#" . $formid . "_" . $input. "_b\").trigger(\"click\");event.stopPropagation();return false;'>" . $link_text . "</a>";
 
     my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\" class=\"edit-file-input\"></input>"
@@ -925,18 +929,18 @@ sub add_interface_chooser_button {
     return ($iface_chooser_button, $hidden_input_fields);
 }
 
-=head2 edit_interface_chooser_link(text, input, type, current_value, idx, formid, [addmode])
+=head2 edit_interface_chooser_link(text, input, type, current_value, cfg_idx, formid, [addmode])
     Return HTML for a link that pops up an interface chooser when clicked, and places
     the selected interface into hidden HTML text field. The parameters are :
         text - Text to appear in the link.
         input - Name of the form field to store the interface in.
         current_value - Current interface
-        idx - Index of the item to edit
+        cfg_idx - Index of the item to edit
         formid - Id of the form containing the button.
         addmode - If set to 1, the selected interface will be appended to the text box instead of replacing its contents.
 =cut
 sub edit_interface_chooser_link {
-    my ($link_text, $input, $current_value, $idx, $formid)  = @_;
+    my ($link_text, $input, $current_value, $cfg_idx, $formid)  = @_;
     my $add = $_[5];
     my $link   = "net/interface_chooser.cgi?multi=$add&interface=";
 
@@ -947,7 +951,7 @@ sub edit_interface_chooser_link {
     my $iface_edit_link = "<a href=\"#\" onclick='event.preventDefault();"
         . $formid."_".$input."_temp = \"".$current_value."\";"
         . "\$(\"input[name=" . $input. "]\").val(\"".$current_value."\");"
-        . "\$(\"input[name=" . $input. "_idx]\").val($idx);"
+        . "\$(\"input[name=" . $input. "_idx]\").val($cfg_idx);"
         . "\$(\"#" . $formid . "_" . $input. "_b\").trigger(\"click\");event.stopPropagation();return false;'>" . $link_text . "</a>";
 
     my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\" class=\"edit-iface-input\"></input>"
@@ -969,7 +973,7 @@ sub edit_interface_chooser_link {
         link_text - Text to appear in link
 =cut
 sub edit_item_popup_modal_link {
-    my ($url, $internalfield, $formid, $link_text, $idx) = @_;
+    my ($url, $internalfield, $formid, $link_text, $cfg_idx) = @_;
 
     my $sep = $url =~ /\?/ ? "&" : "?";
     $url .= $sep . "internalfield=$internalfield";
@@ -979,32 +983,32 @@ sub edit_item_popup_modal_link {
         $link_text = "<span style='color: #595959 !important; font-style: italic;'>" . $text{"empty_value"} . "</span>"
     }
 
-    my $link = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" dnsm_array_idx=\"$idx\">";
+    my $link = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" dnsm_array_idx=\"$cfg_idx\">";
     $link .= "$link_text";
     $link .= "</a>";
     return $link;
 }
 
-=head2 edit_item_link(link_text, internalfield, title, idx, formid, field-mappings[, extra-url-params])
+=head2 edit_item_link(link_text, internalfield, title, cfg_idx, formid, field-mappings[, extra-url-params])
     Returns HTML for a link that will popup, hidden fields, and some JS to handle it 
     for a simple edit window of some kind.
         link_text - Text to appear in link
         internalfield - Keyword that identifies what to edit
         title - Text to appear in the popup window title
-        idx - Index of the item to edit
+        cfg_idx - Index of the item to edit
         formid - Id of the form on the source page to submit
         field-mappings - Array of fields to include in form
         [extra-url-params] - URL-formatted string of any extra param=value pairs (if multiple, delimited with "&")
 =cut
 sub edit_item_link {
-    my ($link_text, $internalfield, $title, $idx, $formid, $fields, $fidx) = @_;
+    my ($link_text, $internalfield, $title, $cfg_idx, $formid, $fields, $fidx) = @_;
     my $extra_url_params = @_[7] || "";
     if ($extra_url_params) {
         $extra_url_params = ( $extra_url_params =~ /^&/ ? "" : "&" ) . $extra_url_params;
     }
 
     $title =~ s/ /+/g ;
-    my $qparams = "action=edit&idx=$idx&title=$title" . $extra_url_params;
+    my $qparams = "action=edit&cfg_idx=$cfg_idx&title=$title" . $extra_url_params;
     $qparams .= "&fidx=" . $fidx;
     my $link = &edit_item_popup_modal_link("list_item_edit_chooser.cgi?" . $qparams, $internalfield, $formid, $link_text, $fidx);
 
@@ -1148,8 +1152,8 @@ sub show_basic_fields {
         print &ui_grid_table(\@grid, 2, 100, undef, undef, $table_header);
     }
 
-    # print &ui_form_end( [ &ui_submit( $text{"save_button"} ), &ui_reset( $text{"undo_button"} ) ] );
-    print &ui_form_end( [ &ui_submit( $text{"save_button"}, "submit" ) ] );
+    # print &ui_form_end( [ &ui_submit( $text{"button_save"} ), &ui_reset( $text{"undo_button"} ) ] );
+    print &ui_form_end( [ &ui_submit( $text{"button_save"}, "submit" ) ] );
 }
 
 sub show_basic_fields_row {
@@ -1246,8 +1250,8 @@ sub show_other_fields {
     print &ui_columns_end();
     print "<span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i>";
     my @form_buttons = ();
-    # push( @form_buttons, &ui_submit( $text{"cancel_button"}, "cancel" ) );
-    push( @form_buttons, &ui_submit( $text{"save_button"}, "submit" ) );
+    # push( @form_buttons, &ui_submit( $text{"button_cancel"}, "cancel" ) );
+    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit" ) );
     print &ui_form_end( \@form_buttons );
 }
 
@@ -1333,7 +1337,7 @@ sub show_field_table {
     my $hidden_file_edit_input_fields;
     my $hidden_item_edit_input_fields;
     my @newfields = @{$definition->{"param_order"}};
-    my @editfields = ( "idx", @newfields );
+    my @editfields = ( "cfg_idx", @newfields );
     my $formid = $internalfield . "_form";
     my @tds = ( $td_label, $td_left );
     my @pathtypes = ( "file", "path", "dir" );
@@ -1402,7 +1406,7 @@ sub show_field_table {
                 $val = &ui_checkbox("boolval", "1", "", $val, undef, 1)
             }
             my $extra_url_params = ($in{"bad_ifield"} 
-                                    && $in{"bad_idx"} eq $item->{"idx"} 
+                                    && $in{"cfg_idx"} eq $item->{"cfg_idx"} 
                                     && $in{"show_validation"} 
                                     ? "show_validation=" . $in{"show_validation"} 
                                         . ($in{"custom_error"} 
@@ -1411,16 +1415,16 @@ sub show_field_table {
                                     : "");
             if ($count == 0) {
                 if ($valtype eq "interface") {
-                    # edit_interface_chooser_link(text, input, current_value, idx, formid, [addmode])
+                    # edit_interface_chooser_link(text, input, current_value, cfg_idx, formid, [addmode])
                     ($edit_link, $hidden_interface_edit_input_fields) = &edit_interface_chooser_link($val, $internalfield, $val, $count, $formid);
                 }
                 elsif (grep { /^$valtype$/ } ( @pathtypes )) {
-                    # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
+                    # edit_file_chooser_link(text, input, type, current_value, cfg_idx, formid, [chroot], [addmode])
                     ($edit_link, $hidden_file_edit_input_fields) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "dir" ? 1 : 0), $val, $count, $formid);
                 }
                 else {
                     # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, $extra_url_params);
+                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, $extra_url_params);
                 }
             }
             else {
@@ -1428,11 +1432,11 @@ sub show_field_table {
                     ($edit_link) = &edit_interface_chooser_link($val, $internalfield, $val, $count, $formid);
                 }
                 elsif (grep { /^$valtype$/ } ( @pathtypes )) {
-                    # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
+                    # edit_file_chooser_link(text, input, type, current_value, cfg_idx, formid, [chroot], [addmode])
                     ($edit_link) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "dir" ? 1 : 0), $val, $count, $formid);
                 }
                 else {
-                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"}, ($in{"bad_ifield"} && $in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : ""));
+                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, ($in{"bad_ifield"} && $in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : ""));
                 }
             }
             push ( @cols, $edit_link );
@@ -1450,9 +1454,9 @@ sub show_field_table {
         print $hidden_add_input_fields . $add_button;
     }
     print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print &ui_submit($text{"button_enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"button_disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"button_delete_sel"}, "delete_sel_$internalfield");
     # if (!$definition->{"val"} || $definition->{"val"}->{"valtype"} ne "interface") {
     if ($addtype ne "interface" && $addtype ne "file") {
         print $hidden_add_input_fields;
@@ -1487,7 +1491,7 @@ sub show_path_list {
     foreach my $item ( @{$dnsmconfig{$configfield}} ) {
         local @cols;
         push ( @cols, &ui_checkbox("enabled", "1", "", $item->{"used"}?1:0, undef, 1) );
-        # edit_file_chooser_link(text, input, type, current_value, idx, formid, [chroot], [addmode])
+        # edit_file_chooser_link(text, input, type, current_value, cfg_idx, formid, [chroot], [addmode])
         ($edit_link, $hidden_edit_input_fields) = &edit_file_chooser_link($item->{"val"}, $internalfield, $chooser_mode, $item->{"val"}, $count, $formid);
         push ( @cols, $edit_link );
         print &ui_clickable_checked_columns_row( \@cols, \@tds, "sel", $count );
@@ -1498,9 +1502,9 @@ sub show_path_list {
     print $hidden_add_input_fields;
     print $file_chooser_button;
     print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print &ui_submit($text{"button_enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"button_disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"button_delete_sel"}, "delete_sel_$internalfield");
     print $hidden_edit_input_fields;
     print &ui_form_end( );
     print $g;
@@ -1635,19 +1639,47 @@ sub check_for_file_errors {
             foreach my $selid ( @sel ) {
                 my $f = $in{"file_" . $selid};
                 my $l = $in{"line_" . $selid};
-                my $a = $in{"disable_sel"} ? 1 : ($in{"delete_sel"} ? 2 : 0);
+                my $a = $in{"button_disable_sel"} ? 1 : ($in{"button_delete_sel"} ? 2 : 0);
                 &save_update($f, $l, undef, $a);
             }
             $error_check_result = $redirect;
             $error_check_action = "redirect";
         }
+        elsif ($in{"fix_perms"}) {
+            if (!$access{"change_perms"}) {
+                $error_check_result = "<div class=\"conf-error-block\">"
+                            . "<h3 style=\"color: red;\">".$text{"error"}."</h3>"
+                            . $text{"acl_change_perms_ecannot"} . "<br/><br/>"
+                            . "</div>";
+                $error_check_action = "warn";
+            }
+            else {
+                my $internalfield = $in{"ifield"};
+                my $configfield = &internal_to_config($internalfield);
+                my $param = $in{"param"};
+                my $relevant_user_name = $in{"foruser"};
+                my $relevant_group_name = $in{"forgroup"};
+                my $perms_failed  = $in{"perms_failed"};
+                my $item;
+                if ($in{"cfg_idx"} > -1) {
+                    $item = $dnsmconfig->{"$configfield"}[$in{"cfg_idx"}];
+                }
+                else {
+                    $item = $dnsmconfig->{"$configfield"};
+                }
+                my $val = ($param eq "val" ? $item->{"val"} : $item->{"val"}->{"$param"});
+                $val = readlink($val) if (-l $val);
+
+                &set_permissions($internalfield, $val, $perms_failed, $relevant_user_name, $relevant_group_name)
+            }
+        }
         elsif ($in{"bad_ifield"}) {
             $error_check_result .= "<script type='text/javascript'>\n"
                     . "\$(document).ready(function() {\n"
                     . "  setTimeout(function() {\n";
-            if (defined($in{"bad_idx"})) {
+            if (defined($in{"cfg_idx"})) {
                 # list item; show edit dialog modal
-                $error_check_result .= "    \$(\"a[dnsm_array_idx='" . $in{"bad_idx"} . "']\").first().trigger(\"click\");\n";
+                $error_check_result .= "    \$(\"a[dnsm_array_idx='" . $in{"cfg_idx"} . "']\").first().trigger(\"click\");\n";
             }
             else {
                 if (defined($in{"custom_error"}) && $in{"custom_error"} ne "") {
@@ -1664,7 +1696,7 @@ sub check_for_file_errors {
     elsif ( @{$dnsmconfig->{"error"}} > 0) {
         my $errorcount = @{$dnsmconfig->{"error"}};
         $error_check_result = "<div class=\"conf-error-block\">"
-                            . "<h3 style=\"color: red;\">".$text{"error_heading"}."</h3>"
+                            . "<h3 style=\"color: red;\">".$text{"configuration_error_heading"}."</h3>"
                             . &text( "err_has_errors_", $errorcount ) . "<br/><br/>"
                             . "<a href=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" class=\"btn btn-lg btn-danger conf-error-button\">"
                             . "<i class=\"fa fa-fw fa-arrow-right\">&nbsp;</i>"
@@ -1673,6 +1705,61 @@ sub check_for_file_errors {
         $error_check_action = "warn";
     }
     return ($error_check_action, $error_check_result);
+}
+
+sub set_permissions {
+    my ($internalfield, $val, $perms_failed, $relevant_user_name, $relevant_group_name) = @_;
+    my $fdef = $configfield_fields{$internalfield};
+    my $pdef = \%{ $fdef->{"$param"} };
+    my $req_perms = $pdef->{"req_perms"};
+
+    my @tst = stat($val);
+    my $target_current_mode = $tst[2]; # returns as hex value?
+    my $target_uid = $tst[4];
+    my $target_gid = $tst[5];
+    my $existingperms = oct(sprintf("%04o", $target_current_mode & 07777)); # now it's octal; just perms (no file type)
+
+    my ($current_user_name, undef, $relevant_user_uid, $relevant_user_gid) = getpwuid($<);
+    $relevant_user_name = $current_user_name if (!$relevant_user_name);
+    $relevant_group_name = getgrgid($relevant_user_gid) if (!$relevant_group_name); 
+    my @relevant_user_gids;
+    if ($relevant_user_name eq $current_user_name) {
+        @relevant_user_gids = getgroups();
+    }
+    else {
+        (undef, undef, $relevant_user_uid, $relevant_user_gid) = getpwnam($relevant_user_name);
+        @relevant_user_gids = split(" ", @{split(":", `groups $relevant_user_name`)}[1]);
+    }
+
+    my $for_whom_multiplier = 00;
+    if ($target_uid == $relevant_user_uid) {
+        # user matches; perms should only change for the user
+        $for_whom_multiplier = 0100;
+    }
+    elsif ($target_gid == $relevant_user_gid || (grep(/^$target_gid$/, @relevant_user_gids))) {
+        # user doesn't match but group matches; perms should only change for the user + group
+        $for_whom_multiplier = 0110;
+    }
+    else {
+        # neither matches; perms should change for user + others
+        $for_whom_multiplier = 0101;
+    }
+    my $newperms;
+    if ($perms_failed & 1) {
+        # needs execute permission
+        $newperms = $existingperms | (01 * $for_whom_multiplier);
+    }
+    if ($perms_failed & 2) {
+        # needs read permission
+        $newperms = $existingperms | (02 * $for_whom_multiplier);
+    }
+    if ($perms_failed & 4) {
+        # needs write permission
+        $newperms = $existingperms | (04 * $for_whom_multiplier);
+    }
+
+    # set_ownership_permissions(user, group, perms, file, ...)
+    &set_ownership_permissions(undef, undef, $newperms, $val);
 }
 
 sub get_current_version {
@@ -1757,19 +1844,27 @@ sub deserialize_string {
     return $var;
 }
 
-=head2 create_error(file, line, desc, configfield, param, idx, [custom_error])
+=head2 create_error(file, line, desc, configfield, param, cfg_idx, [custom_error], [error_type], [foruser], [forgroup])
 =cut
 sub create_error {
-    my ($file, $line, $desc, $configfield, $param, $idx) = @_;
+    my ($file, $line, $desc, $configfield, $param, $cfg_idx) = @_;
     my $custom_error = $_[6] ? $_[6] : 0;
+    my $error_type = $_[7] ? $_[7] : undef;
+    my $foruser = $_[8] ? $_[8] : undef;
+    my $forgroup = $_[9] ? $_[9] : undef;
+    my $perms_failed = $_[10] ? $_[10] : undef;
     return {
                 "file" => $file,
                 "line" => $line,
                 "desc" => $desc,
                 "configfield" => $configfield,
                 "param" => $param,
-                "idx" => defined($idx) ? $idx : -1,
-                "custom_error" => $custom_error
+                "cfg_idx" => defined($cfg_idx) ? $cfg_idx : -1,
+                "custom_error" => $custom_error,
+                "error_type" => $error_type,
+                "foruser" => $foruser,
+                "forgroup" => $forgroup,
+                "perms_failed" => $perms_failed,
            };
 }
 

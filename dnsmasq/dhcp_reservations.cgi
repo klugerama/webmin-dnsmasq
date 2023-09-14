@@ -49,7 +49,7 @@ sub show_reservations() {
         next if ($definition->{$param}->{"ipversion"} == 6);
         push( @newfields, $param );
     }
-    my @editfields = ( "idx", @newfields );
+    my @editfields = ( "cfg_idx", @newfields );
     my $formid = $internalfield . "_form";
     my @tds = ( $td_label, $td_left );
     my @column_headers = ( "",
@@ -87,10 +87,10 @@ sub show_reservations() {
         foreach my $val ( @vals ) {
             # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"} );
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"} );
             }
             else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"idx"} );
+                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"} );
             }
             push( @cols, $edit_link );
         }
@@ -100,9 +100,9 @@ sub show_reservations() {
     print &ui_columns_end();
     print &ui_links_row(\@list_link_buttons);
     print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"delete_sel"}, "delete_sel_$internalfield");
+    print &ui_submit($text{"button_enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($text{"button_disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($text{"button_delete_sel"}, "delete_sel_$internalfield");
     print $hidden_add_input_fields;
     print $hidden_edit_input_fields;
     print &ui_form_end( );
