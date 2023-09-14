@@ -1,6 +1,6 @@
 name=DNSMasq
 desc=DNSMasq DNS & DHCP server
-version=0.6.5.4
+version=0.6.6
 os_support=
-depends=0.77
+depends=2.0
 category=servers
