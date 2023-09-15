@@ -2964,7 +2964,8 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_dirname"},
-                "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
+                "template" => "<" . $text{"tmpl_path_to_directory"} . ">",
+                "pattern" => "(?!.*\\.{2}).*"
             },
             "interface" => {
                 "length" => 10,
