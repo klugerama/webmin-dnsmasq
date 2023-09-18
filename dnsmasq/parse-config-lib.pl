@@ -411,7 +411,8 @@ sub init_configfield_fields {
                 # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
             }
         },
         "dhcp_ttl" => {  # =<time>
@@ -423,7 +424,8 @@ sub init_configfield_fields {
                 # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
             }
         },
         "neg_ttl" => {  # =<time>
@@ -435,7 +437,8 @@ sub init_configfield_fields {
                 # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
             }
         },
         "max_ttl" => {  # =<time>
@@ -447,7 +450,8 @@ sub init_configfield_fields {
                 # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
             }
         },
         "max_cache_ttl" => {  # =<time>
@@ -459,7 +463,8 @@ sub init_configfield_fields {
                 # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
             }
         },
         "min_cache_ttl" => {  # =<time>
@@ -471,7 +476,9 @@ sub init_configfield_fields {
                 # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,4}",
+                "min" => 0,
+                "max" => 3600
             }
         },
         "auth_ttl" => {  # =<time>
@@ -483,7 +490,8 @@ sub init_configfield_fields {
                 # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
             }
         },
         "log_queries" => {  # [=extra]
@@ -581,11 +589,12 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 3,
                 "valtype" => "int",
-                "default" => 0,
+                "default" => 1232,
                 "required" => 1,
                 "label" => $text{"p_label_val_size"},
                 "template" => "<" . $text{"tmpl_size"} . ">",
-                "pattern" => "\\d{1,5}"
+                "pattern" => "\\d{1,5}",
+                "min" => 0,
             }
         },
         "query_port" => {  # =<query_port>
@@ -607,7 +616,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 3,
                 "valtype" => "int",
-                "default" => 0,
+                "default" => 1024,
                 "required" => 1,
                 "label" => $text{"p_label_val_port"},
                 "template" => "<" . $text{"tmpl_port"} . ">",
@@ -1605,7 +1614,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 3,
                 "valtype" => "int",
-                "default" => 0,
+                "default" => 150,
                 "required" => 1,
                 "template" => "<" . $text{"tmpl_integer"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -2489,7 +2498,8 @@ sub init_configfield_fields {
             },
             "filename" => {
                 "length" => 15,
-                "valtype" => "string",
+                "valtype" => "file",
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_filename"},
@@ -2888,7 +2898,7 @@ sub init_configfield_fields {
             "param_order" => [ "interface", "mtu", "priority", "interval", "lifetime" ],
             "interface" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "interface",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_interface"},
@@ -2965,16 +2975,17 @@ sub init_configfield_fields {
             "param_order" => [ "directory", "interface" ],
             "directory" => {
                 "length" => 15,
-                "valtype" => "string",
+                "valtype" => "dir",
+                "req_perms" => "read",
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_dirname"},
                 "template" => "<" . $text{"tmpl_path_to_directory"} . ">",
-                "pattern" => "(?!.*\\.{2}).*"
+                "pattern" => "(?!.*\\.{2}).*" # man page says: "TFTP paths which include ".." are rejected, to stop clients getting outside the specified root"
             },
             "interface" => {
                 "length" => 10,
-                "valtype" => "string",
+                "valtype" => "interface",
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_interface"},
@@ -3145,7 +3156,7 @@ our $TIME = "(\\d{1,5}[mhdw]?|infinite)";
 our $FILE = "[0-9a-zA-Z\_\.\/\-]+";
 our $NUMBER="[0-9]+";
 my $TAG = "(set|tag):([!0-9a-zA-Z\_\.\-]*)";
-my $SETTAG = "(?:set:)[!0-9a-zA-Z\_\.\-]*";
+my $SETTAG = "(?:set:)[0-9a-zA-Z\_\.\-]*";
 my $IPV6PROP = "static|ra-only|ra-names|ra-stateless|slaac|ra-advrouter|off-link";
 my $OPTION = "option6?:([0-9a-zA-Z\-]*)|[0-9]{1,3}";
 my $NAME = "[a-zA-Z\_\.][0-9a-zA-Z\_\.\-]*";
