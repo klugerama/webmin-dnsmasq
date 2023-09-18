@@ -32,7 +32,7 @@ if ($error_check_action eq "redirect") {
 }
 
 &ui_print_header($text{"index_tftp_settings_basic"}, $text{"index_title"}, undef, "intro", 1, 0, 0, &restart_button());
-print &header_style();
+print &header_js();
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "tftp_basic.cgi";

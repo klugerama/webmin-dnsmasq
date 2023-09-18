@@ -1,0 +1,83 @@
+.select_invert {
+  margin-right: unset !important;
+}
+.new-dnsm-button-container {
+  margin-top: -1px;
+  position: absolute;
+}
+.add-item-button-small {
+  height: 28px !important;
+  margin-left: -4px;
+  display: inline-block;
+}
+.remove-item-button-small {
+  height: 28px !important;
+  margin-right: 4px;
+  display: inline-block;
+}
+/* select[multiple] {
+  min-height: unset !important;
+  max-height: unset !important;
+} */
+html[data-bgs='nightRider'] .hl-aw, .hl-aw {
+  background-color: unset !important;
+}
+.conf-error-block {
+  width: 100%;
+  padding: 14px;
+  display: block;
+  border: 2px solid black;
+}
+.conf-error-block h3 {
+    color: red;
+}
+.conf-error-button {
+  display: inline-flex;
+  align-self: center;
+  justify-content: center;
+  align-items: center;
+}
+.dnsm-td-left {
+    text-align: left;
+    width: auto;
+}
+.dnsm-td-label {
+    word-break: break-word !important;
+    overflow-wrap: break-word;
+}
+.dnsm-td-right {
+    text-align: right;
+    width: auto;
+}
+.dnsm-cb-td {
+    width: 15px;
+    height: 31px;
+}
+.dnsm-basic-td {
+    height: 31px;
+    white-space: normal !important;
+    word-break: normal;
+}
+.dnsm-empty-value {
+    color: #595959 !important;
+    font-style: italic;
+}
+.clickable_tr, .clickable_tr_selected {
+    width: 15px;
+    height: 29px;
+}
+.clickable-td {
+    height: 29px;
+    white-space: normal !important;
+    word-break: normal;
+}
+.file-chooser-button {
+    min-width:90px;
+    width:auto;
+    height:33px;
+}
+.iface-chooser-button {
+    min-width:90px;
+    width:auto;
+    height:33px;
+}

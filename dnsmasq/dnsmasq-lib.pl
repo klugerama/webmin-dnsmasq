@@ -25,10 +25,12 @@ our @defaultoryes = ( \@radiodefaultno, \@radioyes );
 # our @defaultorno = ( \@radiodefaultyes, \@radiono );
 our @radioval = ( 1, " " );
 our @defaultorval = ( \@radiodefaultno, \@radioval );
-our $td_left = "style=\"text-align: left; width: auto;\"";
-our $td_label = "style=\"text-align: left; width: auto; word-break: break-word; overflow-wrap: break-word;\"";
-our $td_right = "style=\"text-align: right; width: auto;\"";
-
+our $td_left = "class=\"dnsm-td-left\"";
+our $td_label = "class=\"dnsm-td-left dnsm-td-label\"";
+our $td_right = "class=\"dnsm-td-right\"";
+our $cbtd = 'class="dnsm-cb-td"';
+our $customcbtd = 'class="ui_checked_checkbox flexed dnsm-cb-td"';
+our $dnsm_basic_td = 'class="dnsm-basic-td"';
 
 $last_config_change_flag = $module_var_directory."/config-flag";
 $last_restart_time_flag = $module_var_directory."/restart-flag";
@@ -74,8 +76,7 @@ sub restart_button {
     if (($config{"check_for_updates"} eq "1" && &needs_update_check()) || $config{"dnsmasq_latest_url"}) {
         my $latest = &check_for_updated_version();
         if ($latest) {
-            # $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='hidden show-update-button'>" . $text{"update_module"} . "</a><br>\n";
-            $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='show-update-button'></a><br>\n";
+            $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='show-update-button'>" . $text{"update_module"} . "</a><br>\n";
         }
     }
     my $args = "returnto=".&urlize(&this_url());
@@ -857,7 +858,7 @@ sub add_file_chooser_button {
     my $link   = "chooser.cgi?add=$add&type=$type&chroot=$chroot&file=\"+encodeURIComponent(ifield.value)";
 
     my $file_chooser_button = "<button class='btn btn-inverse btn-tiny file-chooser-button chooser_button' ";
-    $file_chooser_button .= "style='min-width:90px; width:auto; height:33px;' onClick='ifield = \$( \"#$input\" )[0]; ";
+    $file_chooser_button .= "onClick='ifield = \$( \"#$input\" )[0]; ";
     $file_chooser_button .= "chooser = window.open(\"$theme_webprefix/$link, \"chooser\"); chooser.ifield = ifield; window.ifield = ifield;'>";
     $file_chooser_button .= "$button_text</button>\n";
 
@@ -886,7 +887,7 @@ sub edit_file_chooser_link {
     my $link   = "chooser.cgi?add=$add&type=$type&chroot=$chroot&file=\"+encodeURIComponent(ifield.value)";
 
     if ($link_text eq "") {
-        $link_text = "<span style='color: #595959 !important; font-style: italic;'>" . $text{"empty_value"} . "</span>"
+        $link_text = "<span class='dnsm-empty-value'>" . $text{"empty_value"} . "</span>"
     }
 
     my $file_edit_link = "<a href=\"#\" onclick='event.preventDefault();"
@@ -897,7 +898,7 @@ sub edit_file_chooser_link {
 
     my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\" class=\"edit-file-input\"></input>"
         . "<button class='btn file-chooser-button chooser_button hidden' id=\"" . $formid . "_" . $input. "_b\" "
-        . "style='min-width:90px; width:auto; height:33px;' onClick='\$(input[name=".$input."]).val(null); ifield = \$( \"#$input\" )[0]; "
+        . "onClick='\$(input[name=".$input."]).val(null); ifield = \$( \"#$input\" )[0]; "
         . "chooser = window.open(\"" . $theme_webprefix . "/" . $link . ", \"chooser\"); chooser.ifield = ifield; window.ifield = ifield;'>"
         . "</button>\n"
         . "";
@@ -919,7 +920,7 @@ sub add_interface_chooser_button {
     my $link   = "net/interface_chooser.cgi?multi=$add&interface=";
 
     my $iface_chooser_button = "<button class='btn btn-inverse btn-tiny iface-chooser-button chooser_button' ";
-    $iface_chooser_button .= "style='min-width:90px; width:auto; height:33px;' onClick='ifield = \$( \"#$input\" )[0]; ";
+    $iface_chooser_button .= "onClick='ifield = \$( \"#$input\" )[0]; ";
     $iface_chooser_button .= "chooser = window.open(\"$theme_webprefix/$link, \"chooser\"); chooser.ifield = ifield; window.ifield = ifield; ";
     $iface_chooser_button .= "'>$button_text</button>\n";
 
@@ -945,7 +946,7 @@ sub edit_interface_chooser_link {
     my $link   = "net/interface_chooser.cgi?multi=$add&interface=";
 
     if ($link_text eq "") {
-        $link_text = "<span style='color: #595959 !important; font-style: italic;'>" . $text{"empty_value"} . "</span>"
+        $link_text = "<span class='dnsm-empty-value'>" . $text{"empty_value"} . "</span>"
     }
 
     my $iface_edit_link = "<a href=\"#\" onclick='event.preventDefault();"
@@ -956,7 +957,7 @@ sub edit_interface_chooser_link {
 
     my $hidden_input_fields = "<input type=\"hidden\" name=\"$input\" class=\"edit-iface-input\"></input>"
         . "<button class='btn btn-inverse btn-tiny iface-chooser-button chooser_button hidden' id=\"" . $formid . "_" . $input. "_b\" "
-        . "style='min-width:90px; width:auto; height:33px;' onClick='\$(input[name=".$input."]).val(null); ifield = \$( \"#$input\" )[0]; "
+        . "onClick='\$(input[name=".$input."]).val(null); ifield = \$( \"#$input\" )[0]; "
         . "chooser = window.open(\"" . $theme_webprefix . "/" . $link . ", \"chooser\"); chooser.ifield = ifield; window.ifield = ifield;'>"
         . "</button>\n"
         . "";
@@ -980,7 +981,7 @@ sub edit_item_popup_modal_link {
     $url .= "&formid=" . $formid;
 
     if ($link_text eq "") {
-        $link_text = "<span style='color: #595959 !important; font-style: italic;'>" . $text{"empty_value"} . "</span>"
+        $link_text = "<span class='dnsm-empty-value'>" . $text{"empty_value"} . "</span>"
     }
 
     my $link = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" dnsm_array_idx=\"$cfg_idx\">";
@@ -1112,13 +1113,11 @@ sub get_basic_fields {
 =cut
 sub show_basic_fields {
     my ($dnsmconfig, $pageid, $page_fields, $apply_cgi, $table_header) = @_;
-    my $formid = "$pageid_basic_form";
+    my $formid = $pageid . "_basic_form";
 
     my @basic_fields = &get_basic_fields($page_fields);
     return if @basic_fields == 0;
-    my $cbtd = 'style="width: 15px; height: 31px;"';
-    my $td = 'style="height: 31px; white-space: normal !important; word-break: normal;"';
-    my @tds = ( $cbtd, $td, $td );
+    my @tds = ( $cbtd, $dnsm_basic_td, $dnsm_basic_td );
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     if (@basic_fields == 1) {
         my $g = &ui_columns_start( [
@@ -1160,13 +1159,10 @@ sub show_basic_fields_row {
     my ($dnsmconfig, $configfield) = @_;
     my $internalfield = &config_to_internal("$configfield");
 
-    my $cbtd = 'style="width: 15px; height: 31px;"';
-    my $bigtd = 'style="height: 31px; white-space: normal !important; word-break: normal;" colspan=2';
-    my $customcbtd = 'class="ui_checked_checkbox flexed" style="width: 15px; height: 31px;"';
-    my $td = 'style="height: 31px; white-space: normal !important; word-break: normal;"';
+    my $bigtd = $dnsm_basic_td . " colspan=2";
     my @booltds = ( $cbtd, $bigtd );
-    my @cbtds = ( $customcbtd, $td, $td );
-    my @tds = ( $cbtd, $td, $td );
+    my @cbtds = ( $customcbtd, $dnsm_basic_td, $dnsm_basic_td );
+    my @tds = ( $cbtd, $dnsm_basic_td, $dnsm_basic_td );
 
     my $help = &ui_help($configfield . ": " . $text{"p_man_desc_$internalfield"});
     if ( grep { /^$configfield$/ } ( @confbools ) ) {
@@ -1260,6 +1256,7 @@ sub get_field_auto_columns {
     my $configfield = &internal_to_config($internalfield);
     my $item = $dnsmconfig{"$configfield"};
     my $val = $item->{"val"};
+    my @pathtypes = ( "file", "path", "dir" );
     my @cols = ();
     push ( @cols, &show_label_with_help($internalfield, $configfield) );
     # first get a list of all parameters for this field, for the radio button (ui_opt_textbox)
@@ -1267,10 +1264,14 @@ sub get_field_auto_columns {
     my @otherfields = ();
     foreach my $key ( @{ %configfield_fields{$internalfield}->{"param_order"} } ) {
         my $definition = %configfield_fields{$internalfield}->{$key};
-        push ( @otherfields, $internalfield . "_" . $key );
+        my $fieldname = $internalfield . "_" . $key;
+        push ( @otherfields, $fieldname );
         # if this parameter is an array, include
         if ($definition->{"arr"} == 1) {
-            push ( @otherfields, $internalfield . "_" . $key . "_additem" );
+            push ( @otherfields, $fieldname . "_additem" );
+        }
+        elsif ($definition->{"valtype"} eq "interface") {
+            push ( @otherfields, $fieldname . "_ifaceChooser" );
         }
     }
     # ui_opt_textbox(name, value, size, option1, [option2], [disabled?], [&extra-fields], [max], [tags])
@@ -1280,12 +1281,13 @@ sub get_field_auto_columns {
     my $count = 0;
     foreach my $key ( @{ %configfield_fields{$internalfield}->{"param_order"} }) {
         my $definition = %configfield_fields{$internalfield}->{$key};
-        my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
+        # my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
         if ($count == 0) {
             push ( @cols, "<nobr>" . &ui_opt_textbox( $internalfield, $item->{"used"}?1:undef, 1, $text{"disabled"}, undef, undef, \@otherfields, undef, "dummy_field" ) . "</nobr>");
         }
+        my $fieldname = $internalfield . "_" . $key;
         my $tmpl = $definition->{"template"};
-        my $label = $definition->{"label"} || $text{"p_label_" . $internalfield . "_" . $key};
+        my $label = $definition->{"label"} || $text{"p_label_" . $fieldname};
         my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
         my $validation = "";
         $validation .= $definition->{"pattern"} ? " pattern='" . $definition->{"pattern"} . "'" : "";
@@ -1296,21 +1298,29 @@ sub get_field_auto_columns {
             $label .= "&nbsp;<span color='red'>*</span>&nbsp;";
         }
         if ($definition->{"arr"} == 1) {
-            # push ( @cols, $text{"p_label_" . $internalfield . "_" . $key} . "<br>" . &ui_select( $internalfield . "_" . $key, undef, \@{ $val->{$key} }, 3, 1 ) );
-            if ($key eq "val") {
-                push ( @cols, $label . "<br>" . &ui_selectbox_with_controls( $internalfield . "_" . $key, $val, 3, $definition->{"length"}, $tmpl ) );
-            }
-            else {
-                push ( @cols, $label . "<br>" . &ui_selectbox_with_controls( $internalfield . "_" . $key, \@{ $val->{$key} }, 3, $definition->{"length"}, $tmpl ) );
-            }
+            push ( @cols, $label . "<br>" . &ui_selectbox_with_controls( $fieldname, ($key eq "val" ? $val : \@{ $val->{$key} }), 3, $definition->{"length"}, $tmpl ) );
         }
         else {
             my $input;
-            if ($definition->{"valtype"} eq "file") {
-                $input = "<nobr>" . &ui_filebox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation ) . "</nobr>";
+            my $valtype = $definition->{"valtype"};
+            if (grep { /^$valtype$/ } ( @pathtypes )) {
+                $input = "<nobr>" . &ui_filebox( $fieldname, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation, ($valtype eq "dir" ? 1 : 0) ) . "</nobr>";
+            }
+            elsif ($valtype eq "interface") {
+                my $button;
+                if (&foreign_available("net") && defined(net::active_interfaces)) {
+                    &foreign_require("net", "net-lib.pl");
+                    my $buttonname = $fieldname . "_ifaceChooser";
+                    $button = &net::interfaces_chooser_button($fieldname);
+                    webmin_debug_log("--------IFACE", "button: $button ");
+                    $button =~ s/\>/ name="$buttonname">/;
+                    webmin_debug_log("--------IFACE", "button: $button ");
+                }
+                $input = "<nobr>" . &ui_textbox( $fieldname, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation ) . " " .
+                         ( $button ) . "</nobr>";
             }
             else {
-                $input = &ui_textbox( $internalfield . "_" . $key, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation );
+                $input = &ui_textbox( $fieldname, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation );
             }
             push ( @cols, $label . "<br>" . $input );
         }
@@ -1532,9 +1542,9 @@ sub ui_clickable_checked_columns_row {
 
     $checkname = $checkname || "sel";
 
-    my $customcbtd = "class=\"ui_checked_checkbox flexed clickable_tr" . ($checked ? " clickable_tr_selected" : "") . "\" style=\"width: 15px; height: 29px;\"";
-    my $td = 'class="cursor-pointer" style="height: 29px; white-space: normal !important; word-break: normal;"';
-    my @cbtds = ( $customcbtd );
+    my $custom_clickable_td_cb = "class=\"ui_checked_checkbox flexed clickable_tr" . ($checked ? " clickable_tr_selected" : "") . "\"";
+    my $custom_clickable_td = 'class="cursor-pointer clickable-td"';
+    my @custom_clickable_tds = ( $custom_clickable_td_cb );
 
     my @cols = (
         # ui_checkbox(name, value, label, selected?, [tags], [disabled?])
@@ -1542,16 +1552,16 @@ sub ui_clickable_checked_columns_row {
         @{ $columns }
     );
     if ($tdtags) {
-        @cbtds = ( $customcbtd, @{ $tdtags } );
+        @custom_clickable_tds = ( $custom_clickable_td_cb, @{ $tdtags } );
     }
     else {
         foreach my $col (@{ $columns }) {
-            push ( @cbtds, $td );
+            push ( @custom_clickable_tds, $custom_clickable_td );
         }
     }
 
-    # return &ui_columns_row( \@cols, ($tdtags ? $tdtags : \@cbtds) );
-    return &ui_columns_row( \@cols, \@cbtds );
+    # return &ui_columns_row( \@cols, ($tdtags ? $tdtags : \@custom_clickable_tds) );
+    return &ui_columns_row( \@cols, \@custom_clickable_tds );
 }
 
 sub show_title_with_help {
@@ -1648,7 +1658,7 @@ sub check_for_file_errors {
         elsif ($in{"fix_perms"}) {
             if (!$access{"change_perms"}) {
                 $error_check_result = "<div class=\"conf-error-block\">"
-                            . "<h3 style=\"color: red;\">".$text{"error"}."</h3>"
+                            . "<h3>".$text{"error"}."</h3>"
                             . $text{"acl_change_perms_ecannot"} . "<br/><br/>"
                             . "</div>";
                 $error_check_action = "warn";
@@ -1696,7 +1706,7 @@ sub check_for_file_errors {
     elsif ( @{$dnsmconfig->{"error"}} > 0) {
         my $errorcount = @{$dnsmconfig->{"error"}};
         $error_check_result = "<div class=\"conf-error-block\">"
-                            . "<h3 style=\"color: red;\">".$text{"configuration_error_heading"}."</h3>"
+                            . "<h3>".$text{"configuration_error_heading"}."</h3>"
                             . &text( "err_has_errors_", $errorcount ) . "<br/><br/>"
                             . "<a href=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" class=\"btn btn-lg btn-danger conf-error-button\">"
                             . "<i class=\"fa fa-fw fa-arrow-right\">&nbsp;</i>"
@@ -1874,79 +1884,11 @@ sub create_error {
 sub header_js {
     my ($formid, $internalfield) = @_;
     my $script = "";
-    $script .= "<script type='text/javascript'>\n"
-             . "function addItemToSelect(sel){\n"
-             . "    let v=\$(\"input[name=\"+sel+\"_additem]\").val();\n"
-             . "    if (v) \$(\"select[name=\"+sel+\"]\").append(\$(\"<option></option>\").attr(\"value\",v).text(v));\n"
-             . "    \$(\"input[name=\"+sel+\"_additem]\").val(\"\");\n"
-             . "}\n"
-             . "function removeSelectItem(sel){\n"
-             . "    var sItems=[];\n"
-             . "    \$(\"select[name=\"+sel+\"]\").each(function(){\n"
-             . "        sItems.push(\$(this).val());\n"
-             . "    });\n"
-             . "    \$(\"select[name=\"+sel+\"]\").each(function(i,select){\n"
-             . "        \$(\"select[name=\"+sel+\"] option\").each(function(ii,option){\n"
-             . "            if(\$(option).val() != \"\" && sItems[i] == \$(option).val() && sItems[i] != \$(option).parent().val()){\n"
-             . "                \$(option).remove();\n"
-             . "            }\n"
-             . "        });\n"
-             . "    });\n"
-             . "}\n"
-             . "</script>\n";
-    return $script;
-}
-
-sub header_style {
-    my $style = "<style type='text/css'>\n"
-            . ".select_invert {\n"
-            . "  margin-right: unset !important;\n"
-            . "}\n"
-            . ".new-dnsm-button-container {\n"
-            . "  margin-top: -1px;\n"
-            . "  position: absolute;\n"
-            . "}\n"
-            . ".add-item-button-small {\n"
-            . "  height: 28px !important;\n"
-            . "  margin-left: -4px;\n"
-            . "  display: inline-block;\n"
-            . "}\n"
-            . ".remove-item-button-small {\n"
-            . "  height: 28px !important;\n"
-            . "  margin-right: 4px;\n"
-            . "  display: inline-block;\n"
-            . "}\n"
-            . "select[multiple] {\n"
-            . "  min-height: unset !important;\n"
-            . "  max-height: unset !important;\n"
-            . "}\n"
-            . "html[data-bgs='nightRider'] .hl-aw, .hl-aw {\n"
-            . "  background-color: unset !important;\n"
-            . "}\n"
-            . ".conf-error-block {\n"
-            . "  width: 100%;\n"
-            . "  padding: 14px;\n"
-            . "  display: block;\n"
-            . "  border: 2px solid black;\n"
-            . "}\n"
-            . ".conf-error-button {\n"
-            . "  display: inline-flex;\n"
-            . "  align-self: center;\n"
-            . "  justify-content: center;\n"
-            . "  align-items: center;\n"
-            . "}\n"
-            . "\n"
-            . "</style>\n";
-    return $style;
-}
-
-=head2 add_js()
-=cut
-sub add_js {
-    my $script = "";
-    $script .= "<script type='text/javascript'>\n"
-             . "\$(document).ready(function() {\n"
-             . "  setTimeout(function() {\n"
+    # $script .= "<link href=\"dnsmasq.css\" rel=\"stylesheet\">\n";
+    $script .= "<script type=\"text/javascript\" src=\"dnsmasq.js\"></script>\n";
+    $script .= "<script type=\"text/javascript\">\n";
+    $script .= "\$(document).ready(function() {\n";
+    $script .= "  setTimeout(function() {\n"
              . "    \$(\"<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".select-none\");\n" # adds icon to "select none" link/button
              . "    \$(\"<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".file-chooser-button\");\n" # adds icon to "new file" link/button
              . "    \$(\".new-file-input, .new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());\$(this).parent().prev().css(\"margin-right\", \"0px !important\");\$(this).parent().addClass(\"new-dnsm-button-container\");});\n" # adds "new file/interface" link to button list
@@ -1963,109 +1905,85 @@ sub add_js {
              . "    \$(\"input[dummy_field]\").hide();\n"
              . "\n"
              . "  }, 0);\n";
-    $script .= "    \$.each(\$(\".show-update-button\"), function(){\n"
-             . "       var r = '" . $text{"update_module"} . "';\n"
-             . "       \$(this)\n"
-             . "         .data(\"toggle\", \"tooltip\")\n"
-             . "         .data(\"title\", r)\n"
-             . "         .attr(\"data-container\", \"body\")\n"
-             . "         .addClass(vars.h.class.button.tableHeader)\n"
-             . "         .removeClass(\"ui_link\")\n"
-             . "         .append('<i class=\"fa fa-update\"></i><span>' + \"&nbsp;</span>\");\n"
-             . "       \$(this).attr(\"aria-label\", r);\n"
-             . "       \$(this)\n"
-             . "         .contents()\n"
-             . "         .filter(function () {\n"
-             . "             return this.nodeType == 3;\n"
-             . "         })\n"
-             . "         .remove();\n"
-             . "       var l = \$(this);\n"
-             . "       l.tooltip({ container: \"body\", placement: l.is(\":last-child\") ? \"auto right\" : \"auto top\", trigger: \"hover\", delay: { show: vars.plugins.tooltip.delay.show, hide: vars.plugins.tooltip.delay.hide } });\n"
-             . "    });\n";
-    $script .= "  if (!\$('#list-item-edit-modal').length) {\n"
-             . "    var g='<div class=\"modal fade fade5 in\" id=\"list-item-edit-modal\" tabindex=\"-1\" role=\"dialog\" aria-hidden=\"true\">"
-             . "      <div class=\"modal-dialog\">"
-             . "        <div class=\"modal-content\" style=\"padding: 10px;\">"
-            #  . "          <div class=\"modal-header \"><button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button><h4 class=\"modal-title\"></h4></div>"
-             . "        </div>"
-             . "      </div>"
-             . "    </div>';\n"
-             . "    \$(document.body).append(g);\n"
-             . "    \$(\"#list-item-edit-modal\").on('hidden.bs.modal', function () {\n"
-             . "      \$(this).data('bs.modal', null);\n"
-             . "      \$(this).find(\".modal-content\").html(\"\");\n"
-             . "    });\n"
-             . "  }\n"
-             . "\n"
-             . "});\n";
-    $script .= "function addItemToSelect(sel){\n"
-             . "    let v=\$(\"input[name=\"+sel+\"_additem]\").val();\n"
-             . "    if (v) \$(\"select[name=\"+sel+\"]\").append(\$(\"<option></option>\").attr(\"value\",v).text(v));\n"
-             . "    \$(\"input[name=\"+sel+\"_additem]\").val(\"\");\n"
-             . "}\n"
-             . "function removeSelectItem(sel){\n"
-             . "    var sItems=[];\n"
-             . "    \$(\"select[name=\"+sel+\"]\").each(function(){\n"
-             . "        sItems.push(\$(this).val());\n"
-             . "    });\n"
-             . "    \$(\"select[name=\"+sel+\"]\").each(function(i,select){\n"
-             . "        \$(\"select[name=\"+sel+\"] option\").each(function(ii,option){\n"
-             . "            if(\$(option).val() != \"\" && sItems[i] == \$(option).val() && sItems[i] != \$(option).parent().val()){\n"
-             . "                \$(option).remove();\n"
-             . "            }\n"
-             . "        });\n"
-             . "    });\n"
-             . "}\n";
-    $script .= "function submit_form(vals, formid) {"
-             . "  vals.forEach((o) => {"
-             . "    let f=o.f;let v=o.v;"
-             . "    if (f==\"submit\") return;"
-             . "    var selector = \"#\" + formid + \" input[name=\"+f+\"]\";"
-             . "    \$( selector ).val(v);"
-             . "  });"
-             . "  \$(\"#\"+formid).submit();"
-             . "}\n";
-    $script .= "function showCustomValidationFailure(obj_name, msg) {"
-             . "  let i = \$(\"input[name*=\"+obj_name+\"]\").last();\n"
-             . "  let badval = i.val();\n"
-             . "  i[0].setCustomValidity(msg);\n"
-             . "  i[0].addEventListener(\"input\", function(event){ if (i.val()==badval){i[0].setCustomValidity(msg);}else{i[0].setCustomValidity(\"\");}});\n"
-             . "}\n";
-    $script .= "function replaceWithWrapper(selector, context, property, callback) {\n"
-             . "    function findDescriptor(obj, prop){\n"
-             . "        if (obj != null){\n"
-             . "            return Object.hasOwnProperty.call(obj, prop)?\n"
-             . "                Object.getOwnPropertyDescriptor(obj, prop):\n"
-             . "                findDescriptor(Object.getPrototypeOf(obj), prop);\n"
-             . "        }\n"
-             . "    }\n"
-             . "\n"
-             . "    jQuery(selector).each(function(idx, obj) {\n"
-             . "        var {get, set} = findDescriptor(obj, property);\n"
-             . "\n"
-             . "        Object.defineProperty(obj, property, {\n"
-             . "            configurable: true,\n"
-             . "            enumerable: true,\n"
-             . "\n"
-             . "            get() { //overwrite getter\n"
-             . "                var v = get.call(this);  //call the original getter\n"
-             . "                //console.log(\"get \"+property+\":\", v, this);\n"
-             . "                return v;\n"
-             . "            },\n"
-             . "\n"
-             . "            set(v) { //same for setter\n"
-             . "                var ov = get.call(this);  //call the original getter\n"
-             . "                //console.log(\"context :\", context, this);\n"
-             . "                //console.log(\"original \"+property+\":\", ov, this);\n"
-             . "                //console.log(\"set \"+property+\":\", v, this);\n"
-             . "                set.call(this, v);\n"
-             . "                if (context == \"add\" || (ov && v)) callback(obj, property, v);\n"
-             . "            }\n"
-             . "        });\n"
-             . "    });\n"
-             . "}\n";
-    #          . "</div>\n";
+    $script .= "});\n";
     $script .= "</script>\n";
+    return $script;
+}
+
+=head2 add_js()
+=cut
+sub add_js {
+    my $script = "";
+    # $script .= "<script type='text/javascript'>\n";
+    # $script .= "\$(document).ready(function() {\n";
+    # $script .= "  setTimeout(function() {\n"
+    #          . "    \$(\"<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".select-none\");\n" # adds icon to "select none" link/button
+    #          . "    \$(\"<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".file-chooser-button\");\n" # adds icon to "new file" link/button
+    #          . "    \$(\".new-file-input, .new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());\$(this).parent().prev().css(\"margin-right\", \"0px !important\");\$(this).parent().addClass(\"new-dnsm-button-container\");});\n" # adds "new file/interface" link to button list
+    #          . "    \$(\".new-file-input, .new-iface-input\").each(function(){replaceWithWrapper(\$(this), \"add\", \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
+    #          . "    \$(\".edit-file-input, .edit-iface-input\").each(function(){replaceWithWrapper(\$(this), \"edit\", \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
+    #          . "    \$(\"<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".iface-chooser-button\");\n" # adds icon to "new interface" link/button
+    #          . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 0px;'></i>\").prependTo(\".add-item-button\");\n" # adds icon to "new <item>" link/button
+    #          . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".remove-item-button\");\n" # adds icon to "remove <item>" link/button
+    #          . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".add-item-button-small\");\n" # adds icon to mini "new <item>" button for select box
+    #          . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".remove-item-button-small\");\n" # adds icon to mini "remove <item>" button for select box
+    #          . "    \$(\".clickable_tr\").each(function(){\$(this).parent().addClass(\"ui_checked_columns\");});\n" # fixes styling for clickable table row checkboxes
+    #          . "    \$(\".clickable_tr_selected\").each(function(){\$(this).removeClass(\"clickable_tr_selected\");\$(this).parent().addClass(\"hl-aw\");});\n" # fixes styling for clickable table row checkboxes
+    #          . "    \$(\"input[dnsmclass=dnsm-type-int]\").each(function(){\$(this).prop(\"type\", \"number\");});\n" # fixes styling for clickable table row checkboxes
+    #          . "    \$(\"input[dummy_field]\").hide();\n"
+    #          . "\n"
+    #          . "  }, 0);\n";
+    # $script .= "});\n";
+    # $script .= "function submit_form(vals, formid) {"
+    #          . "  vals.forEach((o) => {"
+    #          . "    let f=o.f;let v=o.v;"
+    #          . "    if (f==\"submit\") return;"
+    #          . "    var selector = \"#\" + formid + \" input[name=\"+f+\"]\";"
+    #          . "    \$( selector ).val(v);"
+    #          . "  });"
+    #          . "  \$(\"#\"+formid).submit();"
+    #          . "}\n";
+    # $script .= "function showCustomValidationFailure(obj_name, msg) {"
+    #          . "  let i = \$(\"input[name*=\"+obj_name+\"]\").last();\n"
+    #          . "  let badval = i.val();\n"
+    #          . "  i[0].setCustomValidity(msg);\n"
+    #          . "  i[0].addEventListener(\"input\", function(event){ if (i.val()==badval){i[0].setCustomValidity(msg);}else{i[0].setCustomValidity(\"\");}});\n"
+    #          . "}\n";
+    # $script .= "function replaceWithWrapper(selector, context, property, callback) {\n"
+    #          . "    function findDescriptor(obj, prop){\n"
+    #          . "        if (obj != null){\n"
+    #          . "            return Object.hasOwnProperty.call(obj, prop)?\n"
+    #          . "                Object.getOwnPropertyDescriptor(obj, prop):\n"
+    #          . "                findDescriptor(Object.getPrototypeOf(obj), prop);\n"
+    #          . "        }\n"
+    #          . "    }\n"
+    #          . "\n"
+    #          . "    jQuery(selector).each(function(idx, obj) {\n"
+    #          . "        var {get, set} = findDescriptor(obj, property);\n"
+    #          . "\n"
+    #          . "        Object.defineProperty(obj, property, {\n"
+    #          . "            configurable: true,\n"
+    #          . "            enumerable: true,\n"
+    #          . "\n"
+    #          . "            get() { //overwrite getter\n"
+    #          . "                var v = get.call(this);  //call the original getter\n"
+    #          . "                //console.log(\"get \"+property+\":\", v, this);\n"
+    #          . "                return v;\n"
+    #          . "            },\n"
+    #          . "\n"
+    #          . "            set(v) { //same for setter\n"
+    #          . "                var ov = get.call(this);  //call the original getter\n"
+    #          . "                //console.log(\"context :\", context, this);\n"
+    #          . "                //console.log(\"original \"+property+\":\", ov, this);\n"
+    #          . "                //console.log(\"set \"+property+\":\", v, this);\n"
+    #          . "                set.call(this, v);\n"
+    #          . "                if (context == \"add\" || (ov && v)) callback(obj, property, v);\n"
+    #          . "            }\n"
+    #          . "        });\n"
+    #          . "    });\n"
+    #          . "}\n";
+    #          . "</div>\n";
+    # $script .= "</script>\n";
     return $script;
 }
 

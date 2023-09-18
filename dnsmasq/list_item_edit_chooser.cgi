@@ -149,7 +149,7 @@ my $headstuff = "<script type='text/javascript'>\n"
     . "    event.stopPropagation();\n"
     . "  }\n"
     . "</script>\n";
-$headstuff .= &header_style();
+$headstuff .= &header_js();
 
 &popup_header(undef, $headstuff);
 # &ui_print_header(subtext, title, image, [help], [config], [nomodule], [nowebmin], [rightside], [head-stuff], [body-stuff], [below])

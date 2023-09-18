@@ -36,7 +36,7 @@ my $type = $in{"type"} || "config";
 my @files = ();
 if ($type eq "config") {
     &ui_print_header($text{"index_dns_config_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-    print &header_style();
+    print &header_js();
     $access{'manual_edit'} || &error($text{'acl_manual_edit_ecannot'});
 
     # check for errors in read config
@@ -56,7 +56,7 @@ if ($type eq "config") {
 }
 elsif ($type eq "script") {
     &ui_print_header($text{"index_dns_scripts_edit"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-    print &header_style();
+    print &header_js();
     $access{'edit_scripts'} || &error($text{'acl_edit_scripts_ecannot'});
     push( @files, @{ $dnsmconfig{"scripts"} });
 }
