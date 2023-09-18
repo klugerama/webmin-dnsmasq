@@ -378,6 +378,7 @@ sub init_configfield_fields {
                 "req_perms" => "read",
                 "must_exist" => 1,
                 "default" => "",
+                "required" => 1,
                 "template" => "<" . $text{"tmpl_path_to_file_or_directory"} . ">"
             }
         },
@@ -407,7 +408,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -419,7 +420,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -431,7 +432,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -443,7 +444,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -455,7 +456,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -467,7 +468,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -479,7 +480,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -502,8 +503,10 @@ sub init_configfield_fields {
                 "length" => 15,
                 "valtype" => "string",
                 "default" => "",
-                "required" => 1,
-                "template" => "<" . $text{"tmpl_log_facility"} . ">"
+                # "required" => 1,
+                "template" => "<" . $text{"tmpl_log_facility"} . ">",
+                "can_be" => "file",
+                "req_perms" => "read,write"
             }
         },
         "log_debug" => {
@@ -532,7 +535,7 @@ sub init_configfield_fields {
                 "valtype" => "file",
                 "req_perms" => "read,write",
                 "default" => "",
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
@@ -1070,15 +1073,15 @@ sub init_configfield_fields {
                 "length" => 10,
                 "valtype" => "string",
                 "default" => "",
-                "required" => 1,
+                "required" => 0,
                 "label" => $text{"p_label_val_hostname"},
                 "template" => "<" . $text{"tmpl_hostname"} . ">"
             },
             "preference" => {
                 "length" => 10,
                 "valtype" => "string",
-                "default" => "",
-                "required" => 1,
+                "default" => "1",
+                "required" => 0,
                 "label" => $text{"p_label_val_preference"},
                 "template" => "<" . $text{"tmpl_preference"} . ">"
             },
@@ -2556,7 +2559,9 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 0,
                 "label" => $text{"p_label_val_basename"},
-                "template" => "<" . $text{"tmpl_base_name"} . ">|<" . $text{"tmpl_boot_service_type"} . ">"
+                "template" => "<" . $text{"tmpl_base_name"} . ">|<" . $text{"tmpl_boot_service_type"} . ">",
+                "can_be" => "file",
+                "req_perms" => "read"
             },
             "server" => {
                 "length" => 10,
@@ -2964,7 +2969,8 @@ sub init_configfield_fields {
                 "default" => "",
                 "required" => 1,
                 "label" => $text{"p_label_val_dirname"},
-                "template" => "<" . $text{"tmpl_path_to_directory"} . ">"
+                "template" => "<" . $text{"tmpl_path_to_directory"} . ">",
+                "pattern" => "(?!.*\\.{2}).*"
             },
             "interface" => {
                 "length" => 10,
@@ -4373,6 +4379,10 @@ sub validate_value {
             elsif (defined($val) && $val ne "") {
                 # int, file, path, dir, user, group, string, interface, ip, time
                 my $type = $pdef->{"valtype"};
+                if (defined($pdef->{"can_be"}) && $pdef->{"can_be"} ne "" && $val =~ /\// ) {
+                    # if the value "can_be" a file/path/dir, and contains at least one '/' character, treat as file/path/dir for validation
+                    $type = $pdef->{"can_be"};
+                }
                 # webmin_debug_log("--------FIELD0", "configfield: $configfield type: $type file: $config_filename line: $lineno param: $param val: $val");
                 given ($type) {
                     when ("int") {
