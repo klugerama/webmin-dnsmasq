@@ -378,6 +378,7 @@ sub init_configfield_fields {
                 "req_perms" => "read",
                 "must_exist" => 1,
                 "default" => "",
+                "required" => 1,
                 "template" => "<" . $text{"tmpl_path_to_file_or_directory"} . ">"
             }
         },
@@ -407,7 +408,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -419,7 +420,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -431,7 +432,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -443,7 +444,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -455,7 +456,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -467,7 +468,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -479,7 +480,7 @@ sub init_configfield_fields {
                 "length" => 3,
                 "valtype" => "int",
                 "default" => 0,
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_ttl"},
                 "template" => "<" . $text{"tmpl_TTL"} . ">",
                 "pattern" => "\\d{1,5}"
@@ -502,7 +503,7 @@ sub init_configfield_fields {
                 "length" => 15,
                 "valtype" => "string",
                 "default" => "",
-                "required" => 1,
+                # "required" => 1,
                 "template" => "<" . $text{"tmpl_log_facility"} . ">"
             }
         },
@@ -532,7 +533,7 @@ sub init_configfield_fields {
                 "valtype" => "file",
                 "req_perms" => "read,write",
                 "default" => "",
-                "required" => 1,
+                # "required" => 1,
                 "label" => $text{"p_label_val_filename"},
                 "template" => "<" . $text{"tmpl_path_to_file"} . ">"
             }
@@ -1070,15 +1071,15 @@ sub init_configfield_fields {
                 "length" => 10,
                 "valtype" => "string",
                 "default" => "",
-                "required" => 1,
+                "required" => 0,
                 "label" => $text{"p_label_val_hostname"},
                 "template" => "<" . $text{"tmpl_hostname"} . ">"
             },
             "preference" => {
                 "length" => 10,
                 "valtype" => "string",
-                "default" => "",
-                "required" => 1,
+                "default" => "1",
+                "required" => 0,
                 "label" => $text{"p_label_val_preference"},
                 "template" => "<" . $text{"tmpl_preference"} . ">"
             },
