@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
     if (!location.href.includes("/dnsmasq/")) {
         // no longer in the dnsmasq module; remove scripts and css from head
@@ -85,68 +86,85 @@ $(document).ready(function() {
 });
 
 function addItemToSelect(sel){
-    let v=$("input[name="+sel+"_additem]").val();
-    if (v) $("select[name="+sel+"]").append($("<option></option>").attr("value",v).text(v));
-    $("input[name="+sel+"_additem]").val("");
+    if (core.curModule("dnsmasq")) {
+        let v=$("input[name="+sel+"_additem]").val();
+        if (v) $("select[name="+sel+"]").append($("<option></option>").attr("value",v).text(v));
+        $("input[name="+sel+"_additem]").val("");
+    }
 }
 function removeSelectItem(sel){
-    var sItems=[];
-    $("select[name="+sel+"]").each(function(){
-        sItems.push($(this).val());
-    });
-    $("select[name="+sel+"]").each(function(i,select){
-        $("select[name="+sel+"] option").each(function(ii,option){
-            if($(option).val() != "" && sItems[i] == $(option).val() && sItems[i] != $(option).parent().val()){
-                $(option).remove();
-            }
+    if (core.curModule("dnsmasq")) {
+        var sItems=[];
+        $("select[name="+sel+"]").each(function(){
+            sItems.push($(this).val());
         });
-    });
+        $("select[name="+sel+"]").each(function(i,select){
+            $("select[name="+sel+"] option").each(function(ii,option){
+                if($(option).val() != "" && sItems[i] == $(option).val() && sItems[i] != $(option).parent().val()){
+                    $(option).remove();
+                }
+            });
+        });
+    }
 }
-function submit_form(vals, formid) {
-    vals.forEach((o) => {
-        let f=o.f;let v=o.v;
-        if (f=="submit") return;
-        var selector = "#" + formid + " input[name="+f+"]";
-        $( selector ).val(v);
-    });
-    $("#"+formid).submit();
+function submitParentForm(vals, formid) {
+    if (core.curModule("dnsmasq")) {
+            vals.forEach((o) => {
+            let f=o.f;let v=o.v;
+            if (f=="submit") return;
+            var selector = "#" + formid + " input[name="+f+"]";
+            $( selector ).val(v);
+        });
+        $("#"+formid).submit();
+    }
 }
 function showCustomValidationFailure(obj_name, msg) {
-    let i = $("input[name*="+obj_name+"]").last();
-    let badval = i.val();
-    i[0].setCustomValidity(msg);
-    i[0].addEventListener("input", function(event){ if (i.val()==badval){i[0].setCustomValidity(msg);}else{i[0].setCustomValidity("");}});
-}
-function replaceWithWrapper(selector, context, property, callback) {
-    function findDescriptor(obj, prop){
-        if (obj != null){
-            return Object.hasOwnProperty.call(obj, prop)?
-                Object.getOwnPropertyDescriptor(obj, prop):
-                findDescriptor(Object.getPrototypeOf(obj), prop);
-        }
-    }
-
-    jQuery(selector).each(function(idx, obj) {
-        var {get, set} = findDescriptor(obj, property);
-
-        Object.defineProperty(obj, property, {
-            configurable: true,
-            enumerable: true,
-
-            get() { //overwrite getter
-                var v = get.call(this);  //call the original getter
-                //console.log("get "+property+":", v, this);
-                return v;
-            },
-
-            set(v) { //same for setter
-                var ov = get.call(this);  //call the original getter
-                //console.log("context :", context, this);
-                //console.log("original "+property+":", ov, this);
-                //console.log("set "+property+":", v, this);
-                set.call(this, v);
-                if (context == "add" || (ov && v)) callback(obj, property, v);
+    if (core.curModule("dnsmasq")) {
+        let i = $("input[name*="+obj_name+"]").last();
+        let badval = i.val();
+        i[0].setCustomValidity(msg);
+        i[0].addEventListener("input", function(event){ 
+            if (i.val()==badval) {
+                i[0].setCustomValidity(msg);
+            }
+            else {
+                i[0].setCustomValidity("");
             }
         });
-    });
+    }
+}
+function replaceWithWrapper(selector, context, property, callback) {
+    if (core.curModule("dnsmasq")) {
+        function findDescriptor(obj, prop){
+            if (obj != null){
+                return Object.hasOwnProperty.call(obj, prop)?
+                    Object.getOwnPropertyDescriptor(obj, prop):
+                    findDescriptor(Object.getPrototypeOf(obj), prop);
+            }
+        }
+
+        jQuery(selector).each(function(idx, obj) {
+            var {get, set} = findDescriptor(obj, property);
+
+            Object.defineProperty(obj, property, {
+                configurable: true,
+                enumerable: true,
+
+                get() { //overwrite getter
+                    var v = get.call(this);  //call the original getter
+                    //console.log("get "+property+":", v, this);
+                    return v;
+                },
+
+                set(v) { //same for setter
+                    var ov = get.call(this);  //call the original getter
+                    //console.log("context :", context, this);
+                    //console.log("original "+property+":", ov, this);
+                    //console.log("set "+property+":", v, this);
+                    set.call(this, v);
+                    if (context == "add" || (ov && v)) callback(obj, property, v);
+                }
+            });
+        });
+    }
 }

@@ -145,7 +145,7 @@ my $headstuff = "<script type='text/javascript'>\n"
     . "      vals.push(o);\n"
     . "    });\n"
     . "    \$('#list-item-edit-modal').modal('hide');\n"
-    . "    submit_form(vals, '" . $formid . "');\n"
+    . "    submitParentForm(vals, '" . $formid . "');\n"
     . "    event.stopPropagation();\n"
     . "  }\n"
     . "</script>\n";

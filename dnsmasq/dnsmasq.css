@@ -56,7 +56,7 @@ html[data-bgs='nightRider'] .hl-aw, .hl-aw {
 .dnsm-basic-td {
     height: 31px;
     white-space: normal !important;
-    word-break: normal;
+    word-break: normal !important;
 }
 .dnsm-empty-value {
     color: #595959 !important;
@@ -69,7 +69,7 @@ html[data-bgs='nightRider'] .hl-aw, .hl-aw {
 .clickable-td {
     height: 29px;
     white-space: normal !important;
-    word-break: normal;
+    word-break: normal !important;
 }
 .file-chooser-button {
     min-width:90px;
