@@ -47,7 +47,7 @@ foreach my $configfield ( @confdns ) {
 
 &show_basic_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, $text{"index_dns_sec"} );
 
-&show_other_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, "" );
+&show_other_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, " " );
 
 print &add_js();
 
