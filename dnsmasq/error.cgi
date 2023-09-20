@@ -26,7 +26,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 &ui_print_header($text{"configuration_errors_heading"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_style();
+print &header_js();
 
 # output as web page
 &ReadParse();
@@ -35,9 +35,6 @@ my $returnto = $in{"returnto"} || "index.cgi?tab=dns";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings"};
 
 ## Insert Output code here
-
-# print "<h2 style=\"color: red;\">".$text{"configuration_error_heading"}."</h2>";
-# print "<br><br>";
 
 print &ui_form_start($returnto, "post");
 print &ui_hidden("returnto", $returnto);
@@ -83,7 +80,7 @@ foreach my $error ( @{$dnsmconfig{"error"}} ) {
         push ( @cols, $link );
     }
     my $buttons = "<a href=\"manual_edit.cgi?file=" . $error->{"file"} . "&line=" . $error->{"line"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $text{"button_manual_edit"} . "</a>";
-    webmin_debug_log("--------ERROR", "configfield: $configfield type: $type param: $param error_type: ". $error->{"error_type"} . " ERR_FILE_PERMS: " . ERR_FILE_PERMS());
+    # webmin_debug_log("--------ERROR", "configfield: $configfield type: $type param: $param error_type: ". $error->{"error_type"} . " ERR_FILE_PERMS: " . ERR_FILE_PERMS());
     if ((grep { /^$type$/ } ( @fs )) && $error->{"error_type"} == ERR_FILE_PERMS() && $access{"change_perms"}) {
         $buttons .= "<a href=\"$returnto" . ($returnto =~ /\?/ ? "&" : "?") . "forced_edit=1&fix_perms=1&ifield=" . $internalfield . "&cfg_idx=" . $error->{"cfg_idx"} . "&param=" . $param . "&foruser=" . $error->{"foruser"} . "&forgroup=" . $error->{"forgroup"} . "&perms_failed=" . $error->{"perms_failed"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $text{"button_fix_permissions"} . "</a>";
     }

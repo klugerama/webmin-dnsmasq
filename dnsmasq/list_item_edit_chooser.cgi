@@ -31,9 +31,9 @@ my $title = $in{"title"};
 $title =~ s/\+/ /g;
 our $internalfield = $in{"internalfield"};
 our $configfield = &internal_to_config("$internalfield");
-our $tddoc = 'colspan=2 style="text-align: left; padding-right: 5px; word-break: break-word; overflow-wrap: break-word;"';
-our $tdlabel = 'style="min-width: 100px; width: 100px !important; text-align: right; padding-right: 5px;"';
-our $tdinput = 'style="min-width: 100px; width: 100px !important; padding-left: 5px !important;"';
+our $tddoc = 'colspan=2 class="dnsm-modal-desc"';
+our $tdlabel = 'class="dnsm-modal-td-label"';
+our $tdinput = 'class="dnsm-modal-td-input"';
 our @doctd = ( $tddoc );
 our @tds = ( $tdlabel, $tdinput );
 our $item;
@@ -56,8 +56,8 @@ sub formtable_ip4 {
     $formtable .= &ui_columns_end();
     $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_4", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_4", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -78,8 +78,8 @@ sub formtable_ip6 {
     $formtable .= &ui_columns_end();
     $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_6", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_6", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -145,18 +145,18 @@ my $headstuff = "<script type='text/javascript'>\n"
     . "      vals.push(o);\n"
     . "    });\n"
     . "    \$('#list-item-edit-modal').modal('hide');\n"
-    . "    submit_form(vals, '" . $formid . "');\n"
+    . "    submitParentForm(vals, '" . $formid . "');\n"
     . "    event.stopPropagation();\n"
     . "  }\n"
     . "</script>\n";
-$headstuff .= &header_style();
+# $headstuff .= &header_js();
 
 &popup_header(undef, $headstuff);
 # &ui_print_header(subtext, title, image, [help], [config], [nomodule], [nowebmin], [rightside], [head-stuff], [body-stuff], [below])
 # &ui_print_header(undef, $title, undef, undef, 0, 1, 1, undef, $headstuff);
 
-my $title_header = "<div class=\"modal-title\" style=\"display: flex; width: 100%;\"><span style=\"width: 100%;\"><h4>" . $title . "</h4></span>"
-    . "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" style=\"height: 24px; width: 24px; float: right; padding: 1px 5px; margin: 2px; \">"
+my $title_header = "<div class=\"dnsm-modal-header\"><span class=\"dnsm-modal-title\"><h4 class=\"modal-title\">" . $title . "</h4></span>"
+    . "<button type=\"button\" class=\"close dnsm-close-x\" data-dismiss=\"modal\" aria-label=\"Close\">"
     . "<span aria-hidden=\"true\">&times;</span>"
     . "</button></div>";
 if ($internalfield eq "dhcp_range") {
@@ -169,10 +169,10 @@ if ($internalfield eq "dhcp_range") {
     print &ui_columns_row( [ $desc ], \@doctd );
     if ($action eq "edit") {
         if ($ipversion eq "modal_ip4") {
-            print &ui_columns_row( [ &formtable_ip4($fieldname_prefix) ], [ "colspan=2 style=\"text-align: left; width: auto;\"" ] );
+            print &ui_columns_row( [ &formtable_ip4($fieldname_prefix) ], [ "colspan=2 class=\"dnsm-td-left\"" ] );
         }
         else {
-            print &ui_columns_row( [ &formtable_ip6($fieldname_prefix) ], [ "colspan=2 style=\"text-align: left; width: auto;\"" ] );
+            print &ui_columns_row( [ &formtable_ip6($fieldname_prefix) ], [ "colspan=2 class=\"dnsm-td-left\"" ] );
         }
     }
     else {
@@ -190,7 +190,7 @@ if ($internalfield eq "dhcp_range") {
         $tabrow .= &ui_tabs_end_tab("ipversion", 'modal_ip6');
         $tabrow .= &ui_tabs_end();
 
-        print &ui_columns_row( [ $tabrow ], [ "colspan=2 style=\"text-align: left; width: auto;\"" ] );
+        print &ui_columns_row( [ $tabrow ], [ "colspan=2 class=\"dnsm-td-left\"" ] );
     }
     print &ui_columns_end();
 }
@@ -218,8 +218,8 @@ else {
     print &ui_table_end();
     print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit", undef, "style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
     print &ui_form_end( \@form_buttons );
 }
 if ($in{"show_validation"}) {
@@ -230,9 +230,6 @@ if ($in{"show_validation"}) {
     print "    \$(\"input[name=" . $in{"show_validation"} . "]\").last()[0].reportValidity();\n"
         . "</script>\n";
 }
-# elsif ($internalfield eq "") {
-#     print &ui_columns_row( [ $text{""}, &ui_textbox($fieldname_prefix . "fieldname", $val{""}, 10) ], \@tds );
-# }
 
 # &footer();
 &popup_footer();

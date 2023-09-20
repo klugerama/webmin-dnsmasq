@@ -39,7 +39,7 @@ if ($error_check_action eq "redirect") {
 
 ## Insert Output code here
 &ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_style();
+print &header_js();
 print $error_check_result;
 
 my $tab = "dns";
