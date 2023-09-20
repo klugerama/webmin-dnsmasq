@@ -1,54 +1,22 @@
 
-$(document).ready(function() {
-    if (!location.href.includes("/dnsmasq/")) {
-        // no longer in the dnsmasq module; remove scripts and css from head
-        removeCSS: {
-            var ss = document.head.getElementsByTagName("link");
-            for (let i = 0; i < ss.length; i++) {
-                var scr = ss.item(i);
-                var atts = scr.attributes;
-                for (let a = 0; a < atts.length; a++) {
-                    if (atts[a].name == "href" && atts[a].value.includes("dnsmasq.css")) {
-                        document.head.remove(scr);
-                        break removeCSS;
-                    }
-                }
-            }
-        }
-        removeScript: {
-            var ss = document.head.getElementsByTagName("script");
-            for (let i = 0; i < ss.length; i++) {
-                var scr = ss.item(i);
-                var atts = scr.attributes;
-                for (let a = 0; a < atts.length; a++) {
-                    if (atts[a].name == "src" && atts[a].value.includes("dnsmasq.js")) {
-                        document.head.remove(scr);
-                        break removeScript;
-                    }
-                }
-            }
-        }
-    }
-    else {
-        if (!document.head.innerHTML.includes("dnsmasq.css")) {
-            document.head.innerHTML += '<link href="dnsmasq.css" rel="stylesheet">';
-        }
-        // setTimeout(function() {
-        //     $("<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>").prependTo(".select-none"); // adds icon to "select none" link/button
-        //     $("<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>").prependTo(".file-chooser-button"); // adds icon to "new file" link/button
-        //     $(".new-file-input, .new-iface-input").each(function(){$(this).parent().appendTo($(this).parent().prevUntil(".btn-group").last().prev());$(this).parent().prev().css("margin-right", "0px !important");$(this).parent().addClass("new-dnsm-button-container");}); // adds "new file/interface" link to button list
-        //     $(".new-file-input, .new-iface-input").each(function(){replaceWithWrapper($(this), "add", "value", function(obj){$(obj).closest("form").trigger("submit");});}); // submits "new file/interface" button's form when one is selected
-        //     $(".edit-file-input, .edit-iface-input").each(function(){replaceWithWrapper($(this), "edit", "value", function(obj){$(obj).closest("form").trigger("submit");});}); // submits "new file/interface" button's form when one is selected
-        //     $("<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>").prependTo(".iface-chooser-button"); // adds icon to "new interface" link/button
-        //     $("<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 0px;'></i>").prependTo(".add-item-button"); // adds icon to "new <item>" link/button
-        //     $("<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>").prependTo(".remove-item-button"); // adds icon to "remove <item>" link/button
-        //     $("<i class='fa fa-plus vertical-align-middle' style='margin: 4px;'></i>").prependTo(".add-item-button-small"); // adds icon to mini "new <item>" button for select box
-        //     $("<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>").prependTo(".remove-item-button-small"); // adds icon to mini "remove <item>" button for select box
-        //     $(".clickable_tr").each(function(){$(this).parent().addClass("ui_checked_columns");}); // fixes styling for clickable table row checkboxes
-        //     $(".clickable_tr_selected").each(function(){$(this).removeClass("clickable_tr_selected");$(this).parent().addClass("hl-aw");}); // fixes styling for clickable table row checkboxes
-        //     $("input[dnsmclass=dnsm-type-int]").each(function(){$(this).prop("type", "number");}); // fixes styling for clickable table row checkboxes
-        //     $("input[dummy_field]").hide();
-        // }, 0);
+var doDnsmasqStuff = function(event, xhr, options) {
+    if (core.curModule("dnsmasq")) {
+        setTimeout(function() {
+            $(".select-none.no-icon").each(function(i,o){$("<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")});
+            $(".file-chooser-button.no-icon").each(function(i,o){$("<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")});
+            $(".iface-chooser-button.no-icon").each(function(i,o){$("<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "new interface" link/button
+            $(".add-item-button.no-icon").each(function(i,o){$("<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 0px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "new <item>" link/button
+            $(".remove-item-button.no-icon").each(function(i,o){$("<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "remove <item>" link/button
+            $(".add-item-button-small.no-icon").each(function(i,o){$("<i class='fa fa-plus vertical-align-middle' style='margin: 4px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to mini "new <item>" button for select box
+            $(".remove-item-button-small.no-icon").each(function(i,o){$("<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to mini "remove <item>" button for select box
+            $(".new-file-input, .new-iface-input").each(function(){$(this).parent().appendTo($(this).parent().prevUntil(".btn-group").last().prev());$(this).parent().prev().css("margin-right", "0px !important");$(this).parent().addClass("new-dnsm-button-container");}); // adds "new file/interface" link to button list
+            $(".new-file-input, .new-iface-input").each(function(){replaceWithWrapper($(this), "add", "value", function(obj){$(obj).closest("form").trigger("submit");});}); // submits "new file/interface" button's form when one is selected
+            $(".edit-file-input, .edit-iface-input").each(function(){replaceWithWrapper($(this), "edit", "value", function(obj){$(obj).closest("form").trigger("submit");});}); // submits "new file/interface" button's form when one is selected
+            $(".clickable_tr").each(function(){$(this).parent().addClass("ui_checked_columns");}); // fixes styling for clickable table row checkboxes
+            $(".clickable_tr_selected").each(function(){$(this).removeClass("clickable_tr_selected");$(this).parent().addClass("hl-aw");}); // fixes styling for clickable table row checkboxes
+            $("input[dnsmclass=dnsm-type-int]").each(function(){$(this).prop("type", "number");}); // fixes styling for clickable table row checkboxes
+            $("input[dummy_field]").hide();
+        }, 0);
         $.each($(".show-update-button"), function(){
             var r = $(this).contents();
             $(this)
@@ -81,6 +49,27 @@ $(document).ready(function() {
                 $(this).data('bs.modal', null);
                 $(this).find(".modal-content").html("");
             });
+        }
+    }
+}
+var removeDnsmasqStuff = function(event, xhr, options) {
+    if (!core.curModule("dnsmasq")) {
+        // user is no longer in the dnsmasq module; clean up scripts and css from <head>
+        $("#dnsmasq_css").remove();
+        $("script[src*='dnsmasq.js']").remove();
+        $(document).off("pjax:end", removeDnsmasqStuff);
+        removeDnsmasqStuff = null;
+        $(document).off("pjax:end", doDnsmasqStuff);
+        doDnsmasqStuff = null;
+    }
+}
+$(document).ready(function() {
+    $(document).on("pjax:end", removeDnsmasqStuff);
+    $(document).off("pjax:end", doDnsmasqStuff);
+    $(document).on("pjax:end", doDnsmasqStuff);
+    if (core.curModule("dnsmasq")) {
+        if (!document.head.innerHTML.includes("dnsmasq.css")) {
+            document.head.innerHTML += '<link id="dnsmasq_css" href="dnsmasq.css" rel="stylesheet">';
         }
     }
 });
