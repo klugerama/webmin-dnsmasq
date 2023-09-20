@@ -553,7 +553,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 10,
                 "valtype" => "user",
-                "default" => "",
+                "default" => "nobody",
                 "required" => 1,
                 "label" => $text{"p_label_val_username"},
                 "template" => "<" . $text{"tmpl_username"} . ">"
@@ -564,7 +564,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 10,
                 "valtype" => "group",
-                "default" => "",
+                "default" => "dip",
                 "required" => 1,
                 "label" => $text{"p_label_val_groupname"},
                 "template" => "<" . $text{"tmpl_groupname"} . ">"
