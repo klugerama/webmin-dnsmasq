@@ -3,10 +3,7 @@ A Webmin module for managing [DNSMasq](https://thekelleys.org.uk/dnsmasq/doc.htm
 # Installation
 ## Directly from Github
 1. From the [DNSMasq module releases page](https://github.com/klugerama/webmin-dnsmasq/releases), click `Assets` under the latest release.
-2. Select an installation package; right-click the link selected and copy the link address to the clipboard:
-   1. For Debian-based distributions (Debian, Ubuntu, Kali, Mint, etc.): select `webmin-dnsmasq_<VERSION>_all.deb`
-   2. For RPM-based distributions (Fedora, RHEL, CentOS, Oracle Linux, Scientific Linux, etc.): select `wbm-dnsmasq-<VERSION>-<RELEASE>.noarch.rpm`
-   3. For all other distributions - or any distribution - select `dnsmasq.tar.gz`
+2. Right-click the link for `dnsmasq.wbm.gz` and copy the link address to the clipboard
 3. In Webmin, under the `Webmin` menu, click on `Webmin Configuration`
 4. Click on the `Webmin Modules` icon
 5. Ensure the `Install` tab is selected. Under `Install from`, select `From HTTP or FTP URL`.
@@ -14,15 +11,18 @@ A Webmin module for managing [DNSMasq](https://thekelleys.org.uk/dnsmasq/doc.htm
 7. Click `Install Module`
 8. A new entry will appear under the `Servers` menu: `DNSMasq DNS & DHCP server`
 ## From downloaded file
+1. From the [DNSMasq module releases page](https://github.com/klugerama/webmin-dnsmasq/releases), click `Assets` under the latest release.
+2. Click `dnsmasq.wbm.gz` to download
+3. In Webmin, under the `Webmin` menu, click on `Webmin Configuration`
+4. Click on the `Webmin Modules` icon
+5. Ensure the `Install` tab is selected. Under `Install from`, ensure the option `From local file` is selected. Click the icon to open the 'select file' dialog, and navigate to (and select) the downloaded `dnsmasq.wbm.gz` file.
+6. Click `Install Module`
+7. A new entry will appear under the `Servers` menu: `DNSMasq DNS & DHCP server`
+## From downloaded package
 1. Download the latest build package from the [releases page](https://github.com/klugerama/webmin-dnsmasq/releases). Select and click to download an installation package:
    1. For Debian-based distributions (Debian, Ubuntu, Kali, Mint, etc.): select `webmin-dnsmasq_<VERSION>_all.deb`
    2. For RPM-based distributions (Fedora, RHEL, CentOS, Oracle Linux, Scientific Linux, etc.): select `wbm-dnsmasq-<VERSION>-<RELEASE>.noarch.rpm`
-   3. For all other distributions - or any distribution - select `dnsmasq.tar.gz`
-2. In Webmin, under the `Webmin` menu, click on `Webmin Configuration`
-3. Click on the `Webmin Modules` icon
-4. Ensure the `Install` tab is selected. Under `Install from`, ensure the option `From local file` is selected. Click the icon to open the 'select file' dialog, and navigate to (and select) the downloaded package file.
-5. Click `Install Module`
-6. A new entry will appear under the `Servers` menu: `DNSMasq DNS & DHCP server`
+2. Install the package using your distribution-specific package manager, i.e., `dpkg`, `yum`, `rpm`, etc.
 
 ## Module settings
 By default this module presumes that the configuration file is named `dnsmasq.conf` and can be found directly under `/etc/`. If your configuration file has a different name or is in a different location by default, please [report a GitHub issue](https://github.com/klugerama/webmin-dnsmasq/issues) and include your OS, distribution & distribution version, and DNSMasq version.
