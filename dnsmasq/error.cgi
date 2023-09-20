@@ -36,9 +36,6 @@ my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings"};
 
 ## Insert Output code here
 
-# print "<h2 style=\"color: red;\">".$text{"configuration_error_heading"}."</h2>";
-# print "<br><br>";
-
 print &ui_form_start($returnto, "post");
 print &ui_hidden("returnto", $returnto);
 print &ui_hidden("forced_edit", 1);

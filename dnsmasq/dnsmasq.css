@@ -23,19 +23,19 @@ html[data-bgs='nightRider'] .hl-aw, .hl-aw {
   background-color: unset !important;
 }
 .conf-error-block {
-  width: 100%;
-  padding: 14px;
-  display: block;
-  border: 2px solid black;
+    width: 100%;
+    padding: 14px;
+    display: block;
+    border: 2px solid black;
 }
 .conf-error-block h3 {
     color: red;
 }
 .conf-error-button {
-  display: inline-flex;
-  align-self: center;
-  justify-content: center;
-  align-items: center;
+    display: inline-flex;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
 }
 .dnsm-td-left {
     text-align: left;
@@ -73,11 +73,53 @@ html[data-bgs='nightRider'] .hl-aw, .hl-aw {
 }
 .file-chooser-button {
     min-width:90px;
-    width:auto;
+    width:auto !important;
     height:33px;
 }
 .iface-chooser-button {
     min-width:90px;
-    width:auto;
+    width:auto !important;
     height:33px;
+}
+.dnsm-close-x {
+    height: 24px;
+    width: 24px;
+    float: right;
+    padding: 1px 5px;
+    margin: 2px;
+}
+.dnsm-modal-desc {
+    text-align: left;
+    padding-right: 5px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+.dnsm-modal-td-label {
+    min-width: 100px;
+    width: 100px !important;
+    text-align: right;
+    padding-right: 5px;
+}
+.dnsm-modal-td-input {
+    min-width: 100px;
+    width: 100px !important;
+    padding-left: 5px !important;
+}
+.dnsm-modal-title {
+    width: 100%;
+}
+.dnsm-modal-header {
+    display: flex;
+    width: 100%;
+}
+body .CodeMirror {
+    height: 65vh;
+}
+@media all and (min-width: 1024px) {
+    .panel-body>pre>.CodeMirror {
+        min-height: calc(100vh - 262px);
+    }
+}
+html .container-fluid form ~ [data-cm-viewer] {
+    margin-bottom: 6px;
 }

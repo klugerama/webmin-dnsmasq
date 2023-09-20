@@ -50,18 +50,6 @@ print "Refresh: $config{'refresh'}\r\n"
     if ($config{'refresh'});
 
 &ui_print_header("<tt>".&html_escape($file)."</tt>", $text{'index_dns_view_log'}, "", "intro", 1, 0, 0, &restart_button());
-print "<style>"
-    . "body .CodeMirror {\n"
-    . " height: 65vh;\n"
-    . "}\n"
-    . "\@media all and (min-width: 1024px) {\n"
-    . " .panel-body>pre>.CodeMirror {\n"
-    . " min-height: calc(100vh - 262px);\n"
-    . "}}\n"
-    . "html .container-fluid form ~ [data-cm-viewer] {\n"
-    . " margin-bottom: 6px;\n"
-    . "}\n"
-    . "</style>";
 
 $lines = $in{'lines'} ? int($in{'lines'}) : 100;
 $filter = $in{'filter'} ? quotemeta($in{'filter'}) : "";

@@ -1014,28 +1014,11 @@ sub header_js {
     my ($formid, $internalfield) = @_;
     my $script = "";
     # $script .= "<link href=\"dnsmasq.css\" rel=\"stylesheet\">\n";
-    $script .= "<script type=\"text/javascript\" src=\"dnsmasq.js\"></script>\n";
-    $script .= "<script type=\"text/javascript\">\n";
-    $script .= "\$(document).ready(function() {\n";
-    $script .= "  setTimeout(function() {\n"
-             . "    \$(\"<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".select-none\");\n" # adds icon to "select none" link/button
-             . "    \$(\"<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".file-chooser-button\");\n" # adds icon to "new file" link/button
-             . "    \$(\".new-file-input, .new-iface-input\").each(function(){\$(this).parent().appendTo(\$(this).parent().prevUntil(\".btn-group\").last().prev());\$(this).parent().prev().css(\"margin-right\", \"0px !important\");\$(this).parent().addClass(\"new-dnsm-button-container\");});\n" # adds "new file/interface" link to button list
-             . "    \$(\".new-file-input, .new-iface-input\").each(function(){replaceWithWrapper(\$(this), \"add\", \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
-             . "    \$(\".edit-file-input, .edit-iface-input\").each(function(){replaceWithWrapper(\$(this), \"edit\", \"value\", function(obj){\$(obj).closest(\"form\").trigger(\"submit\");});});\n" # submits "new file/interface" button's form when one is selected
-             . "    \$(\"<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>\").prependTo(\".iface-chooser-button\");\n" # adds icon to "new interface" link/button
-             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 0px;'></i>\").prependTo(\".add-item-button\");\n" # adds icon to "new <item>" link/button
-             . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>\").prependTo(\".remove-item-button\");\n" # adds icon to "remove <item>" link/button
-             . "    \$(\"<i class='fa fa-plus vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".add-item-button-small\");\n" # adds icon to mini "new <item>" button for select box
-             . "    \$(\"<i class='fa fa-trash vertical-align-middle' style='margin: 4px;'></i>\").prependTo(\".remove-item-button-small\");\n" # adds icon to mini "remove <item>" button for select box
-             . "    \$(\".clickable_tr\").each(function(){\$(this).parent().addClass(\"ui_checked_columns\");});\n" # fixes styling for clickable table row checkboxes
-             . "    \$(\".clickable_tr_selected\").each(function(){\$(this).removeClass(\"clickable_tr_selected\");\$(this).parent().addClass(\"hl-aw\");});\n" # fixes styling for clickable table row checkboxes
-             . "    \$(\"input[dnsmclass=dnsm-type-int]\").each(function(){\$(this).prop(\"type\", \"number\");});\n" # fixes styling for clickable table row checkboxes
-             . "    \$(\"input[dummy_field]\").hide();\n"
-             . "\n"
-             . "  }, 0);\n";
-    $script .= "});\n";
-    $script .= "</script>\n";
+    $script .= "<script id=\"dnsmasq_js\" type=\"text/javascript\" src=\"dnsmasq.js\"></script>\n";
+    # $script .= "<script type=\"text/javascript\">\n";
+    # $script .= "\$(document).ready(function() {\n";
+    # $script .= "});\n";
+    # $script .= "</script>\n";
     return $script;
 }
 

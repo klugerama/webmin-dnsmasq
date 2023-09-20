@@ -80,14 +80,7 @@ sub select_none_link {
     my ($field, $form, $text) = @_;
     $form = int($form);
     $text ||= $text{'ui_selnone'};
-    # return "<a class='select_none' href='#' onClick='javascript:var ff = document.forms[$form].$field; ff.checked = false; for(i=0; i<ff.length; i++) { if (!ff[i].disabled) { ff[i].checked = false; } } return false;'><i class='fa fa-fw fa-square-o'> </i>$text</a>";
-    # if (defined(&theme_select_all_link) && defined(&theme_select_invert_link)) {
-    #     return "<a class='select-none' href='#' onClick='javascript:theme_select_all_link($form, \"$field\"); theme_select_invert_link($form, \"$field\"); return false;'>$text</a>";
-    # }
-    # else {
-    #     return "<a class='select-none' href='#' onClick='javascript:select_all_link($form, \"$field\"); select_invert_link($form, \"$field\"); return false;'>$text</a>";
-    # }
-    my $output = "<a class='select-none' href='#' onClick='javascript:theme_select_all_link($form, \"$field\"); theme_select_invert_link($form, \"$field\"); return false;'>";
+    my $output = "<a class='select-none no-icon' href='#' onClick='javascript:theme_select_all_link($form, \"$field\"); theme_select_invert_link($form, \"$field\"); return false;'>";
     $output .= "$text</a>";
     return $output;
 }
@@ -168,7 +161,7 @@ sub add_file_chooser_button {
     my $add    = int($_[5]);
     my $link   = "chooser.cgi?add=$add&type=$type&chroot=$chroot&file=\"+encodeURIComponent(ifield.value)";
 
-    my $file_chooser_button = "<button class='btn btn-inverse btn-tiny file-chooser-button chooser_button' ";
+    my $file_chooser_button = "<button class='btn btn-inverse btn-tiny file-chooser-button chooser_button no-icon' ";
     $file_chooser_button .= "onClick='ifield = \$( \"#$input\" )[0]; ";
     $file_chooser_button .= "chooser = window.open(\"$theme_webprefix/$link, \"chooser\"); chooser.ifield = ifield; window.ifield = ifield;'>";
     $file_chooser_button .= "$button_text</button>\n";
@@ -230,7 +223,7 @@ sub add_interface_chooser_button {
     my $add    = int($_[3]);
     my $link   = "net/interface_chooser.cgi?multi=$add&interface=";
 
-    my $iface_chooser_button = "<button class='btn btn-inverse btn-tiny iface-chooser-button chooser_button' ";
+    my $iface_chooser_button = "<button class='btn btn-inverse btn-tiny iface-chooser-button chooser_button no-icon' ";
     $iface_chooser_button .= "onClick='ifield = \$( \"#$input\" )[0]; ";
     $iface_chooser_button .= "chooser = window.open(\"$theme_webprefix/$link, \"chooser\"); chooser.ifield = ifield; window.ifield = ifield; ";
     $iface_chooser_button .= "'>$button_text</button>\n";
@@ -346,7 +339,7 @@ sub add_item_popup_modal_button {
     my $sep = $url =~ /\?/ ? "&" : "?";
     $url .= $sep . "internalfield=$internalfield";
     $url .= "&formid=$formid";
-    my $rv = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" class='btn btn-inverse btn-tiny add-item-button new-dnsm-button-container' ";
+    my $rv = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" class='btn btn-inverse btn-tiny add-item-button new-dnsm-button-container no-icon' ";
     $rv .= ">";
     $rv .= "$button_content";
     $rv .= "</a>";
@@ -392,17 +385,16 @@ sub get_selectbox_with_controls {
     $s .= "<script type='text/javascript'>\n"
         . "\$(document).ready(function() {\n"
         . "  setTimeout(function() {\n"
-        # . "    \$(\"select[name='$name']\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"min-width: $minwidth;\"; });\n"
         . "    \$(\"select[name='$name']\").attr(\"style\", (i,v)=>{ return (v?v:'')+\"width: 100%;\"; });\n"
         . "  }, 10);\n"
         . "});\n"
         . "\$(\"select[name='$name']\").parents(\"form\").first().on(\"submit\", function(e){ \$(\"select[name='$name'] option\").prop('selected', true); });\n"
         . "</script>";
-    $s .= "<br><nobr><div><span class=\"btn btn-tiny remove-item-button-small\" onclick=\"removeSelectItem('$name'); return false;\"></span>";
+    $s .= "<br><nobr><div><span class=\"btn btn-tiny remove-item-button-small no-icon\" onclick=\"removeSelectItem('$name'); return false;\"></span>";
     # ui_textbox(name, value, size, [disabled?], [maxlength], [tags])
     my $textbox_name = $name . "_additem";
     $s .= &ui_textbox( $textbox_name, undef, $length, undef, undef, "placeholder=\"$template\" title=\"$template\"" );
-    $s .= "<span class=\"btn btn-tiny add-item-button-small\" onclick=\"addItemToSelect('$name'); return false;\"></span>";
+    $s .= "<span class=\"btn btn-tiny add-item-button-small no-icon\" onclick=\"addItemToSelect('$name'); return false;\"></span>";
     $s .= "</div></nobr>";
     $s .= "</div>";
     return $s;
