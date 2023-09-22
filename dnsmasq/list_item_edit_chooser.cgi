@@ -141,7 +141,7 @@ sub get_dropdown_options {
                 my $desc = "";
                 if ($opt->{"desc"}->{"ipv6"}) {
                     if ($opt->{"alt_names"}->{"ipv6"}) {
-                        $desc = "option6:" . $opt->{"alt_names"}->{"ipv6"};
+                        $desc = $opt->{"alt_names"}->{"ipv6"};
                         $options_by_alt_name->{"option6:" . $opt->{"alt_names"}->{"ipv6"}} = $opt->{"name"};
                         $options_by_id->{$opt->{"name"}} = "option6:" . $opt->{"alt_names"}->{"ipv6"};
                     }
