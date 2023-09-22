@@ -17,7 +17,6 @@
 
 BEGIN { push(@INC, ".."); };
 use POSIX qw(ceil getgroups cuserid);
-use URI::Escape;
 use File::Basename;
 use WebminCore;
 
