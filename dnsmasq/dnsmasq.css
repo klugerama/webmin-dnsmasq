@@ -40,6 +40,8 @@ html[data-bgs='nightRider'] .hl-aw, .hl-aw {
 .dnsm-td-left {
     text-align: left;
     width: auto;
+    word-break: break-word !important;
+    overflow-wrap: break-word;
 }
 .dnsm-td-label {
     word-break: break-word !important;
@@ -99,6 +101,8 @@ html[data-bgs='nightRider'] .hl-aw, .hl-aw {
     width: 100px !important;
     text-align: right;
     padding-right: 5px;
+    word-break: break-word !important;
+    overflow-wrap: break-word;
 }
 .dnsm-modal-td-input {
     min-width: 100px;
