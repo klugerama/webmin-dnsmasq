@@ -104,16 +104,23 @@ sub generate_param_rows {
             $label .= "&nbsp;<span color='red'>*</span>&nbsp;";
         }
         my $input;
+        my $fieldname = $fieldname_prefix . $param . ($ipversionfilter ? "_" . ($ipversionfilter == 4 ? 6 : 4) : "");
+
         if ($paramdefinition->{"valtype"} eq "bool") {
-            $input = &ui_checkbox($fieldname_prefix . $param, "1", "", $val{$param});
+            $input = &ui_checkbox($fieldname, "1", "", $val{$param});
         }
         else {
             if ( $paramdefinition->{"arr"} == 1 ) {
-                $input = &ui_textbox($fieldname_prefix . $param, join($paramdefinition->{"sep"}, @{$val{$param}}), $paramdefinition->{"length"}, undef, undef, $input_guidance . $validation);
+                $input = &ui_textbox($fieldname, join($paramdefinition->{"sep"}, @{$val{$param}}), $paramdefinition->{"length"}, undef, undef, $input_guidance . $validation);
             }
             else {
-                # $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}) ];
-                $input = &ui_textbox($fieldname_prefix . $param, $val{$param}, $paramdefinition->{"length"}, undef, undef, $input_guidance . $validation);
+                # $input = &ui_textbox($fieldname, $val{$param}, $paramdefinition->{"length"}) ];
+                $input = &ui_textbox($fieldname, $val{$param}, $paramdefinition->{"length"}, undef, undef, $input_guidance . $validation);
+                if ($paramdefinition->{"sel"}) {
+                    # ui_select(name, value|&values, &options, [size], [multiple], [add-if-missing], [disabled?], [javascript])
+                    my ($options, $selval) = get_dropdown_options($internalfield, $param, $val, $paramdefinition, $ipversionfilter);
+                    $input .= &ui_select($fieldname . "_sel", $selval, $options, 1, 0, ($selval ? 1 : 0), 0, "style=\"width: 220px;\" onchange=\"\$('input[name=" . $fieldname . "]').val(\$(this).val()); return false;\"");
+                }
             }
         }
         $rows .= &ui_columns_row( [ $label, $input ], \@tds );
@@ -121,7 +128,60 @@ sub generate_param_rows {
     return $rows;
 }
 
-# my $headstuff = $base_headstuff;
+sub get_dropdown_options {
+    my ($internalfield, $param, $val, $paramdefinition, $ipversionfilter) = @_;
+    my $selval = $val{$param};
+    my @options = ();
+    if ($internalfield eq "dhcp_option") {
+        my %options_by_alt_name = (); # for looking up the current value
+        my %options_by_id = (); # for looking up the current value
+        my $ipversion = $val{"ipversion"} == 6 ? "ipv6" : $val{"ipversion"} == 4 ? "ipv4" : "new";
+        if ($ipversionfilter == 4) {
+            foreach my $opt ( @{ $paramdefinition->{"sel"} } ) {
+                my $desc = "";
+                if ($opt->{"desc"}->{"ipv6"}) {
+                    if ($opt->{"alt_names"}->{"ipv6"}) {
+                        $desc = "option6:" . $opt->{"alt_names"}->{"ipv6"};
+                        $options_by_alt_name->{"option6:" . $opt->{"alt_names"}->{"ipv6"}} = $opt->{"name"};
+                        $options_by_id->{$opt->{"name"}} = "option6:" . $opt->{"alt_names"}->{"ipv6"};
+                    }
+                    $desc .= ($desc ? " - " : "") . $opt->{"desc"}->{"ipv6"};
+                    push(@options, [ "option6:" . ($opt->{"alt_names"}->{"ipv6"} ? $opt->{"alt_names"}->{"ipv6"} : $opt->{"name"}), $desc ]);
+                }
+            }
+        }
+        else {
+            foreach my $opt ( @{ $paramdefinition->{"sel"} } ) {
+                my $desc = "";
+                if ($opt->{"desc"}->{"ipv4"}) {
+                    if ($opt->{"alt_names"}->{"ipv4"}) {
+                        $desc = $opt->{"alt_names"}->{"ipv4"};
+                        $options_by_alt_name->{$opt->{"alt_names"}->{"ipv4"}} = $opt->{"name"};
+                        $options_by_id->{$opt->{"name"}} = $opt->{"alt_names"}->{"ipv4"};
+                    }
+                    $desc .= ($desc ? " - " : "") . $opt->{"desc"}->{"ipv4"};
+                    push(@options, [ ($opt->{"alt_names"}->{"ipv4"} ? $opt->{"alt_names"}->{"ipv4"} : $opt->{"name"}), $desc ]);
+                }
+            }
+        }
+        if ($selval ne "") {
+            if ($selval !~ /^\d{1,3}$/ ) {
+                $selval = "option6:" . $selval if ($val{"ipversion"} == 6);
+                # if (grep { /^$selval$/ } ( keys %{$options_by_alt_name} ) ) {
+                #     $selval = $options_by_alt_name->{"$selval"};
+                # }
+            }
+            else {
+                $selval = "option6:" . $selval if ($val{"ipversion"} == 6);
+                if (grep { /^$selval$/ } ( keys %{$options_by_id} ) ) {
+                    $selval = $options_by_id->{"$selval"};
+                }
+            }
+        }
+    }
+    return (\@options, $selval);
+}
+
 my $headstuff = "<script type='text/javascript'>\n"
     . "  \$( \".opener_hidden\" ).prop(\"style\", \"display: none;\");\n"
     . "  function check_" . $internalfield . "(formname) {\n"
@@ -159,12 +219,11 @@ my $title_header = "<div class=\"dnsm-modal-header\"><span class=\"dnsm-modal-ti
     . "<button type=\"button\" class=\"close dnsm-close-x\" data-dismiss=\"modal\" aria-label=\"Close\">"
     . "<span aria-hidden=\"true\">&times;</span>"
     . "</button></div>";
-if ($internalfield eq "dhcp_range") {
+if ($internalfield eq "dhcp_range" || $internalfield eq "dhcp_option") {
     my $ipversion = "modal_" . ($in{"ipversion"} || "ip4");
     print &ui_columns_start( undef, 100, undef, undef, $title_header);
     my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_chooser.cgi");
-    my $descstring = $text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr; 
-    $desc .= $descstring;
+    $desc .= $text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr;
     $desc .= &ui_hidden_end("mandesc");
     print &ui_columns_row( [ $desc ], \@doctd );
     if ($action eq "edit") {
@@ -176,7 +235,6 @@ if ($internalfield eq "dhcp_range") {
         }
     }
     else {
-
         my @tabs = ( [ 'modal_ip4', $text{"dhcp_ipversion4"} ],
                     [ 'modal_ip6', $text{"dhcp_ipversion6"} ] );
         $tabrow .= &ui_tabs_start(\@tabs, "ipversion", $ipversion);
@@ -195,6 +253,7 @@ if ($internalfield eq "dhcp_range") {
     print &ui_columns_end();
 }
 else {
+    my $ipversion = "modal_" . ($in{"ipversion"} || "ip4");
     print &ui_form_start(undef, undef, undef, "id=\"".$internalfield."_input_form\" onsubmit=\"save_".$internalfield."('".$internalfield."_input_form');\"");
     if ($action eq "edit") {
         $item = $dnsmconfig{$configfield}[$cfg_idx];
@@ -203,7 +262,7 @@ else {
     }
     print &ui_columns_start( undef, 100, undef, undef, $title_header);
     my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_chooser.cgi");
-    $desc .= $text{"p_man_desc_" . $internalfield};
+    $desc .= $text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr;
     $desc .= &ui_hidden_end("mandesc");
     print &ui_columns_row( [ $desc ], \@doctd );
     if ($in{"ipversion"} eq "ip6") {
