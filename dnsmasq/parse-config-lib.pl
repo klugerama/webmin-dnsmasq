@@ -2092,7 +2092,7 @@ sub init_configfield_fields {
         "dhcp_option" => {  # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
             "param_order" => [ "option", "value", "tag", "vendor", "encap", "vi-encap", "forced" ],
             "option" => {
-                "length" => 10,
+                "length" => 15,
                 "valtype" => "string",
                 "default" => "",
                 "required" => 0,
