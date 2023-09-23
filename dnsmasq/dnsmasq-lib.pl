@@ -1012,7 +1012,7 @@ sub create_error {
 sub header_js {
     my ($formid, $internalfield) = @_;
     my $script = "";
-    # $script .= "<link href=\"dnsmasq.css\" rel=\"stylesheet\">\n";
+    $script .= "<link href=\"dnsmasq.css\" rel=\"stylesheet\">\n";
     $script .= "<script id=\"dnsmasq_js\" type=\"text/javascript\" src=\"dnsmasq.js\"></script>\n";
     # $script .= "<script type=\"text/javascript\">\n";
     # $script .= "\$(document).ready(function() {\n";
