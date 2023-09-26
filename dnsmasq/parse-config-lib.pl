@@ -4562,7 +4562,7 @@ sub validate_value {
         foreach my $param ( @{$fdef->{"param_order"}} ) {
             my $pdef = \%{ $fdef->{"$param"} };
             my $val = ($param eq "val" ? $item->{"val"} : $item->{"val"}->{$param});
-            if (defined($pdef->{"required"}) && $pdef->{"required"} == 1 && (!$val)) {
+            if (defined($pdef->{"required"}) && $pdef->{"required"} == 1 && (!defined($val) || $val eq "")) {
                 push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_valreq"}, $configfield, $param, $cfg_idx));
             }
             elsif (defined($val) && $val ne "") {
