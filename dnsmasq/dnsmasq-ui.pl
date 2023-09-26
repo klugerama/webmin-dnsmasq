@@ -23,12 +23,34 @@ our @defaultoryes = ( \@radiodefaultno, \@radioyes );
 # our @defaultorno = ( \@radiodefaultyes, \@radiono );
 our @radioval = ( 1, " " );
 our @defaultorval = ( \@radiodefaultno, \@radioval );
-our $td_left = "class=\"dnsm-td-left\"";
-our $td_label = "class=\"dnsm-td-left dnsm-td-label\"";
-our $td_right = "class=\"dnsm-td-right\"";
-our $cbtd = 'class="dnsm-cb-td"';
-our $customcbtd = 'class="ui_checked_checkbox flexed dnsm-cb-td"';
-our $dnsm_basic_td = 'class="dnsm-basic-td"';
+our $td_left_class = "dnsm-td-left";
+our $td_label_class = "dnsm-td-left dnsm-td-label";
+our $td_right_class = "dnsm-td-right";
+our $warn_class = "dnsm-warn";
+our $error_class = "dnsm-error";
+our $cbtd_class = "dnsm-cb-td";
+# our $customcbtd_class = "ui_checked_checkbox flexed " . $cbtd_class;
+our $dnsm_basic_td_class = "dnsm-basic-td";
+our $dnsm_header_warn_box_class = "dnsm-header-warn-box"; 
+
+# our $td_left = "class=\"" . $td_left_class . "\"";
+# our $td_label = "class=\"" . $td_label_class . "\"";
+# our $td_right = "class=\"" . $td_right_class . "\"";
+# our $td_warn = "class=\"" . $warn_class . "\"";
+# our $td_error = "class=\"" . $error_class . "\"";
+# our $cbtd = "class=\"" . $cbtd_class . "\"";
+# our $customcbtd = "class=\"ui_checked_checkbox flexed " . $cbtd_class . "\"";
+# our $dnsm_basic_td = "class=\"" . $dnsm_basic_td_class . "\"";
+
+sub get_class_tag {
+    my ($classes) = @_;
+    if (ref($classes) eq "ARRAY") {
+        return "class=\"" . join(" ", @{$classes}) . "\"";
+    }
+    else {
+        return "class=\"$classes\"";
+    }
+}
 
 sub radio_default_or_yes {
     my ($def) = @_;
@@ -408,7 +430,7 @@ sub show_basic_fields {
 
     my @basic_fields = &get_basic_fields($page_fields);
     return if @basic_fields == 0;
-    my @tds = ( $cbtd, $dnsm_basic_td, $dnsm_basic_td );
+    my @tds = ( &get_class_tag($cbtd_class), &get_class_tag($dnsm_basic_td_class), &get_class_tag($dnsm_basic_td_class) );
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     if (@basic_fields == 1) {
         my $g = &ui_columns_start( [
@@ -450,15 +472,13 @@ sub get_basic_fields_row {
     my ($dnsmconfig, $configfield) = @_;
     my $internalfield = &config_to_internal("$configfield");
 
-    my $bigtd = $dnsm_basic_td . " colspan=2";
-    my @booltds = ( $cbtd, $bigtd );
-    my @cbtds = ( $customcbtd, $dnsm_basic_td, $dnsm_basic_td );
-    my @tds = ( $cbtd, $dnsm_basic_td, $dnsm_basic_td );
 
     my $help = &ui_help($configfield . ": " . $text{"p_man_desc_$internalfield"});
     if ( grep { /^$configfield$/ } ( @confbools ) ) {
-        return &ui_checked_columns_row( [
-                $text{"p_label_$internalfield"} . $help,
+        my $bigtd = &get_class_tag($dnsm_basic_td_class) . " colspan=2";
+        my @booltds = ( &get_class_tag($cbtd_class), $bigtd );
+        $row = &ui_checked_columns_row( [
+                ($definition->{"label"} || $text{"p_label_" . $internalfield}) . $help,
             ], \@booltds, "sel", $configfield, ($dnsmconfig->{$configfield}->{"used"})?1:0
         );
     }
@@ -472,30 +492,50 @@ sub get_basic_fields_row {
         $validation .= $definition->{"max"} ne "" ? " max='" . $definition->{"max"} . "'" : "";
         $validation .= $definition->{"required"} == 1 ? " required" : " optional";
         my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
+        my $fname = $internalfield . "val";
+        my $extra_tags = "onchange=\"\$('input[name=" . $fname . "]').prop('disabled', (i, v) => !v);\"";
+        my $val = $dnsmconfig->{$configfield}->{"val"};
+        # my @tds = ( &get_class_tag($cbtd_class), &get_class_tag($dnsm_basic_td_class), &get_class_tag($dnsm_basic_td_class) );
+        my @tds = ( &get_class_tag($dnsm_basic_td_class), &get_class_tag($dnsm_basic_td_class) );
+        my $highlight = "";
+        if ($is_used && defined($definition->{"warn_if"}) && $val eq $definition->{"warn_if"}) {
+            $highlight .= &get_class_tag([$dnsm_header_warn_box_class, $warn_class]);
+        }
         if ( $definition->{"valtype"} eq "user" ) {
-            return &ui_clickable_checked_columns_row( [
-                    $text{"p_label_$internalfield"} . $help, 
-                    &ui_user_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, $input_guidance . $validation )
-                ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
+            $row = &ui_clickable_checked_columns_row( [
+                    $label, 
+                    "<nobr>"
+                        . &ui_user_textbox( $fname, $val, undef, $is_used?0:1, undef, $input_guidance . $validation )
+                        . $req_star
+                        . "</nobr>"
+                ], undef, "sel", $configfield, $is_used, undef, $extra_tags );
         }
         elsif ( $definition->{"valtype"} eq "group" ) {
-            return &ui_clickable_checked_columns_row( [
-                    $text{"p_label_$internalfield"} . $help,
-                    &ui_group_textbox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, undef, $is_used?0:1, undef, $input_guidance . $validation )
-                ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
+            $row = &ui_clickable_checked_columns_row( [
+                    $label, 
+                    "<nobr>"
+                        . &ui_group_textbox( $fname, $val, undef, $is_used?0:1, undef, $input_guidance . $validation )
+                        . $req_star
+                        . "</nobr>"
+                ], undef, "sel", $configfield, $is_used, undef, $extra_tags );
         }
         elsif ( $definition->{"valtype"} =~ /(file|dir|path)$/ ) {
-            return &ui_clickable_checked_columns_row( [
-                    $text{"p_label_$internalfield"} . $help,
-                    &ui_filebox( $internalfield . "val", $dnsmconfig->{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation, $definition->{"valtype"} eq "dir" ? 1 : undef )
-                ], undef, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\"" );
+            $row = &ui_clickable_checked_columns_row( [
+                    $label, 
+                    "<nobr>"
+                        . &ui_filebox( $fname, $val, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation, $definition->{"valtype"} eq "dir" ? 1 : undef )
+                        . $req_star
+                        . "</nobr>"
+                ], undef, "sel", $configfield, $is_used, undef, $extra_tags );
         }
         else {
-            return &ui_checked_columns_row( [
-                    $text{"p_label_$internalfield"} . $help,
-                    &ui_textbox( $internalfield . "val", %{$dnsmconfig}{$configfield}->{"val"}, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation . " dnsmclass=\"dnsm-type-" . $definition->{"valtype"} . "\"" )
-                ], \@tds, "sel", $configfield, $is_used, undef, "onchange=\"\$('input[name=" . $internalfield . "val]').prop('disabled', (i, v) => !v);\""
-            );
+            $row = &ui_clickable_checked_columns_row( [
+                    $label, 
+                    "<nobr>"
+                        . "<span " . $highlight . ">" . &ui_textbox( $fname, $val, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation . " dnsmclass=\"dnsm-type-" . $definition->{"valtype"} . "\"" ) . "</span>"
+                        . $req_star
+                        . "</nobr>"
+                ], \@tds, "sel", $configfield, $is_used, undef, $extra_tags );
         }
     }
 }
@@ -505,13 +545,13 @@ sub show_other_fields {
     my $formid = "$pageid_other_form";
 
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
-    my @tds = ( $td_label, $td_left );
+    my @tds = ( &get_class_tag($td_label_class), &get_class_tag($td_left_class) );
     my @var_fields = &get_other_fields($page_fields);
     return if @var_fields == 0;
     my $col_ct = &get_max_columns(\@var_fields) + 2; # it will always have the label and radio buttons
     my @columns_arr = (3..$col_ct);
     for (@columns_arr) {
-        push( @tds, $td_label );
+        push( @tds, &get_class_tag($td_label_class) );
     }
     print &ui_columns_start( undef, 100, undef, undef, &ui_columns_header( [ $table_header ], [ 'class="table-title" colspan=' . $col_ct ] ), 0 );
     foreach my $configfield ( @var_fields ) {
@@ -626,7 +666,7 @@ sub show_field_table {
     my @newfields = @{$definition->{"param_order"}};
     my @editfields = ( "cfg_idx", @newfields );
     my $formid = $internalfield . "_form";
-    my @tds = ( $td_label, $td_left );
+    my @tds = ( &get_class_tag($td_label_class), &get_class_tag($td_left_class) );
     my @pathtypes = ( "file", "path", "dir" );
     my @column_headers = ( 
         "",
@@ -634,17 +674,17 @@ sub show_field_table {
     );
     # if ( @newfields == 1 ) {
     #     push(@column_headers, $definition->{"@newfields[0]"}->{"label"} );
-    #     push( @tds, $td_left );
+    #     push( @tds, &get_class_tag($td_left_class) );
     # }
     # else {
         foreach my $param ( @newfields ) {
             push(@column_headers, $definition->{"$param"}->{"label"} );
-            push( @tds, $td_left );
+            push( @tds, &get_class_tag($td_left_class) );
         }
     # }
     if ($include_movers) {
             push(@column_headers, "" );
-            push( @tds, $td_left );
+            push( @tds, &get_class_tag($td_left_class) );
     }
     my @list_link_buttons = &list_links( "sel", $formidx );
     my $first_field = $newfields[0];
