@@ -35,11 +35,16 @@ if ($error_check_action eq "redirect") {
 print &header_js();
 print $error_check_result;
 
+my $table_header_warn = "";
+if (%dnsmconfig{"port"}->{"used"} && %dnsmconfig{"port"}->{"val"} eq "0") {
+    $table_header_warn = " <div " . &get_class_tag([$dnsm_header_warn_box_class, $warn_class]) . ">" . $text{"dns_disabled"} . " " . &ui_help($text{"dns_disabled_help"}) . "</div>";
+}
+
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
 my $apply_cgi = "dns_basic_apply.cgi";
-my @tds = ( $td_left, $td_left, $td_left );
+my @tds = ( &get_class_tag($td_left_class), &get_class_tag($td_left_class), &get_class_tag($td_left_class) );
 our $formidx = 1;
 
 my @vals = (
