@@ -59,11 +59,8 @@ my @vals = (
     },
 );
 
-my @page_fields = ();
-foreach my $configfield ( @confdns ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "4" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
+
 my @tabs = (
             [ 'basic', $text{'index_basic'} ],
             [ 'other', $text{"index_other"} ],
@@ -72,26 +69,26 @@ foreach my $v ( @vals ) {
     push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
 }
 my $tab = $in{"tab"} || "basic";
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('tab', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "?tab=basic", $text{"index_dns_alias"} );
-print ui_tabs_end_tab('tab', 'basic');
+print &ui_tabs_start_tab('tab', 'basic');
+&show_basic_fields( \%dnsmconfig, "dns_alias", $page_fields, $apply_cgi . "?tab=basic", $text{"index_dns_alias"} );
+print &ui_tabs_end_tab('tab', 'basic');
 
-print ui_tabs_start_tab('tab', 'other');
-&show_other_fields( \%dnsmconfig, "dns_alias", \@page_fields, $apply_cgi . "?tab=other", $text{"index_other"} );
-print ui_tabs_end_tab('tab', 'other');
+print &ui_tabs_start_tab('tab', 'other');
+&show_other_fields( \%dnsmconfig, "dns_alias", $page_fields, $apply_cgi . "?tab=other", $text{"index_other"} );
+print &ui_tabs_end_tab('tab', 'other');
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_start_tab('tab', $v->{"internalfield"});
     &show_field_table($v->{"internalfield"}, $apply_cgi . "?tab=" . $v->{"internalfield"}, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
-    print ui_tabs_end_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_end_tab('tab', $v->{"internalfield"});
 }
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_alias.cgi ###.

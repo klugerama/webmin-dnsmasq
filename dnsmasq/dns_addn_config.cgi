@@ -61,18 +61,18 @@ foreach my $v ( @vals ) {
     push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
 }
 
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_start_tab('tab', $v->{"internalfield"});
     &show_field_table($v->{"internalfield"}, $apply_cgi . "?tab=" . $v->{"internalfield"}, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
-    print ui_tabs_end_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_end_tab('tab', $v->{"internalfield"});
 }
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_addn_config.cgi ###.

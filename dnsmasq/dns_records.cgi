@@ -51,11 +51,7 @@ my @vals = (
     },
 );
 
-my @page_fields = ();
-foreach my $configfield ( @confdns ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "5" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
 
 my @tabs = ( [ 'basic', $text{'index_basic'} ],
              [ 'recs', $text{"index_dns_records"} ],
@@ -64,25 +60,25 @@ foreach my $v ( @vals ) {
     push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
 }
 my $tab = $in{"tab"} || "basic";
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('tab', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_records", \@page_fields, $apply_cgi . "?tab=basic", $text{"index_basic"} );
-print ui_tabs_end_tab('tab', 'basic');
+print &ui_tabs_start_tab('tab', 'basic');
+&show_basic_fields( \%dnsmconfig, "dns_records", $page_fields, $apply_cgi . "?tab=basic", $text{"index_basic"} );
+print &ui_tabs_end_tab('tab', 'basic');
 
-print ui_tabs_start_tab('tab', 'recs');
-&show_other_fields( \%dnsmconfig, "dns_records", \@page_fields, $apply_cgi . "?tab=recs", $text{"index_dns_records"} );
-print ui_tabs_end_tab('tab', 'recs');
+print &ui_tabs_start_tab('tab', 'recs');
+&show_other_fields( \%dnsmconfig, "dns_records", $page_fields, $apply_cgi . "?tab=recs", $text{"index_dns_records"} );
+print &ui_tabs_end_tab('tab', 'recs');
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_start_tab('tab', $v->{"internalfield"});
     &show_field_table($v->{"internalfield"}, $apply_cgi . "?tab=" . $v->{"internalfield"}, $v->{"add_button_text"}, \%dnsmconfig, $formidx++);
-    print ui_tabs_end_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_end_tab('tab', $v->{"internalfield"});
 }
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_records.cgi ###.

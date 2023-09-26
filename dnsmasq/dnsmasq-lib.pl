@@ -19,6 +19,7 @@ BEGIN { push(@INC, ".."); };
 use POSIX qw(ceil getgroups cuserid);
 use File::Basename;
 use WebminCore;
+use experimental qw( switch );
 
 use constant ERR_FILE_PERMS => 1;
 
@@ -713,6 +714,37 @@ sub can_access {
         return 0 if ($a[$i] ne $f[$i]);
     }
     return 1;
+}
+
+sub get_page_fields {
+    my ($cgi) = @_;
+    my ($context, $page, @page_fields);
+    CONTEXT: foreach my $c ( keys %dnsmnav ) {
+        foreach my $p ( keys %{%dnsmnav{$c}} ) {
+            if (%dnsmnav{$c}->{$p}->{"cgi_name"} eq basename($cgi)) {
+                $context = $c;
+                $page = $p;
+                last CONTEXT;
+            }
+        }
+    }
+    my @subset;
+    given ( $context ) {
+        when ("dns") {
+            @subset = @confdns;
+        }
+        when ("dhcp") {
+            @subset = @confdhcp;
+        }
+        when ("t_b_p") {
+            @subset = @conft_b_p;
+        }
+    }
+    foreach my $configfield ( @subset ) {
+        next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne $page );
+        push( @page_fields, $configfield );
+    }
+    return ($context, $page, \@page_fields);
 }
 
 sub get_basic_fields {

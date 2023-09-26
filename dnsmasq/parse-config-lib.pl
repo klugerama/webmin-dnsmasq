@@ -581,7 +581,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_port"} . ">",
                 "pattern" => "\\d{1,5}",
                 "min" => 0,
-                "max" => 65535
+                "max" => 65535,
+                "warn_if" => 0,
             }
         },
         "edns_packet_max" => {  # =<size>

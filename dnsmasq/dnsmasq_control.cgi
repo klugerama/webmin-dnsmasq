@@ -141,6 +141,6 @@ if ($config{"check_for_updates"} eq "1" || ($in{"manual_check_for_update"} && $i
 }
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dnsmasq_control.cgi ###.
