@@ -39,18 +39,14 @@ my $returnto = $in{"returnto"} || "dns_sec.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_sec_settings"};
 my $apply_cgi = "dns_sec_apply.cgi";
 
-my @page_fields = ();
-foreach my $configfield ( @confdns ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "6" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
 
-&show_basic_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, $text{"index_dns_sec"} );
+&show_basic_fields( \%dnsmconfig, "dns_sec", $page_fields, $apply_cgi, $text{"index_dns_sec"} );
 
-&show_other_fields( \%dnsmconfig, "dns_sec", \@page_fields, $apply_cgi, "" );
+&show_other_fields( \%dnsmconfig, "dns_sec", $page_fields, $apply_cgi, " " );
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_sec.cgi ###.

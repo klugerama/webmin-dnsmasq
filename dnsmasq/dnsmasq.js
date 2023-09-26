@@ -55,7 +55,7 @@ var doDnsmasqStuff = function(event, xhr, options) {
 var removeDnsmasqStuff = function(event, xhr, options) {
     if (!core.curModule("dnsmasq")) {
         // user is no longer in the dnsmasq module; clean up scripts and css from <head>
-        $("#dnsmasq_css").remove();
+        // $("#dnsmasq_css").remove();
         $("script[src*='dnsmasq.js']").remove();
         $(document).off("pjax:end", removeDnsmasqStuff);
         removeDnsmasqStuff = null;
@@ -67,11 +67,11 @@ $(document).ready(function() {
     $(document).on("pjax:end", removeDnsmasqStuff);
     $(document).off("pjax:end", doDnsmasqStuff);
     $(document).on("pjax:end", doDnsmasqStuff);
-    if (core.curModule("dnsmasq")) {
-        if (!document.head.innerHTML.includes("dnsmasq.css")) {
-            document.head.innerHTML += '<link id="dnsmasq_css" href="dnsmasq.css" rel="stylesheet">';
-        }
-    }
+    // if (core.curModule("dnsmasq")) {
+    //     if (!document.head.innerHTML.includes("dnsmasq.css")) {
+    //         document.head.innerHTML += '<link id="dnsmasq_css" href="dnsmasq.css" rel="stylesheet">';
+    //     }
+    // }
 });
 
 function addItemToSelect(sel){

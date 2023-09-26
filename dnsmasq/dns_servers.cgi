@@ -61,26 +61,26 @@ foreach my $v ( @vals ) {
 }
 
 my $tab = $in{"tab"} || "basic";
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('tab', 'basic');
-my @page_fields = ();
-foreach my $configfield ( @confdns ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "2" );
-    push( @page_fields, $configfield );
-}
-&show_basic_fields( \%dnsmconfig, "dns_servers", \@page_fields, $apply_cgi, $text{"index_dns_servers"} );
-&show_other_fields( \%dnsmconfig, "dns_servers", \@page_fields, $apply_cgi, $text{"index_dns_servers"} );
-print ui_tabs_end_tab('tab', 'basic');
+print &ui_tabs_start_tab('tab', 'basic');
+
+my ($context, $page, $page_fields) = &get_page_fields($0);
+
+&show_basic_fields( \%dnsmconfig, "dns_servers", $page_fields, $apply_cgi, $text{"index_dns_servers"} );
+
+&show_other_fields( \%dnsmconfig, "dns_servers", $page_fields, $apply_cgi, $text{"index_dns_servers"} );
+
+print &ui_tabs_end_tab('tab', 'basic');
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_start_tab('tab', $v->{"internalfield"});
     &show_field_table($v->{"internalfield"}, $apply_cgi . "?tab=" . $v->{"internalfield"}, $v->{"add_button_text"}, 
         \%dnsmconfig, $formidx++, undef, 1, $returnto . "?tab=" . $v->{"internalfield"}, $returnlabel);
-    print ui_tabs_end_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_end_tab('tab', $v->{"internalfield"});
 }
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 

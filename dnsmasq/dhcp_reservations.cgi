@@ -51,7 +51,7 @@ sub show_reservations() {
     }
     my @editfields = ( "cfg_idx", @newfields );
     my $formid = $internalfield . "_form";
-    my @tds = ( $td_label, $td_left );
+    my @tds = ( &get_class_tag($td_label_class), &get_class_tag($td_left_class) );
     my @column_headers = ( "",
         $text{"enabled"},
         $text{"p_label_val_hostname"}, 
@@ -62,7 +62,7 @@ sub show_reservations() {
         $text{"p_label_val_tag"}, 
         $text{"p_label_val_leasetime"}, );
     foreach my $param ( @newfields ) {
-        push( @tds, $td_left );
+        push( @tds, &get_class_tag($td_left_class) );
     }
     # my @list_link_buttons = &list_links( "sel", 0, "dhcp_res_apply.cgi", "dhcp-host=new,0.0.0.0", "dhcp_reservations.cgi", &text("add_", $text{"_host"}) );
     my @list_link_buttons = &list_links( "sel", 1 );
@@ -112,6 +112,6 @@ sub show_reservations() {
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dhcp_reservations.cgi ###.

@@ -39,6 +39,7 @@ our @tds = ( $tdlabel, $tdinput );
 our $item;
 our %val;
 our $fieldname_prefix = ( $action eq "add" ? "new_" : "" ) . $internalfield . "_";
+our $at_least_one_required = 0;
 
 sub formtable_ip4 {
     my ($fieldname_prefix) = @_;
@@ -54,7 +55,9 @@ sub formtable_ip4 {
     $formtable .= &ui_columns_start( [ undef, undef ], 100);
     $formtable .= &generate_param_rows(6);
     $formtable .= &ui_columns_end();
-    $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    if ($at_least_one_required) {
+        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    }
     my @form_buttons = ();
     push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
     push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_4", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
@@ -76,7 +79,9 @@ sub formtable_ip6 {
     $formtable .= &ui_columns_start( [ undef, undef ], 100);
     $formtable .= &generate_param_rows(4);
     $formtable .= &ui_columns_end();
-    $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    if ($at_least_one_required) {
+        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    }
     my @form_buttons = ();
     push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
     push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_6", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
@@ -101,6 +106,7 @@ sub generate_param_rows {
         $validation .= $paramdefinition->{"max"} ? " max='" . $paramdefinition->{"max"} . "'" : "";
         $validation .= $paramdefinition->{"required"} == 1 ? " required" : " optional";
         if ($paramdefinition->{"required"}) {
+            $at_least_one_required = 1;
             $label .= "&nbsp;<span color='red'>*</span>&nbsp;";
         }
         my $input;
@@ -275,7 +281,9 @@ else {
         print &generate_param_rows();
     }
     print &ui_table_end();
-    print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    if ($at_least_one_required) {
+        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    }
     my @form_buttons = ();
     push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
     push( @form_buttons, &ui_submit( $text{"button_save"}, "submit", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );

@@ -39,15 +39,11 @@ my $returnto = $in{"returnto"} || "tftp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_settings_basic"};
 my $apply_cgi = "tftp_basic_apply.cgi";
 
-my @page_fields = ();
-foreach my $configfield ( @conft_b_p ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "1" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
 
-&show_basic_fields( \%dnsmconfig, "tftp_basic", \@page_fields, $apply_cgi, $text{"index_tftp_settings_basic"} );
+&show_basic_fields( \%dnsmconfig, "tftp_basic", $page_fields, $apply_cgi, $text{"index_tftp_settings_basic"} );
 
-&show_other_fields( \%dnsmconfig, "tftp_basic", \@page_fields, $apply_cgi, " " );
+&show_other_fields( \%dnsmconfig, "tftp_basic", $page_fields, $apply_cgi, " " );
 
 print &add_js();
 

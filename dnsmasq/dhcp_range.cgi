@@ -63,9 +63,9 @@ sub show_ip_range_list {
     }
     my @editfields = ( "cfg_idx", @newfields );
     my $formid = $internalfield . "_" . $ipver . "_form";
-    my @tds = ( $td_label, $td_left, $td_left ); # extra column for set-tags
+    my @tds = ( &get_class_tag($td_label_class), &get_class_tag($td_left_class), &get_class_tag($td_left_class) ); # extra column for set-tags
     foreach my $param ( @newfields ) {
-        push( @tds, $td_left );
+        push( @tds, &get_class_tag($td_left_class) );
     }
     my @list_link_buttons = &list_links( "sel", $formidx );
     my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_range"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields, "ipversion=ip" . $ipver );
@@ -119,20 +119,20 @@ sub show_ip_range_list {
 my @tabs = (   [ 'ip4', $text{"dhcp_ipversion4"} ],
             [ 'ip6', $text{"dhcp_ipversion6"} ] );
 my $ipversion = $in{"ipversion"} || "ip4";
-print ui_tabs_start(\@tabs, "ipversion", $ipversion);
+print &ui_tabs_start(\@tabs, "ipversion", $ipversion);
 
-print ui_tabs_start_tab("ipversion", 'ip4');
+print &ui_tabs_start_tab("ipversion", 'ip4');
 &show_ip_range_list(4, $formidx++);
-print ui_tabs_end_tab("ipversion", 'ip4');
+print &ui_tabs_end_tab("ipversion", 'ip4');
 
-print ui_tabs_start_tab("ipversion", 'ip6');
+print &ui_tabs_start_tab("ipversion", 'ip6');
 &show_ip_range_list(6, $formidx++);
-print ui_tabs_end_tab("ipversion", 'ip6');
+print &ui_tabs_end_tab("ipversion", 'ip6');
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dhcp_range.cgi ###.

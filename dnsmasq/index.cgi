@@ -50,21 +50,21 @@ if ( defined ($in{"tab"}) ) {
 my @tabs = (   [ 'dns', $text{'index_dns_settings'} ],
             [ 'dhcp', $text{'index_dhcp_settings'} ],
             [ 'tftp', $text{'index_tftp_settings'} ] );
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('tab', 'dns');
+print &ui_tabs_start_tab('tab', 'dns');
 show_dns_settings();
-print ui_tabs_end_tab('tab', 'dns');
+print &ui_tabs_end_tab('tab', 'dns');
 
-print ui_tabs_start_tab('tab', 'dhcp');
+print &ui_tabs_start_tab('tab', 'dhcp');
 show_dhcp_settings();
-print ui_tabs_end_tab('tab', 'dhcp');
+print &ui_tabs_end_tab('tab', 'dhcp');
 
-print ui_tabs_start_tab('tab', 'tftp');
+print &ui_tabs_start_tab('tab', 'tftp');
 show_tftp_settings();
-print ui_tabs_end_tab('tab', 'tftp');
+print &ui_tabs_end_tab('tab', 'tftp');
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 

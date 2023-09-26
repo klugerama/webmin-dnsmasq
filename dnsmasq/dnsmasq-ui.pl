@@ -427,6 +427,7 @@ sub get_selectbox_with_controls {
 sub show_basic_fields {
     my ($dnsmconfig, $pageid, $page_fields, $apply_cgi, $table_header) = @_;
     my $formid = $pageid . "_basic_form";
+    our $at_least_one_required = 0;
 
     my @basic_fields = &get_basic_fields($page_fields);
     return if @basic_fields == 0;
@@ -463,6 +464,9 @@ sub show_basic_fields {
         }
         print &ui_grid_table(\@grid, 2, 100, undef, undef, $table_header);
     }
+    if ($at_least_one_required) {
+        print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    }
 
     # print &ui_form_end( [ &ui_submit( $text{"button_save"} ), &ui_reset( $text{"undo_button"} ) ] );
     print &ui_form_end( [ &ui_submit( $text{"button_save"}, "submit" ) ] );
@@ -471,6 +475,7 @@ sub show_basic_fields {
 sub get_basic_fields_row {
     my ($dnsmconfig, $configfield) = @_;
     my $internalfield = &config_to_internal("$configfield");
+    my $row = "";
 
 
     my $help = &ui_help($configfield . ": " . $text{"p_man_desc_$internalfield"});
@@ -485,12 +490,21 @@ sub get_basic_fields_row {
     elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
         my $definition = %configfield_fields{$internalfield}->{"val"};
         my $tmpl = $definition->{"template"};
+        my $label = $text{"p_label_" . $internalfield} . $help;
         my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
         my $validation = "";
         $validation .= $definition->{"pattern"} ne "" ? " pattern='" . $definition->{"pattern"} . "'" : "";
         $validation .= $definition->{"min"} ne "" ? " min='" . $definition->{"min"} . "'" : "";
         $validation .= $definition->{"max"} ne "" ? " max='" . $definition->{"max"} . "'" : "";
-        $validation .= $definition->{"required"} == 1 ? " required" : " optional";
+        my $req_star = "";
+        if ($definition->{"required"} == 1) {
+            $at_least_one_required = 1;
+            $req_star = "&nbsp;<span color='red'>*</span>&nbsp;";
+            $validation .= " required";
+        }
+        else {
+            $validation .= " optional";
+        }
         my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
         my $fname = $internalfield . "val";
         my $extra_tags = "onchange=\"\$('input[name=" . $fname . "]').prop('disabled', (i, v) => !v);\"";
@@ -537,12 +551,14 @@ sub get_basic_fields_row {
                         . "</nobr>"
                 ], \@tds, "sel", $configfield, $is_used, undef, $extra_tags );
         }
+        return $row;
     }
 }
 
 sub show_other_fields {
     my ($dnsmconfig, $pageid, $page_fields, $apply_cgi, $table_header) = @_;
     my $formid = "$pageid_other_form";
+    our $at_least_one_required = 0;
 
     print &ui_form_start( $apply_cgi, "post", undef, "id='$formid'" );
     my @tds = ( &get_class_tag($td_label_class), &get_class_tag($td_left_class) );
@@ -556,12 +572,14 @@ sub show_other_fields {
     print &ui_columns_start( undef, 100, undef, undef, &ui_columns_header( [ $table_header ], [ 'class="table-title" colspan=' . $col_ct ] ), 0 );
     foreach my $configfield ( @var_fields ) {
         my $internalfield = &config_to_internal($configfield);
-        local @cols = &get_field_auto_columns($dnsmconfig, $internalfield, $col_ct);
+        my @cols = &get_field_auto_columns($internalfield, $col_ct);
         print &ui_columns_row( \@cols, \@tds );
     }
 
     print &ui_columns_end();
-    print "<span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i>";
+    if ($at_least_one_required) {
+        print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+    }
     my @form_buttons = ();
     # push( @form_buttons, &ui_submit( $text{"button_cancel"}, "cancel" ) );
     push( @form_buttons, &ui_submit( $text{"button_save"}, "submit" ) );
@@ -569,7 +587,7 @@ sub show_other_fields {
 }
 
 sub get_field_auto_columns {
-    my ($dnsmconfig, $internalfield, $columns) = @_;
+    my ($internalfield, $col_ct) = @_;
     my $configfield = &internal_to_config($internalfield);
     my $item = $dnsmconfig{"$configfield"};
     my $val = $item->{"val"};
@@ -612,6 +630,7 @@ sub get_field_auto_columns {
         $validation .= $definition->{"max"} ? " max='" . $definition->{"max"} . "'" : "";
         $validation .= $definition->{"required"} == 1 ? " required" : " optional";
         if ($definition->{"required"}) {
+            $at_least_one_required = 1;
             $label .= "&nbsp;<span color='red'>*</span>&nbsp;";
         }
         if ($definition->{"arr"} == 1) {
@@ -643,7 +662,7 @@ sub get_field_auto_columns {
         }
         $count++;
     }
-    while (@cols <= $columns) {
+    while (@cols <= $col_ct) {
         push( @cols, "&nbsp;" );
     }
     return @cols;

@@ -40,31 +40,27 @@ my $returnto = $in{"returnto"} || "dhcp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
 my $apply_cgi = "dhcp_basic_apply.cgi";
 
-my @page_fields = ();
-foreach my $configfield ( @confdhcp ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "1" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
 
 my @tabs = ( [ 'basic', $text{'index_basic'} ],
             [ 'other', $text{"index_other"} ],
             [ 'bridge_interface', $text{'index_dhcp_bridge_interface'} ],
            );
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('tab', 'basic');
-&show_basic_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi . "?tab=basic", $text{"index_dhcp_settings_basic"} );
-print ui_tabs_end_tab('tab', 'basic');
+print &ui_tabs_start_tab('tab', 'basic');
+&show_basic_fields( \%dnsmconfig, "dhcp_basic", $page_fields, $apply_cgi . "?tab=basic", $text{"index_dhcp_settings_basic"} );
+print &ui_tabs_end_tab('tab', 'basic');
 
-print ui_tabs_start_tab('tab', 'other');
-&show_other_fields( \%dnsmconfig, "dhcp_basic", \@page_fields, $apply_cgi . "?tab=basic", " " );
-print ui_tabs_end_tab('tab', 'other');
+print &ui_tabs_start_tab('tab', 'other');
+&show_other_fields( \%dnsmconfig, "dhcp_basic", $page_fields, $apply_cgi . "?tab=basic", " " );
+print &ui_tabs_end_tab('tab', 'other');
 
-print ui_tabs_start_tab('tab', 'bridge_interface');
+print &ui_tabs_start_tab('tab', 'bridge_interface');
 &show_field_table("bridge_interface", $apply_cgi . "?tab=bridge_interface", $text{"_interface_bridge"}, \%dnsmconfig, 3);
-print ui_tabs_end_tab('tab', 'bridge_interface');
+print &ui_tabs_end_tab('tab', 'bridge_interface');
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 
