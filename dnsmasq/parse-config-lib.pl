@@ -553,7 +553,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 10,
                 "valtype" => "user",
-                "default" => "",
+                "default" => "nobody",
                 "required" => 1,
                 "label" => $text{"p_label_val_username"},
                 "template" => "<" . $text{"tmpl_username"} . ">"
@@ -564,7 +564,7 @@ sub init_configfield_fields {
             "val" => {
                 "length" => 10,
                 "valtype" => "group",
-                "default" => "",
+                "default" => "dip",
                 "required" => 1,
                 "label" => $text{"p_label_val_groupname"},
                 "template" => "<" . $text{"tmpl_groupname"} . ">"
@@ -581,7 +581,8 @@ sub init_configfield_fields {
                 "template" => "<" . $text{"tmpl_port"} . ">",
                 "pattern" => "\\d{1,5}",
                 "min" => 0,
-                "max" => 65535
+                "max" => 65535,
+                "warn_if" => 0,
             }
         },
         "edns_packet_max" => {  # =<size>
@@ -4562,7 +4563,7 @@ sub validate_value {
         foreach my $param ( @{$fdef->{"param_order"}} ) {
             my $pdef = \%{ $fdef->{"$param"} };
             my $val = ($param eq "val" ? $item->{"val"} : $item->{"val"}->{$param});
-            if (defined($pdef->{"required"}) && $pdef->{"required"} == 1 && (!$val)) {
+            if (defined($pdef->{"required"}) && $pdef->{"required"} == 1 && (!defined($val) || $val eq "")) {
                 push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, $text{"err_valreq"}, $configfield, $param, $cfg_idx));
             }
             elsif (defined($val) && $val ne "") {

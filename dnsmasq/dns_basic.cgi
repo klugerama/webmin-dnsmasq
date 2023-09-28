@@ -63,31 +63,28 @@ my @vals = (
     },
 );
 
-my @page_fields = ();
-foreach my $configfield ( @confdns ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "1" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
+
 my @tabs = ( [ 'basic', $text{'index_basic'} ] );
 foreach my $v ( @vals ) {
     push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
 }
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('tab', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_basic", \@page_fields, $apply_cgi . "?tab=basic", $text{"index_dns_settings_basic"} );
-print ui_tabs_end_tab('tab', 'basic');
+print &ui_tabs_start_tab('tab', 'basic');
+&show_basic_fields( \%dnsmconfig, "dns_basic", $page_fields, $apply_cgi . "?tab=basic", $text{"index_dns_settings_basic"} . $table_header_warn );
+print &ui_tabs_end_tab('tab', 'basic');
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_start_tab('tab', $v->{"internalfield"});
     &show_path_list($v->{"internalfield"}, $apply_cgi . "?tab=" . $v->{"internalfield"}, $v->{"add_button_text"}, $v->{"val_label"}, $v->{"chooser_mode"}, $formidx++);
-    print ui_tabs_end_tab('tab', $v->{"internalfield"});
+    print &ui_tabs_end_tab('tab', $v->{"internalfield"});
 }
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_basic.cgi ###.

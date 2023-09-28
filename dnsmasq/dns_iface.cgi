@@ -39,16 +39,13 @@ my $returnto = $in{"returnto"} || "dns_iface.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_iface_settings"};
 my $apply_cgi = "dns_iface_apply.cgi";
 
-my @tds = ( $td_left, $td_left, $td_left );
+my @tds = ( &get_class_tag($td_left_class), &get_class_tag($td_left_class), &get_class_tag($td_left_class) );
 our $formidx = 0;
 
 my @vals = ( "interface", "except_interface", "no_dhcp_interface" );
 
-my @page_fields = ();
-foreach my $configfield ( @confdns ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "3" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
+
 my @tabs = (   [ 'basic', $text{'index_basic'} ] );
 foreach my $v ( @vals ) {
     push(@tabs, [ $v, $text{"p_desc_" . $v} ]);
@@ -56,26 +53,26 @@ foreach my $v ( @vals ) {
 push(@tabs, [ 'listen_address', $text{"p_desc_listen_address"} ]);
 
 my $tab = $in{"tab"} || "basic";
-print ui_tabs_start(\@tabs, 'tab', $tab);
+print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print ui_tabs_start_tab('tab', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_iface", \@page_fields, $apply_cgi, $text{"index_dns_iface_settings"} );
-print ui_tabs_end_tab('tab', 'basic');
+print &ui_tabs_start_tab('tab', 'basic');
+&show_basic_fields( \%dnsmconfig, "dns_iface", $page_fields, $apply_cgi, $text{"index_dns_iface_settings"} );
+print &ui_tabs_end_tab('tab', 'basic');
 
 foreach my $v ( @vals ) {
-    print ui_tabs_start_tab('tab', $v);
+    print &ui_tabs_start_tab('tab', $v);
     &show_field_table($v, $apply_cgi . "?tab=" . $v, $text{"_iface"}, \%dnsmconfig, $formidx++);
-    print ui_tabs_end_tab('tab', $v);
+    print &ui_tabs_end_tab('tab', $v);
 }
 
-print ui_tabs_start_tab('tab', 'listen_address');
+print &ui_tabs_start_tab('tab', 'listen_address');
 &show_field_table("listen_address", $apply_cgi . "?tab=listen_address", $text{"_listen"}, \%dnsmconfig, $formidx++);
-print ui_tabs_end_tab('tab', 'listen_address');
+print &ui_tabs_end_tab('tab', 'listen_address');
 
-print ui_tabs_end();
+print &ui_tabs_end();
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_iface.cgi ###.

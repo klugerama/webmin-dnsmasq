@@ -39,18 +39,14 @@ my $returnto = $in{"returnto"} || "dns_auth.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
 my $apply_cgi = "dns_auth_apply.cgi";
 
-my @page_fields = ();
-foreach my $configfield ( @confdns ) {
-    next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "7" );
-    push( @page_fields, $configfield );
-}
+my ($context, $page, $page_fields) = &get_page_fields($0);
 
-&show_basic_fields( \%dnsmconfig, "dns_auth", \@page_fields, $apply_cgi, $text{"index_basic"} );
+&show_basic_fields( \%dnsmconfig, "dns_auth", $page_fields, $apply_cgi, $text{"index_basic"} );
 
-&show_other_fields( \%dnsmconfig, "dns_auth", \@page_fields, $apply_cgi, " " );
+&show_other_fields( \%dnsmconfig, "dns_auth", $page_fields, $apply_cgi, " " );
 
 print &add_js();
 
-ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
 
 ### END of dns_auth.cgi ###.

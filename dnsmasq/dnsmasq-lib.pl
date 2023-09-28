@@ -19,6 +19,7 @@ BEGIN { push(@INC, ".."); };
 use POSIX qw(ceil getgroups cuserid);
 use File::Basename;
 use WebminCore;
+use experimental qw( switch );
 
 use constant ERR_FILE_PERMS => 1;
 
@@ -715,6 +716,37 @@ sub can_access {
     return 1;
 }
 
+sub get_page_fields {
+    my ($cgi) = @_;
+    my ($context, $page, @page_fields);
+    CONTEXT: foreach my $c ( keys %dnsmnav ) {
+        foreach my $p ( keys %{%dnsmnav{$c}} ) {
+            if (%dnsmnav{$c}->{$p}->{"cgi_name"} eq basename($cgi)) {
+                $context = $c;
+                $page = $p;
+                last CONTEXT;
+            }
+        }
+    }
+    my @subset;
+    given ( $context ) {
+        when ("dns") {
+            @subset = @confdns;
+        }
+        when ("dhcp") {
+            @subset = @confdhcp;
+        }
+        when ("t_b_p") {
+            @subset = @conft_b_p;
+        }
+    }
+    foreach my $configfield ( @subset ) {
+        next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne $page );
+        push( @page_fields, $configfield );
+    }
+    return ($context, $page, \@page_fields);
+}
+
 sub get_basic_fields {
     my ($page_fields) = @_;
     my @basic_fields = ();
@@ -1012,7 +1044,7 @@ sub create_error {
 sub header_js {
     my ($formid, $internalfield) = @_;
     my $script = "";
-    # $script .= "<link href=\"dnsmasq.css\" rel=\"stylesheet\">\n";
+    $script .= "<link href=\"dnsmasq.css\" rel=\"stylesheet\">\n";
     $script .= "<script id=\"dnsmasq_js\" type=\"text/javascript\" src=\"dnsmasq.js\"></script>\n";
     # $script .= "<script type=\"text/javascript\">\n";
     # $script .= "\$(document).ready(function() {\n";
