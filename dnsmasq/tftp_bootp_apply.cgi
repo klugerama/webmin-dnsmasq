@@ -33,7 +33,7 @@ my @sel = split(/\0/, $in{'sel'});
 
 my @tftp_bools = ();
 my @tftp_singles = ();
-foreach my $configfield ( @conft_b_p ) {
+foreach my $configfield ( @conftftp ) {
     next if ( grep { /^$configfield$/ } ( @confarrs ) );
     next if ( %dnsmconfigvals{"$configfield"}->{"mult"} ne "" );
     next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne "2" );

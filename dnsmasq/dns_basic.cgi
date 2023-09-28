@@ -31,14 +31,19 @@ if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
-&ui_print_header($text{"index_dns_settings_basic"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_js();
-print $error_check_result;
+my ($section, $page) = &get_context($0);
+my ($page_fields) = &get_page_fields($0);
 
-my $table_header_warn = "";
-if (%dnsmconfig{"port"}->{"used"} && %dnsmconfig{"port"}->{"val"} eq "0") {
-    $table_header_warn = " <div " . &get_class_tag([$dnsm_header_warn_box_class, $warn_class]) . ">" . $text{"dns_disabled"} . " " . &ui_help($text{"dns_disabled_help"}) . "</div>";
-}
+# # my $page_header_warn = "";
+# # if (%dnsmconfig{"dns_disabled"} && $config{"show_dns_disabled"}) {
+# #     &load_theme_library();
+# #     # $page_header_warn = " <div " . &get_class_tag([$dnsm_header_warn_box_class, $warn_class]) . ">" . $text{"dns_disabled"} . " " . &ui_help($text{"dns_disabled_help"}) . "</div>";
+# #     $page_header_warn = &wrap_warning($text{"dns_disabled"}, $text{"dns_disabled_help"});
+# # }
+
+&ui_print_header($text{"index_dns_settings_basic"} . &icon_if_disabled($section), $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+print &header_js(\%dnsmconfig);
+print $error_check_result;
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_basic.cgi";
@@ -68,16 +73,14 @@ my @vals = (
     },
 );
 
-my ($context, $page, $page_fields) = &get_page_fields($0);
-
-my @tabs = ( [ 'basic', $text{'index_basic'} ] );
+my @tabs = ( [ 'basic', $text{'index_basic'} . &icon_if_disabled($section) ] );
 foreach my $v ( @vals ) {
     push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
 }
 print &ui_tabs_start(\@tabs, 'tab', $tab);
 
 print &ui_tabs_start_tab('tab', 'basic');
-&show_basic_fields( \%dnsmconfig, "dns_basic", $page_fields, $apply_cgi . "?tab=basic", $text{"index_dns_settings_basic"} . $table_header_warn );
+&show_basic_fields( \%dnsmconfig, "dns_basic", $page_fields, $apply_cgi . "?tab=basic", $text{"index_dns_settings_basic"} );
 print &ui_tabs_end_tab('tab', 'basic');
 
 foreach my $v ( @vals ) {

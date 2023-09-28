@@ -26,7 +26,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 &ui_print_header($text{"configuration_errors_heading"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_js();
+print &header_js(\%dnsmconfig);
 
 # output as web page
 &ReadParse();

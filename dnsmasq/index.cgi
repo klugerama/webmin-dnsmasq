@@ -39,17 +39,19 @@ if ($error_check_action eq "redirect") {
 
 ## Insert Output code here
 &ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_js();
+print &header_js(\%dnsmconfig);
 print $error_check_result;
 
-my $tab = "dns";
+my @tabs = ( );
+foreach my $c ( @section ) {
+    push(@tabs, [$c, $text{"index_" . $c . "_settings"} . &icon_if_disabled($c)]);
+}
+
+my $tab = @section[0];
 if ( defined ($in{"tab"}) ) {
     $tab = $in{"tab"};
 }
 
-my @tabs = (   [ 'dns', $text{'index_dns_settings'} ],
-            [ 'dhcp', $text{'index_dhcp_settings'} ],
-            [ 'tftp', $text{'index_tftp_settings'} ] );
 print &ui_tabs_start(\@tabs, 'tab', $tab);
 
 print &ui_tabs_start_tab('tab', 'dns');

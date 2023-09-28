@@ -511,10 +511,6 @@ sub get_basic_fields_row {
         my $val = $dnsmconfig->{$configfield}->{"val"};
         # my @tds = ( &get_class_tag($cbtd_class), &get_class_tag($dnsm_basic_td_class), &get_class_tag($dnsm_basic_td_class) );
         my @tds = ( &get_class_tag($dnsm_basic_td_class), &get_class_tag($dnsm_basic_td_class) );
-        my $highlight = "";
-        if ($is_used && defined($definition->{"warn_if"}) && $val eq $definition->{"warn_if"}) {
-            $highlight .= &get_class_tag([$dnsm_header_warn_box_class, $warn_class]);
-        }
         if ( $definition->{"valtype"} eq "user" ) {
             $row = &ui_clickable_checked_columns_row( [
                     $label, 
@@ -546,7 +542,7 @@ sub get_basic_fields_row {
             $row = &ui_clickable_checked_columns_row( [
                     $label, 
                     "<nobr>"
-                        . "<span " . $highlight . ">" . &ui_textbox( $fname, $val, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation . " dnsmclass=\"dnsm-type-" . $definition->{"valtype"} . "\"" ) . "</span>"
+                        . &ui_textbox( $fname, $val, $definition->{"length"}, $is_used?0:1, undef, $input_guidance . $validation . " dnsmclass=\"dnsm-type-" . $definition->{"valtype"} . "\"" )
                         . $req_star
                         . "</nobr>"
                 ], \@tds, "sel", $configfield, $is_used, undef, $extra_tags );
@@ -946,5 +942,36 @@ sub custom_theme_ui_links_row {
             }
         }
     }
+}
+
+sub icon_if_disabled {
+    my ($section) = @_;
+    my $icon = "";
+    if (%dnsmconfig{$section . "_disabled"} && $config{"show_" . $section . "_disabled"}) {
+        my $page = %dnsmconfig{$section . "_disabled_ifield_page"};
+        my $tab = %dnsmconfig{$section . "_disabled_ifield_tab"};
+        &load_theme_library();
+        $icon = &disabled_icon($section, $page, $tab, $text{$section . "_disabled_help"});
+    }
+    return $icon;
+}
+
+sub wrap_warning {
+    my ($txt) = @_;
+    my $help = $_[1] ? " " . &ui_help($_[1]) : "";
+    my $classes = $_[2] ? $_[2] : $warn_class;
+    return " <div " . &get_class_tag([$dnsm_header_warn_box_class, $classes]) . ">" . $txt . $help . "</div>"
+}
+
+sub disabled_icon {
+    my ($section, $page, $tab, $title) = @_;
+    my $nav = %{%dnsmnav{$section}}{$page};
+    my $link_target = $nav->{"cgi_name"};
+    if ($nav->{"tab"}) {
+        $link_target .= "?tab=" . $nav->{"tab"}->{$tab};
+    }
+    return (
+"<sup class=\"ui_help dnsm-" . $section . "-disabled\" dnsm-link-target=\"" . $link_target . "\" data-container=\"body\" data-placement=\"auto right\" data-title=\"$title\" data-toggle=\"tooltip\"><i class=\"fa fa-0_80x fa-ban cursor-help\"></i></sup>"
+    );
 }
 

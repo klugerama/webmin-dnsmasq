@@ -31,8 +31,11 @@ if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
-&ui_print_header($text{"index_dns_servers"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_js();
+my ($section, $page) = &get_context($0);
+my ($page_fields) = &get_page_fields($0);
+
+&ui_print_header($text{"index_dns_servers"} . &icon_if_disabled($section), $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dns_servers.cgi";
@@ -51,7 +54,6 @@ my @vals = (
     },
 );
 
-
 my @tabs = (   [ 'basic', $text{'index_basic'} ],
             # [ 'server', $text{"p_desc_server"} ],
             # [ 'rev_server', $text{"p_desc_rev_server"} ],
@@ -64,8 +66,6 @@ my $tab = $in{"tab"} || "basic";
 print &ui_tabs_start(\@tabs, 'tab', $tab);
 
 print &ui_tabs_start_tab('tab', 'basic');
-
-my ($context, $page, $page_fields) = &get_page_fields($0);
 
 &show_basic_fields( \%dnsmconfig, "dns_servers", $page_fields, $apply_cgi, $text{"index_dns_servers"} );
 

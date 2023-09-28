@@ -31,8 +31,11 @@ if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
-&ui_print_header($text{"index_dns_iface_settings"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_js();
+my ($section, $page) = &get_context($0);
+my ($page_fields) = &get_page_fields($0);
+
+&ui_print_header($text{"index_dns_iface_settings"} . &icon_if_disabled($section), $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dns_iface.cgi";
@@ -43,8 +46,6 @@ my @tds = ( &get_class_tag($td_left_class), &get_class_tag($td_left_class), &get
 our $formidx = 0;
 
 my @vals = ( "interface", "except_interface", "no_dhcp_interface" );
-
-my ($context, $page, $page_fields) = &get_page_fields($0);
 
 my @tabs = (   [ 'basic', $text{'index_basic'} ] );
 foreach my $v ( @vals ) {

@@ -59,7 +59,48 @@ html[data-bgs='nightRider'] .hl-aw, .hl-aw {
     border-width: 2px;
 }
 .dnsm-warn {
-    border-color: rgb(255, 255, 64) !important;
+    border-color: yellow !important;
+}
+.dnsm-dns-disabled-row-border {
+    border-top: 2px solid !important;
+}
+.dnsm-dhcp-disabled-row-border {
+    border-top: 2px solid !important;
+}
+.dnsm-tftp-disabled-row-border {
+    border-top: 2px solid !important;
+}
+.dnsm-dns-disabled-border {
+    border-width: 2px;
+    border-style: solid;
+    border-color: yellow !important;
+}
+.dnsm-dhcp-disabled-border {
+    border-width: 2px;
+    border-style: solid;
+    border-color: blue !important;
+}
+.dnsm-tftp-disabled-border {
+    border-width: 2px;
+    border-style: solid;
+    border-color: magenta !important;
+}
+.dnsm-dns-disabled {
+    color: yellow !important;
+}
+.dnsm-dhcp-disabled {
+    color: blue !important;
+}
+.dnsm-tftp-disabled {
+    color: magenta !important;
+}
+.dnsm-disabled-link {
+    display: inline-block !important;
+    padding: 0 !important;
+    margin: 0;
+    float: none;
+    clear: none;
+    border: none !important;
 }
 .dnsm-error {
     /* background-color: red; */

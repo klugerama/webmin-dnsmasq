@@ -77,7 +77,7 @@ if ($error_check_action eq "redirect") {
 }
 
 &ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
-print &header_js();
+print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 if ($show_buttons == 1) {
