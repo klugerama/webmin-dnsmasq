@@ -29,175 +29,176 @@ use experimental qw( switch );
 #   value if none is specified
 # mult:
 #   {char} ---- (complete) specified value may be specified multiple times, separated by the specified character
+our @section = ( "dns", "dhcp", "tftp" );
 our %dnsmconfigvals = (
-    "no-hosts"                  => { "idx" => 0,   "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "addn-hosts"                => { "idx" => 1,   "valtype" => "path",    "section" => "dns",   "page" => "1", "tab" => "2", "arr" => 1, "mult" => "" }, # =<file>
-    "hostsdir"                  => { "idx" => 2,   "valtype" => "dir",     "section" => "dns",   "page" => "1", "tab" => "3", "arr" => 1, "mult" => "" }, # =<path>
-    "expand-hosts"              => { "idx" => 3,   "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "local-ttl"                 => { "idx" => 4,   "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
-    "dhcp-ttl"                  => { "idx" => 5,   "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
-    "neg-ttl"                   => { "idx" => 6,   "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
-    "max-ttl"                   => { "idx" => 7,   "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
-    "max-cache-ttl"             => { "idx" => 8,   "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
-    "min-cache-ttl"             => { "idx" => 9,   "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
-    "auth-ttl"                  => { "idx" => 10,  "valtype" => "int",     "section" => "dns",   "page" => "7", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
-    "log-queries"               => { "idx" => 11,  "valtype" => "string",  "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # [=extra]
-    "log-facility"              => { "idx" => 12,  "valtype" => "string",  "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<facility>
-    "log-debug"                 => { "idx" => 13,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "log-async"                 => { "idx" => 14,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 5, "val_optional" => 1 }, # [=<lines>]
-    "pid-file"                  => { "idx" => 15,  "valtype" => "file",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "user"                      => { "idx" => 16,  "valtype" => "string",  "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "nobody" }, # =<username>
-    "group"                     => { "idx" => 17,  "valtype" => "string",  "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "dip" }, # =<groupname>
-    "port"                      => { "idx" => 18,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 53 }, # =<port>
-    "edns-packet-max"           => { "idx" => 19,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 4096 }, # =<size>
-    "query-port"                => { "idx" => 20,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<query_port>
-    "min-port"                  => { "idx" => 21,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 1024 }, # =<port>
-    "max-port"                  => { "idx" => 22,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<port>
-    "interface"                 => { "idx" => 23,  "valtype" => "string",  "section" => "dns",   "page" => "3", "tab" => "2", "arr" => 1, "mult" => "" }, # =<interface name>
-    "except-interface"          => { "idx" => 24,  "valtype" => "string",  "section" => "dns",   "page" => "3", "tab" => "3", "arr" => 1, "mult" => "" }, # =<interface name>
-    "auth-server"               => { "idx" => 25,  "valtype" => "var",     "section" => "dns",   "page" => "7", "tab" => "1", "arr" => 0, "mult" => "" }, # =<domain>,[<interface>|<ip-address>...]
-    "local-service"             => { "idx" => 26,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "no-dhcp-interface"         => { "idx" => 27,  "valtype" => "string",  "section" => "dns",   "page" => "3", "tab" => "4", "arr" => 1, "mult" => "" }, # =<interface name>
-    "listen-address"            => { "idx" => 28,  "valtype" => "ip",      "section" => "dns",   "page" => "3", "tab" => "5", "arr" => 1, "mult" => "" }, # =<ipaddr>
-    "bind-interfaces"           => { "idx" => 29,  "valtype" => "bool",    "section" => "dns",   "page" => "3", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "bind-dynamic"              => { "idx" => 30,  "valtype" => "bool",    "section" => "dns",   "page" => "3", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "localise-queries"          => { "idx" => 31,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "bogus-priv"                => { "idx" => 32,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "alias"                     => { "idx" => 33,  "valtype" => "var",     "section" => "dns",   "page" => "4", "tab" => "3", "arr" => 1, "mult" => "" }, # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>] # previously "dns_forced"?
-    "bogus-nxdomain"            => { "idx" => 34,  "valtype" => "var",     "section" => "dns",   "page" => "4", "tab" => "4", "arr" => 1, "mult" => "" }, # =<ipaddr>[/prefix]
-    "ignore-address"            => { "idx" => 35,  "valtype" => "var",     "section" => "dns",   "page" => "4", "tab" => "6", "arr" => 1, "mult" => "" }, # =<ipaddr>[/prefix]
-    "filterwin2k"               => { "idx" => 36,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "resolv-file"               => { "idx" => 37,  "valtype" => "file",    "section" => "dns",   "page" => "1", "tab" => "4", "arr" => 1, "mult" => "", "default" => "/etc/resolv.conf" }, # =<file>
-    "no-resolv"                 => { "idx" => 38,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "enable-dbus"               => { "idx" => 39,  "valtype" => "string",  "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "uk.org.thekelleys.dnsmasq", "val_optional" => 1 }, # [=<service-name>]
-    "enable-ubus"               => { "idx" => 40,  "valtype" => "string",  "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "dnsmasq", "val_optional" => 1 }, # [=<service-name>]
-    "strict-order"              => { "idx" => 41,  "valtype" => "bool",    "section" => "dns",   "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "all-servers"               => { "idx" => 42,  "valtype" => "bool",    "section" => "dns",   "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dns-loop-detect"           => { "idx" => 43,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "stop-dns-rebind"           => { "idx" => 44,  "valtype" => "bool",    "section" => "dns",   "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "rebind-localhost-ok"       => { "idx" => 45,  "valtype" => "bool",    "section" => "dns",   "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "rebind-domain-ok"          => { "idx" => 46,  "valtype" => "string",  "section" => "dns",   "page" => "4", "tab" => "2", "arr" => 0, "mult" => "/" }, # =[<domain>]|[[/<domain>/[<domain>/]
-    "no-poll"                   => { "idx" => 47,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "clear-on-reload"           => { "idx" => 48,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "domain-needed"             => { "idx" => 49,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "local"                     => { "idx" => 50,  "valtype" => "var",     "section" => "dns",   "page" => "2", "tab" => "2", "arr" => 1, "mult" => "" }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-    "server"                    => { "idx" => 51,  "valtype" => "var",     "section" => "dns",   "page" => "2", "tab" => "2", "arr" => 1, "mult" => "" }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
-    "rev-server"                => { "idx" => 52,  "valtype" => "var",     "section" => "dns",   "page" => "2", "tab" => "3", "arr" => 1, "mult" => "" }, # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
-    "address"                   => { "idx" => 53,  "valtype" => "var",     "section" => "dns",   "page" => "4", "tab" => "5", "arr" => 1, "mult" => "" }, # =/<domain>[/<domain>...]/[<ipaddr>]
-    "ipset"                     => { "idx" => 54,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "3", "arr" => 1, "mult" => "" }, # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
-    "connmark-allowlist-enable" => { "idx" => 55,  "valtype" => "string",  "section" => "dns",   "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=<mask>]
-    "connmark-allowlist"        => { "idx" => 56,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "4", "arr" => 1, "mult" => "" }, # =<connmark>[/<mask>][,<pattern>[/<pattern>...]] 
-    "mx-host"                   => { "idx" => 57,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<mx name>[[,<hostname>],<preference>]
-    "mx-target"                 => { "idx" => 58,  "valtype" => "string",  "section" => "dns",   "page" => "5", "tab" => "1", "arr" => 0, "mult" => "" }, # =<hostname>
-    "selfmx"                    => { "idx" => 59,  "valtype" => "bool",    "section" => "dns",   "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "localmx"                   => { "idx" => 60,  "valtype" => "bool",    "section" => "dns",   "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "srv-host"                  => { "idx" => 61,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
-    "host-record"               => { "idx" => 62,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
-    "dynamic-host"              => { "idx" => 63,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,[IPv4-address],[IPv6-address],<interface>
-    "txt-record"                => { "idx" => 64,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>[[,<text>],<text>]
-    "ptr-record"                => { "idx" => 65,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>[,<target>]
-    "naptr-record"              => { "idx" => 66,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
-    "caa-record"                => { "idx" => 67,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<flags>,<tag>,<value>
-    "cname"                     => { "idx" => 68,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<cname>,[<cname>,]<target>[,<TTL>]
-    "dns-rr"                    => { "idx" => 69,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<RR-number>,[<hex data>]
-    "interface-name"            => { "idx" => 70,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<interface>[/4|/6]
-    "synth-domain"              => { "idx" => 71,  "valtype" => "var",     "section" => "dns",   "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<domain>,<address range>[,<prefix>[*]]
-    "dumpfile"                  => { "idx" => 72,  "valtype" => "file",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path/to/file>
-    "dumpmask"                  => { "idx" => 73,  "valtype" => "string",  "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<mask>
-    "add-mac"                   => { "idx" => 74,  "valtype" => "string",  "section" => "dns",   "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=base64|text]
-    "add-cpe-id"                => { "idx" => 75,  "valtype" => "string",  "section" => "dns",   "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =<string>
-    "add-subnet"                => { "idx" => 76,  "valtype" => "var",     "section" => "dns",   "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
-    "umbrella"                  => { "idx" => 77,  "valtype" => "var",     "section" => "dns",   "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=deviceid:<deviceid>[,orgid:<orgid>]]
-    "cache-size"                => { "idx" => 78,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 150 }, # =<cachesize>
-    "no-negcache"               => { "idx" => 79,  "valtype" => "bool",    "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dns-forward-max"           => { "idx" => 80,  "valtype" => "int",     "section" => "dns",   "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 150 }, # =<queries>
-    "dnssec"                    => { "idx" => 81,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "trust-anchor"              => { "idx" => 82,  "valtype" => "var",     "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 0, "mult" => "" }, # =[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
-    "dnssec-check-unsigned"     => { "idx" => 83,  "valtype" => "string",  "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 1, "val_optional" => 1 }, # [=no]
-    "dnssec-no-timecheck"       => { "idx" => 84,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dnssec-timestamp"          => { "idx" => 85,  "valtype" => "file",    "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "proxy-dnssec"              => { "idx" => 86,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dnssec-debug"              => { "idx" => 87,  "valtype" => "bool",    "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "auth-zone"                 => { "idx" => 88,  "valtype" => "var",     "section" => "dns",   "page" => "7", "tab" => "1", "arr" => 0, "mult" => "" }, # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>]|<interface>.....][,exclude:<subnet>[/<prefix length>]|<interface>].....]
-    "auth-soa"                  => { "idx" => 89,  "valtype" => "var",     "section" => "dns",   "page" => "7", "tab" => "1", "arr" => 0, "mult" => "" }, # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
-    "auth-sec-servers"          => { "idx" => 90,  "valtype" => "string",  "section" => "dns",   "page" => "7", "tab" => "1", "arr" => 0, "mult" => "," }, # =<domain>[,<domain>[,<domain>...]]
-    "auth-peer"                 => { "idx" => 91,  "valtype" => "ip",      "section" => "dns",   "page" => "7", "tab" => "1", "arr" => 0, "mult" => "," }, # =<ip-address>[,<ip-address>[,<ip-address>...]]
-    "conntrack"                 => { "idx" => 92,  "valtype" => "bool",    "section" => "dns",   "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-range"                => { "idx" => 93,  "valtype" => "var",     "section" => "dhcp",  "page" => "5", "tab" => "1", "arr" => 1, "mult" => "" }, # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
-    "dhcp-host"                 => { "idx" => 94,  "valtype" => "var",     "section" => "dhcp",  "page" => "6", "tab" => "1", "arr" => 1, "mult" => "" }, # TODO edit # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
-    "dhcp-hostsfile"            => { "idx" => 95,  "valtype" => "path",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "dhcp-optsfile"             => { "idx" => 96,  "valtype" => "path",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "dhcp-hostsdir"             => { "idx" => 97,  "valtype" => "dir",     "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "dhcp-optsdir"              => { "idx" => 98,  "valtype" => "dir",     "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "read-ethers"               => { "idx" => 99,  "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-option"               => { "idx" => 100, "valtype" => "var",     "section" => "dhcp",  "page" => "3", "tab" => "1", "arr" => 1, "mult" => "" }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-    "dhcp-option-force"         => { "idx" => 101, "valtype" => "var",     "section" => "dhcp",  "page" => "3", "tab" => "1", "arr" => 1, "mult" => "" }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
-    "dhcp-no-override"          => { "idx" => 102, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-relay"                => { "idx" => 103, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<local address>,<server address>[,<interface]
-    "dhcp-vendorclass"          => { "idx" => 104, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "3", "arr" => 1, "mult" => "" }, # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
-    "dhcp-userclass"            => { "idx" => 105, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "2", "arr" => 1, "mult" => "" }, # =set:<tag>,<user-class>
-    "dhcp-mac"                  => { "idx" => 106, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<MAC address>
-    "dhcp-circuitid"            => { "idx" => 107, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<circuit-id>
-    "dhcp-remoteid"             => { "idx" => 108, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<remote-id>
-    "dhcp-subscrid"             => { "idx" => 109, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<subscriber-id>
-    "dhcp-proxy"                => { "idx" => 110, "valtype" => "ip",      "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => ",", "val_optional" => 1 }, # [=<ip addr>]......
-    "dhcp-match"                => { "idx" => 111, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
-    "dhcp-name-match"           => { "idx" => 112, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<name>[*]
-    "tag-if"                    => { "idx" => 113, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
-    "dhcp-ignore"               => { "idx" => 114, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =tag:<tag>[,tag:<tag>]
-    "dhcp-ignore-names"         => { "idx" => 115, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
-    "dhcp-generate-names"       => { "idx" => 116, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =tag:<tag>[,tag:<tag>]
-    "dhcp-broadcast"            => { "idx" => 117, "valtype" => "var",     "section" => "dhcp",  "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
-    "dhcp-boot"                 => { "idx" => 118, "valtype" => "var",     "section" => "t_b_p", "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
-    "dhcp-sequential-ip"        => { "idx" => 119, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-ignore-clid"          => { "idx" => 120, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "pxe-service"               => { "idx" => 121, "valtype" => "var",     "section" => "t_b_p", "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
-    "pxe-prompt"                => { "idx" => 122, "valtype" => "var",     "section" => "t_b_p", "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<prompt>[,<timeout>]
-    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => "t_b_p", "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =<vendor>[,...]
-    "dhcp-lease-max"            => { "idx" => 124, "valtype" => "int",     "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 1000 }, # =<number>
-    "dhcp-authoritative"        => { "idx" => 125, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-rapid-commit"         => { "idx" => 126, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-alternate-port"       => { "idx" => 127, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "tab" => "2", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=<server port>[,<client port>]]
-    "bootp-dynamic"             => { "idx" => 128, "valtype" => "string",  "section" => "t_b_p", "page" => "2", "tab" => "1", "arr" => 1, "mult" => "", "val_optional" => 1 }, # [=<network-id>[,<network-id>]]
-    "no-ping"                   => { "idx" => 129, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "log-dhcp"                  => { "idx" => 130, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "quiet-dhcp"                => { "idx" => 131, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "quiet-dhcp6"               => { "idx" => 132, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "quiet-ra"                  => { "idx" => 133, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-leasefile"            => { "idx" => 134, "valtype" => "file",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "dhcp-duid"                 => { "idx" => 135, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<enterprise-id>,<uid>
-    "dhcp-script"               => { "idx" => 136, "valtype" => "file",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "dhcp-luascript"            => { "idx" => 137, "valtype" => "file",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
-    "dhcp-scriptuser"           => { "idx" => 138, "valtype" => "string",  "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "root" }, # =<username>
-    "script-arp"                => { "idx" => 139, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "leasefile-ro"              => { "idx" => 140, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "script-on-renewal"         => { "idx" => 141, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "bridge-interface"          => { "idx" => 142, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "tab" => "3", "arr" => 1, "mult" => "" }, # TODO edit # =<interface>,<alias>[,<alias>]
-    "shared-network"            => { "idx" => 143, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<interface|addr>,<addr>
-    "domain"                    => { "idx" => 144, "valtype" => "var",     "section" => "dhcp",  "page" => "2", "tab" => "1", "arr" => 1, "mult" => "" }, # =<domain>[,<address range>[,local]]
-    "dhcp-fqdn"                 => { "idx" => 145, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "dhcp-client-update"        => { "idx" => 146, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "enable-ra"                 => { "idx" => 147, "valtype" => "bool",    "section" => "dhcp",  "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "ra-param"                  => { "idx" => 148, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
-    "dhcp-reply-delay"          => { "idx" => 149, "valtype" => "var",     "section" => "dhcp",  "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<integer>
-    "enable-tftp"               => { "idx" => 150, "valtype" => "string",  "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=<interface>[,<interface>]]
-    "tftp-root"                 => { "idx" => 151, "valtype" => "var",     "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<directory>[,<interface>]
-    "tftp-no-fail"              => { "idx" => 152, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "tftp-unique-root"          => { "idx" => 153, "valtype" => "string",  "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=ip|mac]
-    "tftp-secure"               => { "idx" => 154, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "tftp-lowercase"            => { "idx" => 155, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "tftp-max"                  => { "idx" => 156, "valtype" => "int",     "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<connections>
-    "tftp-mtu"                  => { "idx" => 157, "valtype" => "int",     "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<mtu size>
-    "tftp-no-blocksize"         => { "idx" => 158, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "tftp-port-range"           => { "idx" => 159, "valtype" => "var",     "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<start>,<end>
-    "tftp-single-port"          => { "idx" => 160, "valtype" => "bool",    "section" => "t_b_p", "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
-    "conf-file"                 => { "idx" => 161, "valtype" => "var",     "section" => "dns",   "page" => "6", "tab" => "1", "arr" => 1, "mult" => "" }, # =<file>
-    "conf-dir"                  => { "idx" => 162, "valtype" => "var",     "section" => "dns",   "page" => "6", "tab" => "3", "arr" => 1, "mult" => "" }, # =<directory>[,<file-extension>......],
-    "servers-file"              => { "idx" => 163, "valtype" => "var",     "section" => "dns",   "page" => "6", "tab" => "2", "arr" => 1, "mult" => "" }, # =<file>
+    "no-hosts"                  => { "idx" => 0,   "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "addn-hosts"                => { "idx" => 1,   "valtype" => "path",    "section" => @section[0], "page" => "1", "tab" => "2", "arr" => 1, "mult" => "" }, # =<file>
+    "hostsdir"                  => { "idx" => 2,   "valtype" => "dir",     "section" => @section[0], "page" => "1", "tab" => "3", "arr" => 1, "mult" => "" }, # =<path>
+    "expand-hosts"              => { "idx" => 3,   "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "local-ttl"                 => { "idx" => 4,   "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
+    "dhcp-ttl"                  => { "idx" => 5,   "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
+    "neg-ttl"                   => { "idx" => 6,   "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
+    "max-ttl"                   => { "idx" => 7,   "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
+    "max-cache-ttl"             => { "idx" => 8,   "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
+    "min-cache-ttl"             => { "idx" => 9,   "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
+    "auth-ttl"                  => { "idx" => 10,  "valtype" => "int",     "section" => @section[0], "page" => "7", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # =<time>
+    "log-queries"               => { "idx" => 11,  "valtype" => "string",  "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 }, # [=extra]
+    "log-facility"              => { "idx" => 12,  "valtype" => "string",  "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<facility>
+    "log-debug"                 => { "idx" => 13,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "log-async"                 => { "idx" => 14,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 5, "val_optional" => 1 }, # [=<lines>]
+    "pid-file"                  => { "idx" => 15,  "valtype" => "file",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "user"                      => { "idx" => 16,  "valtype" => "string",  "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "nobody" }, # =<username>
+    "group"                     => { "idx" => 17,  "valtype" => "string",  "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "dip" }, # =<groupname>
+    "port"                      => { "idx" => 18,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 53 }, # =<port>
+    "edns-packet-max"           => { "idx" => 19,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 4096 }, # =<size>
+    "query-port"                => { "idx" => 20,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<query_port>
+    "min-port"                  => { "idx" => 21,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 1024 }, # =<port>
+    "max-port"                  => { "idx" => 22,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<port>
+    "interface"                 => { "idx" => 23,  "valtype" => "string",  "section" => @section[0], "page" => "3", "tab" => "2", "arr" => 1, "mult" => "" }, # =<interface name>
+    "except-interface"          => { "idx" => 24,  "valtype" => "string",  "section" => @section[0], "page" => "3", "tab" => "3", "arr" => 1, "mult" => "" }, # =<interface name>
+    "auth-server"               => { "idx" => 25,  "valtype" => "var",     "section" => @section[0], "page" => "7", "tab" => "1", "arr" => 0, "mult" => "" }, # =<domain>,[<interface>|<ip-address>...]
+    "local-service"             => { "idx" => 26,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "no-dhcp-interface"         => { "idx" => 27,  "valtype" => "string",  "section" => @section[0], "page" => "3", "tab" => "4", "arr" => 1, "mult" => "" }, # =<interface name>
+    "listen-address"            => { "idx" => 28,  "valtype" => "ip",      "section" => @section[0], "page" => "3", "tab" => "5", "arr" => 1, "mult" => "" }, # =<ipaddr>
+    "bind-interfaces"           => { "idx" => 29,  "valtype" => "bool",    "section" => @section[0], "page" => "3", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "bind-dynamic"              => { "idx" => 30,  "valtype" => "bool",    "section" => @section[0], "page" => "3", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "localise-queries"          => { "idx" => 31,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "bogus-priv"                => { "idx" => 32,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "alias"                     => { "idx" => 33,  "valtype" => "var",     "section" => @section[0], "page" => "4", "tab" => "3", "arr" => 1, "mult" => "" }, # =[<old-ip>]|[<start-ip>-<end-ip>],<new-ip>[,<mask>] # previously "dns_forced"?
+    "bogus-nxdomain"            => { "idx" => 34,  "valtype" => "var",     "section" => @section[0], "page" => "4", "tab" => "4", "arr" => 1, "mult" => "" }, # =<ipaddr>[/prefix]
+    "ignore-address"            => { "idx" => 35,  "valtype" => "var",     "section" => @section[0], "page" => "4", "tab" => "6", "arr" => 1, "mult" => "" }, # =<ipaddr>[/prefix]
+    "filterwin2k"               => { "idx" => 36,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "resolv-file"               => { "idx" => 37,  "valtype" => "file",    "section" => @section[0], "page" => "1", "tab" => "4", "arr" => 1, "mult" => "", "default" => "/etc/resolv.conf" }, # =<file>
+    "no-resolv"                 => { "idx" => 38,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "enable-dbus"               => { "idx" => 39,  "valtype" => "string",  "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "uk.org.thekelleys.dnsmasq", "val_optional" => 1 }, # [=<service-name>]
+    "enable-ubus"               => { "idx" => 40,  "valtype" => "string",  "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "dnsmasq", "val_optional" => 1 }, # [=<service-name>]
+    "strict-order"              => { "idx" => 41,  "valtype" => "bool",    "section" => @section[0], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "all-servers"               => { "idx" => 42,  "valtype" => "bool",    "section" => @section[0], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dns-loop-detect"           => { "idx" => 43,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "stop-dns-rebind"           => { "idx" => 44,  "valtype" => "bool",    "section" => @section[0], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "rebind-localhost-ok"       => { "idx" => 45,  "valtype" => "bool",    "section" => @section[0], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "rebind-domain-ok"          => { "idx" => 46,  "valtype" => "string",  "section" => @section[0], "page" => "4", "tab" => "2", "arr" => 0, "mult" => "/" }, # =[<domain>]|[[/<domain>/[<domain>/]
+    "no-poll"                   => { "idx" => 47,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "clear-on-reload"           => { "idx" => 48,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "domain-needed"             => { "idx" => 49,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "local"                     => { "idx" => 50,  "valtype" => "var",     "section" => @section[0], "page" => "2", "tab" => "2", "arr" => 1, "mult" => "" }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+    "server"                    => { "idx" => 51,  "valtype" => "var",     "section" => @section[0], "page" => "2", "tab" => "2", "arr" => 1, "mult" => "" }, # =[/[<domain>]/[domain/]][<ipaddr>[#<port>]][@<interface>][@<source-ip>[#<port>]]
+    "rev-server"                => { "idx" => 52,  "valtype" => "var",     "section" => @section[0], "page" => "2", "tab" => "3", "arr" => 1, "mult" => "" }, # =<ip-address>/<prefix-len>[,<ipaddr>][#<port>][@<interface>][@<source-ip>[#<port>]]
+    "address"                   => { "idx" => 53,  "valtype" => "var",     "section" => @section[0], "page" => "4", "tab" => "5", "arr" => 1, "mult" => "" }, # =/<domain>[/<domain>...]/[<ipaddr>]
+    "ipset"                     => { "idx" => 54,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "3", "arr" => 1, "mult" => "" }, # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
+    "connmark-allowlist-enable" => { "idx" => 55,  "valtype" => "string",  "section" => @section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=<mask>]
+    "connmark-allowlist"        => { "idx" => 56,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "4", "arr" => 1, "mult" => "" }, # =<connmark>[/<mask>][,<pattern>[/<pattern>...]] 
+    "mx-host"                   => { "idx" => 57,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<mx name>[[,<hostname>],<preference>]
+    "mx-target"                 => { "idx" => 58,  "valtype" => "string",  "section" => @section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "" }, # =<hostname>
+    "selfmx"                    => { "idx" => 59,  "valtype" => "bool",    "section" => @section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "localmx"                   => { "idx" => 60,  "valtype" => "bool",    "section" => @section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "srv-host"                  => { "idx" => 61,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<_service>.<_prot>.[<domain>],[<target>[,<port>[,<priority>[,<weight>]]]]
+    "host-record"               => { "idx" => 62,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>[,<name>....],[<IPv4-address>],[<IPv6-address>][,<TTL>]
+    "dynamic-host"              => { "idx" => 63,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,[IPv4-address],[IPv6-address],<interface>
+    "txt-record"                => { "idx" => 64,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>[[,<text>],<text>]
+    "ptr-record"                => { "idx" => 65,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>[,<target>]
+    "naptr-record"              => { "idx" => 66,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<order>,<preference>,<flags>,<service>,<regexp>[,<replacement>]
+    "caa-record"                => { "idx" => 67,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<flags>,<tag>,<value>
+    "cname"                     => { "idx" => 68,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<cname>,[<cname>,]<target>[,<TTL>]
+    "dns-rr"                    => { "idx" => 69,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<RR-number>,[<hex data>]
+    "interface-name"            => { "idx" => 70,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<name>,<interface>[/4|/6]
+    "synth-domain"              => { "idx" => 71,  "valtype" => "var",     "section" => @section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<domain>,<address range>[,<prefix>[*]]
+    "dumpfile"                  => { "idx" => 72,  "valtype" => "file",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path/to/file>
+    "dumpmask"                  => { "idx" => 73,  "valtype" => "string",  "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<mask>
+    "add-mac"                   => { "idx" => 74,  "valtype" => "string",  "section" => @section[0], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=base64|text]
+    "add-cpe-id"                => { "idx" => 75,  "valtype" => "string",  "section" => @section[0], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =<string>
+    "add-subnet"                => { "idx" => 76,  "valtype" => "var",     "section" => @section[0], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [[=[<IPv4 address>/]<IPv4 prefix length>][,[<IPv6 address>/]<IPv6 prefix length>]]
+    "umbrella"                  => { "idx" => 77,  "valtype" => "var",     "section" => @section[0], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=deviceid:<deviceid>[,orgid:<orgid>]]
+    "cache-size"                => { "idx" => 78,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 150 }, # =<cachesize>
+    "no-negcache"               => { "idx" => 79,  "valtype" => "bool",    "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dns-forward-max"           => { "idx" => 80,  "valtype" => "int",     "section" => @section[0], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 150 }, # =<queries>
+    "dnssec"                    => { "idx" => 81,  "valtype" => "bool",    "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "trust-anchor"              => { "idx" => 82,  "valtype" => "var",     "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 0, "mult" => "" }, # =[<class>],<domain>,<key-tag>,<algorithm>,<digest-type>,<digest>
+    "dnssec-check-unsigned"     => { "idx" => 83,  "valtype" => "string",  "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 1, "val_optional" => 1 }, # [=no]
+    "dnssec-no-timecheck"       => { "idx" => 84,  "valtype" => "bool",    "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dnssec-timestamp"          => { "idx" => 85,  "valtype" => "file",    "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "proxy-dnssec"              => { "idx" => 86,  "valtype" => "bool",    "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dnssec-debug"              => { "idx" => 87,  "valtype" => "bool",    "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "auth-zone"                 => { "idx" => 88,  "valtype" => "var",     "section" => @section[0], "page" => "7", "tab" => "1", "arr" => 0, "mult" => "" }, # =<domain>[,<subnet>[/<prefix length>][,<subnet>[/<prefix length>]|<interface>.....][,exclude:<subnet>[/<prefix length>]|<interface>].....]
+    "auth-soa"                  => { "idx" => 89,  "valtype" => "var",     "section" => @section[0], "page" => "7", "tab" => "1", "arr" => 0, "mult" => "" }, # =<serial>[,<hostmaster>[,<refresh>[,<retry>[,<expiry>]]]]
+    "auth-sec-servers"          => { "idx" => 90,  "valtype" => "string",  "section" => @section[0], "page" => "7", "tab" => "1", "arr" => 0, "mult" => "," }, # =<domain>[,<domain>[,<domain>...]]
+    "auth-peer"                 => { "idx" => 91,  "valtype" => "ip",      "section" => @section[0], "page" => "7", "tab" => "1", "arr" => 0, "mult" => "," }, # =<ip-address>[,<ip-address>[,<ip-address>...]]
+    "conntrack"                 => { "idx" => 92,  "valtype" => "bool",    "section" => @section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-range"                => { "idx" => 93,  "valtype" => "var",     "section" => @section[1], "page" => "5", "tab" => "1", "arr" => 1, "mult" => "" }, # =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-addr>[,<end-addr>|<mode>][,<netmask>[,<broadcast>]][,<lease time>] -OR- =[tag:<tag>[,tag:<tag>],][set:<tag>,]<start-IPv6addr>[,<end-IPv6addr>|constructor:<interface>][,<mode>][,<prefix-len>][,<lease time>]
+    "dhcp-host"                 => { "idx" => 94,  "valtype" => "var",     "section" => @section[1], "page" => "6", "tab" => "1", "arr" => 1, "mult" => "" }, # TODO edit # =[<hwaddr>][,id:<client_id>|*][,set:<tag>][tag:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
+    "dhcp-hostsfile"            => { "idx" => 95,  "valtype" => "path",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "dhcp-optsfile"             => { "idx" => 96,  "valtype" => "path",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "dhcp-hostsdir"             => { "idx" => 97,  "valtype" => "dir",     "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "dhcp-optsdir"              => { "idx" => 98,  "valtype" => "dir",     "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "read-ethers"               => { "idx" => 99,  "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-option"               => { "idx" => 100, "valtype" => "var",     "section" => @section[1], "page" => "3", "tab" => "1", "arr" => 1, "mult" => "" }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+    "dhcp-option-force"         => { "idx" => 101, "valtype" => "var",     "section" => @section[1], "page" => "3", "tab" => "1", "arr" => 1, "mult" => "" }, # =[tag:<tag>,[tag:<tag>,]][encap:<opt>,][vi-encap:<enterprise>,][vendor:[<vendor-class>],][<opt>|option:<opt-name>|option6:<opt>|option6:<opt-name>],[<value>[,<value>]]
+    "dhcp-no-override"          => { "idx" => 102, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-relay"                => { "idx" => 103, "valtype" => "var",     "section" => @section[1], "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<local address>,<server address>[,<interface]
+    "dhcp-vendorclass"          => { "idx" => 104, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "3", "arr" => 1, "mult" => "" }, # =set:<tag>,[enterprise:<IANA-enterprise number>,]<vendor-class>
+    "dhcp-userclass"            => { "idx" => 105, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "2", "arr" => 1, "mult" => "" }, # =set:<tag>,<user-class>
+    "dhcp-mac"                  => { "idx" => 106, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<MAC address>
+    "dhcp-circuitid"            => { "idx" => 107, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<circuit-id>
+    "dhcp-remoteid"             => { "idx" => 108, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<remote-id>
+    "dhcp-subscrid"             => { "idx" => 109, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<subscriber-id>
+    "dhcp-proxy"                => { "idx" => 110, "valtype" => "ip",      "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => ",", "val_optional" => 1 }, # [=<ip addr>]......
+    "dhcp-match"                => { "idx" => 111, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<option number>|option:<option name>|vi-encap:<enterprise>[,<value>]
+    "dhcp-name-match"           => { "idx" => 112, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>,<name>[*]
+    "tag-if"                    => { "idx" => 113, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =set:<tag>[,set:<tag>[,tag:<tag>[,tag:<tag>]]]
+    "dhcp-ignore"               => { "idx" => 114, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =tag:<tag>[,tag:<tag>]
+    "dhcp-ignore-names"         => { "idx" => 115, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
+    "dhcp-generate-names"       => { "idx" => 116, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "" }, # =tag:<tag>[,tag:<tag>]
+    "dhcp-broadcast"            => { "idx" => 117, "valtype" => "var",     "section" => @section[1], "page" => "4", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=tag:<tag>[,tag:<tag>]]
+    "dhcp-boot"                 => { "idx" => 118, "valtype" => "var",     "section" => @section[2], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
+    "dhcp-sequential-ip"        => { "idx" => 119, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-ignore-clid"          => { "idx" => 120, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "pxe-service"               => { "idx" => 121, "valtype" => "var",     "section" => @section[2], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
+    "pxe-prompt"                => { "idx" => 122, "valtype" => "var",     "section" => @section[2], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<prompt>[,<timeout>]
+    "dhcp-pxe-vendor"           => { "idx" => 123, "valtype" => "string",  "section" => @section[2], "page" => "2", "tab" => "1", "arr" => 0, "mult" => "" }, # =<vendor>[,...]
+    "dhcp-lease-max"            => { "idx" => 124, "valtype" => "int",     "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 1000 }, # =<number>
+    "dhcp-authoritative"        => { "idx" => 125, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-rapid-commit"         => { "idx" => 126, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-alternate-port"       => { "idx" => 127, "valtype" => "var",     "section" => @section[1], "page" => "1", "tab" => "2", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=<server port>[,<client port>]]
+    "bootp-dynamic"             => { "idx" => 128, "valtype" => "string",  "section" => @section[2], "page" => "2", "tab" => "1", "arr" => 1, "mult" => "", "val_optional" => 1 }, # [=<network-id>[,<network-id>]]
+    "no-ping"                   => { "idx" => 129, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "log-dhcp"                  => { "idx" => 130, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "quiet-dhcp"                => { "idx" => 131, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "quiet-dhcp6"               => { "idx" => 132, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "quiet-ra"                  => { "idx" => 133, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-leasefile"            => { "idx" => 134, "valtype" => "file",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "dhcp-duid"                 => { "idx" => 135, "valtype" => "var",     "section" => @section[1], "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<enterprise-id>,<uid>
+    "dhcp-script"               => { "idx" => 136, "valtype" => "file",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "dhcp-luascript"            => { "idx" => 137, "valtype" => "file",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<path>
+    "dhcp-scriptuser"           => { "idx" => 138, "valtype" => "string",  "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => "root" }, # =<username>
+    "script-arp"                => { "idx" => 139, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "leasefile-ro"              => { "idx" => 140, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "script-on-renewal"         => { "idx" => 141, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "bridge-interface"          => { "idx" => 142, "valtype" => "var",     "section" => @section[1], "page" => "1", "tab" => "3", "arr" => 1, "mult" => "" }, # TODO edit # =<interface>,<alias>[,<alias>]
+    "shared-network"            => { "idx" => 143, "valtype" => "var",     "section" => @section[1], "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<interface|addr>,<addr>
+    "domain"                    => { "idx" => 144, "valtype" => "var",     "section" => @section[1], "page" => "2", "tab" => "1", "arr" => 1, "mult" => "" }, # =<domain>[,<address range>[,local]]
+    "dhcp-fqdn"                 => { "idx" => 145, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "dhcp-client-update"        => { "idx" => 146, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "enable-ra"                 => { "idx" => 147, "valtype" => "bool",    "section" => @section[1], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "ra-param"                  => { "idx" => 148, "valtype" => "var",     "section" => @section[1], "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =<interface>,[mtu:<integer>|<interface>|off,][high,|low,]<ra-interval>[,<router lifetime>]
+    "dhcp-reply-delay"          => { "idx" => 149, "valtype" => "var",     "section" => @section[1], "page" => "1", "tab" => "2", "arr" => 0, "mult" => "" }, # =[tag:<tag>,]<integer>
+    "enable-tftp"               => { "idx" => 150, "valtype" => "string",  "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=<interface>[,<interface>]]
+    "tftp-root"                 => { "idx" => 151, "valtype" => "var",     "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<directory>[,<interface>]
+    "tftp-no-fail"              => { "idx" => 152, "valtype" => "bool",    "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "tftp-unique-root"          => { "idx" => 153, "valtype" => "string",  "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=ip|mac]
+    "tftp-secure"               => { "idx" => 154, "valtype" => "bool",    "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "tftp-lowercase"            => { "idx" => 155, "valtype" => "bool",    "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "tftp-max"                  => { "idx" => 156, "valtype" => "int",     "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<connections>
+    "tftp-mtu"                  => { "idx" => 157, "valtype" => "int",     "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<mtu size>
+    "tftp-no-blocksize"         => { "idx" => 158, "valtype" => "bool",    "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "tftp-port-range"           => { "idx" => 159, "valtype" => "var",     "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "" }, # =<start>,<end>
+    "tftp-single-port"          => { "idx" => 160, "valtype" => "bool",    "section" => @section[2], "page" => "1", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
+    "conf-file"                 => { "idx" => 161, "valtype" => "var",     "section" => @section[0], "page" => "6", "tab" => "1", "arr" => 1, "mult" => "" }, # =<file>
+    "conf-dir"                  => { "idx" => 162, "valtype" => "var",     "section" => @section[0], "page" => "6", "tab" => "3", "arr" => 1, "mult" => "" }, # =<directory>[,<file-extension>......],
+    "servers-file"              => { "idx" => 163, "valtype" => "var",     "section" => @section[0], "page" => "6", "tab" => "2", "arr" => 1, "mult" => "" }, # =<file>
 );
 
 our %dnsmnav = (
-    "dns" => {
+    @section[0] => { # dns
         "1" => {
             "cgi_name" => "dns_basic.cgi",
             "tab" => {
@@ -275,7 +276,7 @@ our %dnsmnav = (
             "cgi_name" => "view_log.cgi",
         },
     },
-    "dhcp" => {
+    @section[1] => { # dhcp
         "1" => {
             "cgi_name" => "dhcp_basic.cgi",
             "tab" => {
@@ -309,7 +310,7 @@ our %dnsmnav = (
             "cgi_name" => "dhcp_reservations.cgi",
         },
     },
-    "t_b_p" => {
+    @section[2] => { # tftp
         "1" => {
             "cgi_name" => "tftp_basic.cgi",
         },
@@ -325,7 +326,7 @@ our @confsingles = ( ); # options which may contain no more than one parameter/v
 our @confarrs = ( ); # options which may be specified more than once
 our @confdns = ( ); # options which are specific to DNS
 our @confdhcp = ( ); # options which are specific to DHCP
-our @conft_b_p = ( ); # options which are specific to TFTP/Bootp/PXE
+our @conftftp = ( ); # options which are specific to TFTP/Bootp/PXE
 
 my $key;
 my $vals;
@@ -348,8 +349,8 @@ while ( ($key, $vals) = each %dnsmconfigvals ) {
     if ( $vals->{"section"} eq "dhcp") {
         push ( @confdhcp, $key );
     }
-    if ( $vals->{"section"} eq "t_b_p") {
-        push ( @conft_b_p, $key );
+    if ( $vals->{"section"} eq "tftp") {
+        push ( @conftftp, $key );
     }
 }
 @confbools = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confbools );
@@ -358,7 +359,7 @@ while ( ($key, $vals) = each %dnsmconfigvals ) {
 @confarrs = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confarrs );
 @confdns = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confdns );
 @confdhcp = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @confdhcp );
-@conft_b_p = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @conft_b_p );
+@conftftp = (sort { $dnsmconfigvals{$a}->{"idx"} <=> $dnsmconfigvals{$b}->{"idx"} } @conftftp );
 our %configfield_fields = ( );
 
 sub init_configfield_fields {
@@ -3149,6 +3150,7 @@ sub init_configfield_fields {
                 "label" => $text{"p_label_val_interfaces"},
                 "template" => "<" . $text{"tmpl_interface"} . ">[,<" . $text{"tmpl_interface"} . ">]"
             },
+            "warn_if" => 0,
         },
         "tftp_root" => {  # =<directory>[,<interface>]
             "param_order" => [ "directory", "interface" ],
@@ -4546,6 +4548,32 @@ sub parse_config_file {
                 my $item = $dnsmconfig_ref->{"$configfield"};
                 &validate_value($configfield, $item, $dnsmconfig_ref, $current_user, \@usernames, \@groupnames, \@iface_names);
             }
+        }
+        # set some flags
+        if ($dnsmconfig_ref->{"port"}->{"used"} && $dnsmconfig_ref->{"port"}->{"val"} eq "0") {
+            $dnsmconfig_ref->{"dns_disabled"} = 1;
+            $dnsmconfig_ref->{"dns_disabled_cfield"} = "port";
+            $dnsmconfig_ref->{"dns_disabled_ifield_page"} = %dnsmconfigvals{"port"}->{"page"};
+            $dnsmconfig_ref->{"dns_disabled_ifield_tab"} = %dnsmconfigvals{"port"}->{"tab"};
+        }
+        my $has_range = 0;
+        foreach my $range ( @{$dnsmconfig_ref->{"dhcp-range"}}) {
+            if ($range->{"used"}) {
+                $has_range = 1;
+                last;
+            }
+        }
+        if (!$has_range) {
+            $dnsmconfig_ref->{"dhcp_disabled"} = 1;
+            $dnsmconfig_ref->{"dhcp_disabled_cfield"} = "dhcp-range";
+            $dnsmconfig_ref->{"dhcp_disabled_ifield_page"} = %dnsmconfigvals{"dhcp-range"}->{"page"};
+            $dnsmconfig_ref->{"dhcp_disabled_ifield_tab"} = %dnsmconfigvals{"dhcp-range"}->{"tab"};
+        }
+        if (!$dnsmconfig_ref->{"enable_tftp"}->{"used"}) {
+            $dnsmconfig_ref->{"tftp_disabled"} = 1;
+            $dnsmconfig_ref->{"tftp_disabled_cfield"} = "enable-tftp";
+            $dnsmconfig_ref->{"tftp_disabled_ifield_page"} = %dnsmconfigvals{"enable-tftp"}->{"page"};
+            $dnsmconfig_ref->{"tftp_disabled_ifield_tab"} = %dnsmconfigvals{"enable-tftp"}->{"tab"};
         }
     }
 } #end of sub parse_config_file

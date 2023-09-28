@@ -31,15 +31,16 @@ if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
-&ui_print_header($text{"index_tftp_settings_basic"}, $text{"index_title"}, undef, "intro", 1, 0, 0, &restart_button());
-print &header_js();
+my ($section, $page) = &get_context($0);
+my ($page_fields) = &get_page_fields($0);
+
+&ui_print_header($text{"index_tftp_settings_basic"} . &icon_if_disabled($section), $text{"index_title"}, undef, "intro", 1, 0, 0, &restart_button());
+print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "tftp_basic.cgi";
 my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_settings_basic"};
 my $apply_cgi = "tftp_basic_apply.cgi";
-
-my ($context, $page, $page_fields) = &get_page_fields($0);
 
 &show_basic_fields( \%dnsmconfig, "tftp_basic", $page_fields, $apply_cgi, $text{"index_tftp_settings_basic"} );
 

@@ -104,6 +104,7 @@ sub show_dns_settings {
         push(@icons, "images/" . ($current_theme ? "theme/" : "") . $buttons[$i]->{"icon"} );
     }
 
+    #icons_table(&links, &titles, &icons, [columns], [href], [width], [height], &befores, &afters)
     print &icons_table(\@links, \@titles, \@icons);
     # &footer("/", $text{"index"});
 }

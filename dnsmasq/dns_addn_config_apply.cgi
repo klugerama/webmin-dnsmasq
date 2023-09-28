@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_addn_config.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $text{"index_dns_addn_config"};
 
 # adjust everything to what we got
 

@@ -557,10 +557,10 @@ sub update_simple_vals {
 }
 
 sub apply_simple_vals {
-    my ($domain, $sel, $page) = @_;
+    my ($section, $sel, $page) = @_;
     my @page_fields_bools = ();
     my @page_fields_singles = ();
-    my @domain_array = $domain eq "dns" ? @confdns : ($domain eq "dhcp" ? @confdhcp : @conft_b_p);
+    my @domain_array = $section eq "dns" ? @confdns : ($section eq "dhcp" ? @confdhcp : @conftftp);
     foreach my $configfield ( @domain_array ) {
         next if ( grep { /^$configfield$/ } ( @confarrs ) );
         next if ( %dnsmconfigvals{"$configfield"}->{"mult"} ne "" );
@@ -606,9 +606,9 @@ sub apply_simple_vals {
 }
 
 sub check_other_vals {
-    my ($domain, $sel) = @_;
+    my ($section, $sel) = @_;
     my @vars = ();
-    my @domain_array = $domain eq "dns" ? @confdns : $domain eq "dhcp" ? @confdhcp : @conft_b_p;
+    my @domain_array = $section eq "dns" ? @confdns : $section eq "dhcp" ? @confdhcp : @conftftp;
     foreach my $configfield ( @domain_array ) {
         next if ( grep { /^$configfield$/ } ( @confarrs ) );
         next if ( %dnsmconfigvals{"$configfield"}->{"mult"} ne "" );
@@ -716,35 +716,42 @@ sub can_access {
     return 1;
 }
 
-sub get_page_fields {
+sub get_context {
     my ($cgi) = @_;
-    my ($context, $page, @page_fields);
-    CONTEXT: foreach my $c ( keys %dnsmnav ) {
-        foreach my $p ( keys %{%dnsmnav{$c}} ) {
-            if (%dnsmnav{$c}->{$p}->{"cgi_name"} eq basename($cgi)) {
-                $context = $c;
+    my ($section, $page);
+    CONTEXT: foreach my $s ( @section ) {
+        foreach my $p ( keys %{%dnsmnav{$s}} ) {
+            if (%dnsmnav{$s}->{$p}->{"cgi_name"} eq basename($cgi)) {
+                $section = $s;
                 $page = $p;
                 last CONTEXT;
             }
         }
     }
+    return ($section, $page);
+}
+
+sub get_page_fields {
+    my ($cgi) = @_;
+    my ($section, $page) = get_context($cgi);
+    my @page_fields =();
     my @subset;
-    given ( $context ) {
+    given ( $section ) {
         when ("dns") {
             @subset = @confdns;
         }
         when ("dhcp") {
             @subset = @confdhcp;
         }
-        when ("t_b_p") {
-            @subset = @conft_b_p;
+        when ("tftp") {
+            @subset = @conftftp;
         }
     }
     foreach my $configfield ( @subset ) {
         next if ( %dnsmconfigvals{"$configfield"}->{"page"} ne $page );
         push( @page_fields, $configfield );
     }
-    return ($context, $page, \@page_fields);
+    return (\@page_fields);
 }
 
 sub get_basic_fields {
@@ -1042,10 +1049,23 @@ sub create_error {
 }
 
 sub header_js {
-    my ($formid, $internalfield) = @_;
+    my ($dnsmconfig) = @_;
     my $script = "";
     $script .= "<link href=\"dnsmasq.css\" rel=\"stylesheet\">\n";
     $script .= "<script id=\"dnsmasq_js\" type=\"text/javascript\" src=\"dnsmasq.js\"></script>\n";
+    $script .= "<script>\n";
+    foreach my $c ( @section ) {
+        if ($dnsmconfig->{$c . "_disabled"} && $config{"show_" . $c . "_disabled"}) {
+            $script .= "    " . $c . "_disabled=true;\n";
+            $script .= "    " . $c . "_disabled_cfield='" . $dnsmconfig->{$c . "_disabled_cfield"} . "';\n";
+            $script .= "    " . $c . "_disabled_ifield_page='" . $dnsmconfig->{$c . "_disabled_ifield_page"} . "';\n";
+        }
+        else {
+            $script .= "    " . $c . "_disabled=false;\n";
+        }
+    }
+    $script .= "    if (typeof doDnsmasqStuff !== 'function') { var timer = window.setInterval(function(){ if (typeof doDnsmasqStuff == 'function') { window.clearInterval(timer); doDnsmasqStuff(); }}, 50); } else { doDnsmasqStuff(); }\n";
+    $script .= "</script>\n";
     # $script .= "<script type=\"text/javascript\">\n";
     # $script .= "\$(document).ready(function() {\n";
     # $script .= "});\n";

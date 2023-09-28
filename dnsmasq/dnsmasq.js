@@ -1,9 +1,10 @@
 
 var doDnsmasqStuff = function(event, xhr, options) {
     if (core.curModule("dnsmasq")) {
+        dnsm_init=true;
         setTimeout(function() {
-            $(".select-none.no-icon").each(function(i,o){$("<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")});
-            $(".file-chooser-button.no-icon").each(function(i,o){$("<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")});
+            $(".select-none.no-icon").each(function(i,o){$("<i class='fa fa-minus-square -cs vertical-align-middle' style='margin-right: 8px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "select none" link/button
+            $(".file-chooser-button.no-icon").each(function(i,o){$("<i class='fa fa-fw fa-files-o -cs vertical-align-middle' style='margin-right:5px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "new file/path/directory" link/button
             $(".iface-chooser-button.no-icon").each(function(i,o){$("<i class='fa fa2 fa2-plus-network vertical-align-middle' style='margin-right:5px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "new interface" link/button
             $(".add-item-button.no-icon").each(function(i,o){$("<i class='fa fa-plus vertical-align-middle' style='margin-right: 8px; margin: 5px 8px 5px 0px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "new <item>" link/button
             $(".remove-item-button.no-icon").each(function(i,o){$("<i class='fa fa-trash vertical-align-middle' style='margin-right: 8px;'></i>").prependTo($(o)); $(o).removeClass("no-icon")}); // adds icon to "remove <item>" link/button
@@ -16,6 +17,29 @@ var doDnsmasqStuff = function(event, xhr, options) {
             $(".clickable_tr_selected").each(function(){$(this).removeClass("clickable_tr_selected");$(this).parent().addClass("hl-aw");}); // fixes styling for clickable table row checkboxes
             $("input[dnsmclass=dnsm-type-int]").each(function(){$(this).prop("type", "number");}); // fixes styling for clickable table row checkboxes
             $("input[dummy_field]").hide();
+            let sections=["dns","dhcp","tftp"];
+            sections.forEach((s)=> {
+                if (typeof window[`${s}_disabled`] !== 'undefined' && window[`${s}_disabled`] === true) {
+                    // turn small icon into link to relevant page
+                    $(`.dnsm-${s}-disabled`).each((i,o)=>{
+                        let a=$("<a href></a>").appendTo($(o).parent());
+                        a.prop("href", $(o).attr("dnsm-link-target"));
+                        $(o).appendTo(a);
+                    });
+                    // highlight main icon
+                    let i=$(`#att_${s} > .icons-row > .icons-container`).eq(window[`${s}_disabled_ifield_page`] - 1);
+                    if(i){ // index
+                        i.addClass(`dnsm-${s}-disabled-border`).removeClass("grayscaled");
+                    }
+                    // highlight relevant field
+                    if(typeof window[`${s}_disabled_cfield`] !== 'undefined' && window[`${s}_disabled_cfield`] !== "") {
+                        i=$("input[type=checkbox][name=sel][value='" + window[`${s}_disabled_cfield`] + "']").eq(0);
+                        if(i){
+                            i.closest("tr").addClass(`dnsm-${s}-disabled-row-border`).addClass(`dnsm-${s}-disabled-border`);
+                        }
+                    }
+                }
+            });
         }, 0);
         $.each($(".show-update-button"), function(){
             var r = $(this).contents();
@@ -55,7 +79,6 @@ var doDnsmasqStuff = function(event, xhr, options) {
 var removeDnsmasqStuff = function(event, xhr, options) {
     if (!core.curModule("dnsmasq")) {
         // user is no longer in the dnsmasq module; clean up scripts and css from <head>
-        // $("#dnsmasq_css").remove();
         $("script[src*='dnsmasq.js']").remove();
         $(document).off("pjax:end", removeDnsmasqStuff);
         removeDnsmasqStuff = null;
@@ -67,11 +90,6 @@ $(document).ready(function() {
     $(document).on("pjax:end", removeDnsmasqStuff);
     $(document).off("pjax:end", doDnsmasqStuff);
     $(document).on("pjax:end", doDnsmasqStuff);
-    // if (core.curModule("dnsmasq")) {
-    //     if (!document.head.innerHTML.includes("dnsmasq.css")) {
-    //         document.head.innerHTML += '<link id="dnsmasq_css" href="dnsmasq.css" rel="stylesheet">';
-    //     }
-    // }
 });
 
 function addItemToSelect(sel){

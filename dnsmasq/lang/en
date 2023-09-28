@@ -234,7 +234,7 @@ index_dns_control=Service Control
 index_dns_view_log=View Logfile
 
 dns_disabled=DNS Disabled
-dns_disabled_help=Port must be &gt; 0
+dns_disabled_help=DNS server disabled: Port must be &gt; 0
 manual_file=Edit File:
 manual_econffile=Invalid configuration file
 manual_escriptfile=Invalid script file
@@ -557,7 +557,7 @@ _range=DHCP range
 _interface_bridge=DHCP interface bridge
 
 dhcp_disabled=DHCP Disabled
-dhcp_disabled_help=At least one 'dhcp-range' must be defined
+dhcp_disabled_help=DHCP server disabled: at least one 'dhcp-range' must be defined
 dhcp_ipversion4=IPv4
 dhcp_ipversion6=IPv6
 
@@ -1029,7 +1029,7 @@ index_tftp_settings_basic=Basic TFTP settings
 index_tftp_boot_pxe_settings=BOOTP/PXE settings
 
 tftp_disabled=TFTP Disabled
-tftp_disabled_help=TFTP Disabled
+tftp_disabled_help=TFTP server disabled: 'enable-tftp' must be enabled
 _networkid=Network ID
 
 # Property labels/descriptions
