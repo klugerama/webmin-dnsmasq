@@ -422,6 +422,25 @@ sub get_selectbox_with_controls {
     return $s;
 }
 
+sub show_main_icons_section {
+    my ($sec_id) = @_;
+    my @links = ();
+    my @titles = ();
+    my @icons = ();
+
+    my $sec = %dnsmnav{$sec_id};
+    local $i;
+    for ($i = 1; $i <= (keys %{$sec}); $i++ ) {
+        my $button = $sec->{"$i"};
+        next if ($button->{"access"} && !$access{$button->{"access"}});
+        push(@links, $button->{"cgi_name"} . ($button->{"cgi_params"} ? "?" . $button->{"cgi_params"} : "") );
+        push(@titles, $button->{"title"} );
+        push(@icons, "images/" . ($current_theme ? "theme/" : "") . $button->{"icon"} );
+    }
+
+    print &icons_table(\@links, \@titles, \@icons);
+}
+
 =head2 show_basic_fields(\%dnsmconfig, $pageid, \@page_fields, $apply_cgi, $table_header)
 =cut
 sub show_basic_fields {
@@ -644,9 +663,9 @@ sub get_field_auto_columns {
                     &foreign_require("net", "net-lib.pl");
                     my $buttonname = $fieldname . "_ifaceChooser";
                     $button = &net::interfaces_chooser_button($fieldname);
-                    webmin_debug_log("--------IFACE", "button: $button ");
+                    # webmin_debug_log("--------IFACE", "button: $button ");
                     $button =~ s/\>/ name="$buttonname">/;
-                    webmin_debug_log("--------IFACE", "button: $button ");
+                    # webmin_debug_log("--------IFACE", "button: $button ");
                 }
                 $input = "<nobr>" . &ui_textbox( $fieldname, $val->{$key}, $definition->{"length"}, undef, undef, $input_guidance . $validation ) . " " .
                          ( $button ) . "</nobr>";

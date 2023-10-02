@@ -17,10 +17,6 @@
 
 require 'dnsmasq-lib.pl';
 
-require 'dns.cgi';
-require 'dhcp.cgi';
-require 'tftp.cgi';
-
 ## put in ACL checks here if needed
 
 # read config file
@@ -54,17 +50,11 @@ if ( defined ($in{"tab"}) ) {
 
 print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print &ui_tabs_start_tab('tab', 'dns');
-show_dns_settings();
-print &ui_tabs_end_tab('tab', 'dns');
-
-print &ui_tabs_start_tab('tab', 'dhcp');
-show_dhcp_settings();
-print &ui_tabs_end_tab('tab', 'dhcp');
-
-print &ui_tabs_start_tab('tab', 'tftp');
-show_tftp_settings();
-print &ui_tabs_end_tab('tab', 'tftp');
+foreach my $c ( @section ) {
+    print &ui_tabs_start_tab('tab', $c);
+    show_main_icons_section($c);
+    print &ui_tabs_end_tab('tab', $c);
+}
 
 print &ui_tabs_end();
 
