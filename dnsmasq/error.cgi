@@ -64,24 +64,27 @@ foreach my $error ( @{$dnsmconfig{"error"}} ) {
     my $internalfield = &config_to_internal($configfield);
     my $is_ignored = grep { $error->{"full"} } ( @{$config{"ignored"}} );
     my $param = $error->{"param"};
-    my $fd = $dnsmconfigvals{"$configfield"};
-    my $fdef = $configfield_fields{$internalfield};
-    my $pdef = \%{ $fdef->{"$param"} };
-    my $type = $pdef->{"valtype"};
-    my $nav = %{%dnsmnav{$fd->{"section"}}}{$fd->{"page"}};
-    $link_target = $nav->{"cgi_name"} . "?" . ($nav->{"cgi_params"} ? $nav->{"cgi_params"} . "&" : "") . "forced_edit=1&bad_ifield=$internalfield&line=" . $error->{"line"} . "&show_validation=" . $internalfield . "_" . $error->{"param"} . "&custom_error=" . $error->{"custom_error"};
-    if ($nav->{"tab"}) {
-        $link_target .= "&tab=" . $nav->{"tab"}->{$fd->{"tab"}};
-    }
-    if ($error->{"cfg_idx"} ne "-1") {
-        $link_target .= "&cfg_idx=" . $error->{"cfg_idx"};
+    webmin_debug_log("--------ERROR", "configfield: $configfield type: $type param: $param error_type: ". $error->{"error_type"} . " ERR_FILE_PERMS: " . ERR_FILE_PERMS());
+    my $type = "";
+    if ( grep { /^$configfield$/ } ( keys %dnsmconfigvals ) ) {
+        my $fd = $dnsmconfigvals{"$configfield"};
+        my $fdef = $configfield_fields{$internalfield};
+        my $pdef = \%{ $fdef->{"$param"} };
+        $type = $pdef->{"valtype"};
+        my $nav = %{%dnsmnav{$fd->{"section"}}}{$fd->{"page"}};
+        $link_target = $nav->{"cgi_name"} . "?" . ($nav->{"cgi_params"} ? $nav->{"cgi_params"} . "&" : "") . "forced_edit=1&bad_ifield=$internalfield&line=" . $error->{"line"} . "&show_validation=" . $internalfield . "_" . $error->{"param"} . "&custom_error=" . $error->{"custom_error"};
+        if ($nav->{"tab"}) {
+            $link_target .= "&tab=" . $nav->{"tab"}->{$fd->{"tab"}};
+        }
+        if ($error->{"cfg_idx"} ne "-1") {
+            $link_target .= "&cfg_idx=" . $error->{"cfg_idx"};
+        }
     }
     foreach my $key ( @error_fields ) {
         my $link = "<a href=\"" . $link_target . "\">" . $error->{$key} . "</a>";
         push ( @cols, $link );
     }
     my $buttons = "<a href=\"manual_edit.cgi?file=" . $error->{"file"} . "&line=" . $error->{"line"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $dnsmasq::text{"button_manual_edit"} . "</a>";
-    # webmin_debug_log("--------ERROR", "configfield: $configfield type: $type param: $param error_type: ". $error->{"error_type"} . " ERR_FILE_PERMS: " . ERR_FILE_PERMS());
     if ((grep { /^$type$/ } ( @fs )) && $error->{"error_type"} == ERR_FILE_PERMS() && $dnsmasq::access{"change_perms"}) {
         $buttons .= "<a href=\"$returnto" . ($returnto =~ /\?/ ? "&" : "?") . "forced_edit=1&fix_perms=1&ifield=" . $internalfield . "&cfg_idx=" . $error->{"cfg_idx"} . "&param=" . $param . "&foruser=" . $error->{"foruser"} . "&forgroup=" . $error->{"forgroup"} . "&perms_failed=" . $error->{"perms_failed"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $dnsmasq::text{"button_fix_permissions"} . "</a>";
     }
