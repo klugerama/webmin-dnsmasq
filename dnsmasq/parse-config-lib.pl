@@ -3622,7 +3622,7 @@ sub parse_config_file {
                 $temp{"full"} = $line;
                 if ( ! grep { /^$configfield$/ } ( keys %dnsmconfigvals ) ) {
                     # print "Error in line $lineno ($configfield: unknown option)! ";
-                    push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_unknown_", $configfield)));
+                    push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_unknown_", $configfield), $configfield, $remainder, 0));
                     next;
                 }
                 my $confvar = \%{ $dnsmconfigvals{"$configfield"} };
