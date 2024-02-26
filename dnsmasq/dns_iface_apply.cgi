@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_iface.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_iface_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_iface_settings"};
 
 # # adjust everything to what we got
 

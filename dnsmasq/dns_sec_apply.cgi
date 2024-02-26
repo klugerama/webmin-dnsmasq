@@ -28,12 +28,12 @@ $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "dns_sec.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_sec_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_sec_settings"};
 
 # check for input data errors
 if( ($in{resolv_std}) && ($in{resolv_file} !~ /^$FILE$/) ) {
-	my $line = "error.cgi?line=".$text{"p_label_resolv_file"};
-	$line .= "&type=" . &urlize($text{"err_filebad"});
+	my $line = "error.cgi?line=".$dnsmasq::text{"p_label_resolv_file"};
+	$line .= "&type=" . &urlize($dnsmasq::text{"err_filebad"});
 	&redirect( $line );
 	exit;
 }

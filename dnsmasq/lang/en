@@ -232,6 +232,7 @@ index_dns_config_edit=Edit config files
 index_dns_scripts_edit=Edit script files
 index_dns_control=Service Control
 index_dns_view_log=View Logfile
+index_dns_configuration_errors=Configuration Errors
 
 dns_disabled=DNS Disabled
 dns_disabled_help=DNS server disabled: Port must be &gt; 0

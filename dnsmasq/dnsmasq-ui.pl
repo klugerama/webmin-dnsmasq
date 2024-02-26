@@ -15,7 +15,7 @@
 #
 #    This module based on the DNSMasq Webmin module by Neil Fisher
 
-our @radiodefaultno = ( 0, $text{"default"} );
+our @radiodefaultno = ( 0, $dnsmasq::text{"default"} );
 our @radioyes = ( 1, "Yes" );
 our @defaultoryes = ( \@radiodefaultno, \@radioyes );
 # our @radiodefaultyes = ( 1, "Default" );
@@ -77,22 +77,22 @@ sub restart_button {
     if (($config{"check_for_updates"} eq "1" && &needs_update_check()) || $config{"dnsmasq_latest_url"}) {
         my $latest = &check_for_updated_version();
         if ($latest) {
-            $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='show-update-button'>" . $text{"update_module"} . "</a><br>\n";
+            $buttons .= "<a href='dnsmasq_control.cgi?manual_check_for_update=1' class='show-update-button'>" . $dnsmasq::text{"update_module"} . "</a><br>\n";
         }
     }
     my $args = "returnto=".&urlize(&this_url());
     if (&is_dnsmasq_running()) {
-        $buttons .= ($access{'restart'} ?
-            "<a href='restart.cgi?" . $args . "'>" . $text{"index_button_restart"} . "</a><br>\n" : "").
-            ($access{'stop'} ?
-            "<a href='stop.cgi?" . $args . "'>" . $text{"index_button_stop"} . "</a>" : "");
-        # return "<a href=\"restart.cgi?$args\">$text{"lib_buttac"}</a><br>\n".
-        #     "<a href=\"stop.cgi?$args\">$text{"lib_buttsd"}</a>\n";
+        $buttons .= ($dnsmasq::access{'restart'} ?
+            "<a href='restart.cgi?" . $args . "'>" . $dnsmasq::text{"index_button_restart"} . "</a><br>\n" : "").
+            ($dnsmasq::access{'stop'} ?
+            "<a href='stop.cgi?" . $args . "'>" . $dnsmasq::text{"index_button_stop"} . "</a>" : "");
+        # return "<a href=\"restart.cgi?$args\">$dnsmasq::text{"lib_buttac"}</a><br>\n".
+        #     "<a href=\"stop.cgi?$args\">$dnsmasq::text{"lib_buttsd"}</a>\n";
     }
     else {
-        $buttons .= $access{'start'} ?
-            "<a href='start.cgi?" . $args . "'>" . $text{"index_button_start"} . "</a>" : "";
-        # return "<a href=\"start.cgi?$args\">$text{"lib_buttsd1"}</a>\n";
+        $buttons .= $dnsmasq::access{'start'} ?
+            "<a href='start.cgi?" . $args . "'>" . $dnsmasq::text{"index_button_start"} . "</a>" : "";
+        # return "<a href=\"start.cgi?$args\">$dnsmasq::text{"lib_buttsd1"}</a>\n";
     }
     return $buttons;
 }
@@ -101,7 +101,7 @@ sub select_none_link {
     return &theme_select_none_link(@_) if (defined(&theme_select_none_link));
     my ($field, $form, $text) = @_;
     $form = int($form);
-    $text ||= $text{'ui_selnone'};
+    $text ||= $dnsmasq::text{'ui_selnone'};
     my $output = "<a class='select-none no-icon' href='#' onClick='javascript:theme_select_all_link($form, \"$field\"); theme_select_invert_link($form, \"$field\"); return false;'>";
     $output .= "$text</a>";
     return $output;
@@ -213,7 +213,7 @@ sub edit_file_chooser_link {
     my $link   = "chooser.cgi?add=$add&type=$type&chroot=$chroot&file=\"+encodeURIComponent(ifield.value)";
 
     if ($link_text eq "") {
-        $link_text = "<span class='dnsm-empty-value'>" . $text{"empty_value"} . "</span>"
+        $link_text = "<span class='dnsm-empty-value'>" . $dnsmasq::text{"empty_value"} . "</span>"
     }
 
     my $file_edit_link = "<a href=\"#\" onclick='event.preventDefault();"
@@ -272,7 +272,7 @@ sub edit_interface_chooser_link {
     my $link   = "net/interface_chooser.cgi?multi=$add&interface=";
 
     if ($link_text eq "") {
-        $link_text = "<span class='dnsm-empty-value'>" . $text{"empty_value"} . "</span>"
+        $link_text = "<span class='dnsm-empty-value'>" . $dnsmasq::text{"empty_value"} . "</span>"
     }
 
     my $iface_edit_link = "<a href=\"#\" onclick='event.preventDefault();"
@@ -307,7 +307,7 @@ sub edit_item_popup_modal_link {
     $url .= "&formid=" . $formid;
 
     if ($link_text eq "") {
-        $link_text = "<span class='dnsm-empty-value'>" . $text{"empty_value"} . "</span>"
+        $link_text = "<span class='dnsm-empty-value'>" . $dnsmasq::text{"empty_value"} . "</span>"
     }
 
     my $link = "<a data-toggle=\"modal\" href=\"$url\" data-target=\"#list-item-edit-modal\" data-backdrop=\"static\" dnsm_array_idx=\"$cfg_idx\">";
@@ -432,7 +432,7 @@ sub show_main_icons_section {
     local $i;
     for ($i = 1; $i <= (keys %{$sec}); $i++ ) {
         my $button = $sec->{"$i"};
-        next if ($button->{"access"} && !$access{$button->{"access"}});
+        next if ($button->{"access"} && !$dnsmasq::access{$button->{"access"}});
         push(@links, $button->{"cgi_name"} . ($button->{"cgi_params"} ? "?" . $button->{"cgi_params"} : "") );
         push(@titles, $button->{"title"} );
         push(@icons, "images/" . ($current_theme ? "theme/" : "") . $button->{"icon"} );
@@ -455,8 +455,8 @@ sub show_basic_fields {
     if (@basic_fields == 1) {
         my $g = &ui_columns_start( [
                 "",
-                $text{'column_option'},
-                $text{'column_value'}
+                $dnsmasq::text{'column_option'},
+                $dnsmasq::text{'column_value'}
             ], undef, 0, \@tds);
         my $configfield = @basic_fields[0];
         $g .= &get_basic_fields_row($dnsmconfig, $configfield);
@@ -471,8 +471,8 @@ sub show_basic_fields {
         foreach my $column_array ([ @basic_fields[0..$l-1] ], [ @basic_fields[$l..$#basic_fields] ]) {
             my $g = &ui_columns_start( [
                     "",
-                    $text{'column_option'},
-                    $text{'column_value'}
+                    $dnsmasq::text{'column_option'},
+                    $dnsmasq::text{'column_value'}
                 ], undef, 0, \@tds);
 
             foreach my $configfield ( @$column_array ) {
@@ -484,11 +484,11 @@ sub show_basic_fields {
         print &ui_grid_table(\@grid, 2, 100, undef, undef, $table_header);
     }
     if ($at_least_one_required) {
-        print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+        print "<div><span color='red'>*</span>&nbsp;<i>" . $dnsmasq::text{"footnote_required_parameter"} . "</i></div>";
     }
 
-    # print &ui_form_end( [ &ui_submit( $text{"button_save"} ), &ui_reset( $text{"undo_button"} ) ] );
-    print &ui_form_end( [ &ui_submit( $text{"button_save"}, "submit" ) ] );
+    # print &ui_form_end( [ &ui_submit( $dnsmasq::text{"button_save"} ), &ui_reset( $dnsmasq::text{"undo_button"} ) ] );
+    print &ui_form_end( [ &ui_submit( $dnsmasq::text{"button_save"}, "submit" ) ] );
 }
 
 sub get_basic_fields_row {
@@ -497,19 +497,19 @@ sub get_basic_fields_row {
     my $row = "";
 
 
-    my $help = &ui_help($configfield . ": " . $text{"p_man_desc_$internalfield"});
+    my $help = &ui_help($configfield . ": " . $dnsmasq::text{"p_man_desc_$internalfield"});
     if ( grep { /^$configfield$/ } ( @confbools ) ) {
         my $bigtd = &get_class_tag($dnsm_basic_td_class) . " colspan=2";
         my @booltds = ( &get_class_tag($cbtd_class), $bigtd );
         $row = &ui_checked_columns_row( [
-                ($definition->{"label"} || $text{"p_label_" . $internalfield}) . $help,
+                ($definition->{"label"} || $dnsmasq::text{"p_label_" . $internalfield}) . $help,
             ], \@booltds, "sel", $configfield, ($dnsmconfig->{$configfield}->{"used"})?1:0
         );
     }
     elsif ( grep { /^$configfield$/ } ( @confsingles ) ) {
         my $definition = %configfield_fields{$internalfield}->{"val"};
         my $tmpl = $definition->{"template"};
-        my $label = $text{"p_label_" . $internalfield} . $help;
+        my $label = $dnsmasq::text{"p_label_" . $internalfield} . $help;
         my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
         my $validation = "";
         $validation .= $definition->{"pattern"} ne "" ? " pattern='" . $definition->{"pattern"} . "'" : "";
@@ -593,11 +593,11 @@ sub show_other_fields {
 
     print &ui_columns_end();
     if ($at_least_one_required) {
-        print "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+        print "<div><span color='red'>*</span>&nbsp;<i>" . $dnsmasq::text{"footnote_required_parameter"} . "</i></div>";
     }
     my @form_buttons = ();
-    # push( @form_buttons, &ui_submit( $text{"button_cancel"}, "cancel" ) );
-    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit" ) );
+    # push( @form_buttons, &ui_submit( $dnsmasq::text{"button_cancel"}, "cancel" ) );
+    push( @form_buttons, &ui_submit( $dnsmasq::text{"button_save"}, "submit" ) );
     print &ui_form_end( \@form_buttons );
 }
 
@@ -633,11 +633,11 @@ sub get_field_auto_columns {
         my $definition = %configfield_fields{$internalfield}->{$key};
         # my $is_used = $dnsmconfig->{$configfield}->{"used"}?1:0;
         if ($count == 0) {
-            push ( @cols, "<nobr>" . &ui_opt_textbox( $internalfield, $item->{"used"}?1:undef, 1, $text{"disabled"}, undef, undef, \@otherfields, undef, "dummy_field" ) . "</nobr>");
+            push ( @cols, "<nobr>" . &ui_opt_textbox( $internalfield, $item->{"used"}?1:undef, 1, $dnsmasq::text{"disabled"}, undef, undef, \@otherfields, undef, "dummy_field" ) . "</nobr>");
         }
         my $fieldname = $internalfield . "_" . $key;
         my $tmpl = $definition->{"template"};
-        my $label = $definition->{"label"} || $text{"p_label_" . $fieldname};
+        my $label = $definition->{"label"} || $dnsmasq::text{"p_label_" . $fieldname};
         my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
         my $validation = "";
         $validation .= $definition->{"pattern"} ? " pattern='" . $definition->{"pattern"} . "'" : "";
@@ -659,7 +659,7 @@ sub get_field_auto_columns {
             }
             elsif ($valtype eq "interface") {
                 my $button;
-                if (&foreign_available("net") && defined(net::active_interfaces)) {
+                if (&foreign_available("net") && defined(&net::active_interfaces)) {
                     &foreign_require("net", "net-lib.pl");
                     my $buttonname = $fieldname . "_ifaceChooser";
                     $button = &net::interfaces_chooser_button($fieldname);
@@ -683,7 +683,7 @@ sub get_field_auto_columns {
     return @cols;
 }
 
-# &show_field_table("listen_address", "dns_iface_apply.cgi", $text{"_listen"}, \%dnsmconfig);
+# &show_field_table("listen_address", "dns_iface_apply.cgi", $dnsmasq::text{"_listen"}, \%dnsmconfig);
 sub show_field_table {
     my ($internalfield, $apply_cgi, $addtext, $dnsmconfig, $formidx) = @_;
     my $addtype = defined($_[5]) ? $_[5] : undef;
@@ -704,7 +704,7 @@ sub show_field_table {
     my @pathtypes = ( "file", "path", "dir" );
     my @column_headers = ( 
         "",
-        $text{"enabled"}
+        $dnsmasq::text{"enabled"}
     );
     # if ( @newfields == 1 ) {
     #     push(@column_headers, $definition->{"@newfields[0]"}->{"label"} );
@@ -734,13 +734,13 @@ sub show_field_table {
         }
     }
     if ($addtype eq "interface") {
-        ($add_button, $hidden_add_input_fields) = &add_interface_chooser_button( &text("add_", $text{"_iface"}), "new_" . $internalfield, $formid );
+        ($add_button, $hidden_add_input_fields) = &add_interface_chooser_button( &text("add_", $dnsmasq::text{"_iface"}), "new_" . $internalfield, $formid );
     }
     elsif ($addtype eq "file") {
-        ($add_button, $hidden_add_input_fields) = &add_file_chooser_button( &text("add_", $text{"_" . $definition->{$first_field}->{"valtype"}}), "new_" . $internalfield, $formid );
+        ($add_button, $hidden_add_input_fields) = &add_file_chooser_button( &text("add_", $dnsmasq::text{"_" . $definition->{$first_field}->{"valtype"}}), "new_" . $internalfield, $formid );
     }
     else {
-        ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $addtext), $internalfield, $text{"p_label_$internalfield"}, $formid, \@newfields );
+        ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $addtext), $internalfield, $dnsmasq::text{"p_label_$internalfield"}, $formid, \@newfields );
         push(@list_link_buttons, $add_button);
     }
 
@@ -785,7 +785,7 @@ sub show_field_table {
                 }
                 else {
                     # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
-                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, $extra_url_params);
+                    ($edit_link, $hidden_item_edit_input_fields) = &edit_item_link($val, $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, $extra_url_params);
                 }
             }
             else {
@@ -797,7 +797,7 @@ sub show_field_table {
                     ($edit_link) = &edit_file_chooser_link($val, $internalfield, ($valtype eq "dir" ? 1 : 0), $val, $count, $formid);
                 }
                 else {
-                    ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, ($in{"bad_ifield"} && $in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : ""));
+                    ($edit_link) = &edit_item_link($val, $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, ($in{"bad_ifield"} && $in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : ""));
                 }
             }
             push ( @cols, $edit_link );
@@ -814,10 +814,10 @@ sub show_field_table {
     if ($addtype eq "interface" || $addtype eq "file") {
         print $hidden_add_input_fields . $add_button;
     }
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"button_enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"button_disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"button_delete_sel"}, "delete_sel_$internalfield");
+    print "<p>" . $dnsmasq::text{"with_selected"} . "</p>";
+    print &ui_submit($dnsmasq::text{"button_enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_delete_sel"}, "delete_sel_$internalfield");
     # if (!$definition->{"val"} || $definition->{"val"}->{"valtype"} ne "interface") {
     if ($addtype ne "interface" && $addtype ne "file") {
         print $hidden_add_input_fields;
@@ -844,7 +844,7 @@ sub show_path_list {
     print $file_chooser_button;
     print &ui_columns_start( [ 
         "",
-        $text{"enabled"}, 
+        $dnsmasq::text{"enabled"}, 
         $val_label, 
         # "full" 
     ], 100, undef, undef, &ui_columns_header( [ &show_title_with_help($internalfield, $configfield) ], [ 'class="table-title" colspan=3' ] ), 1 );
@@ -862,10 +862,10 @@ sub show_path_list {
     print &ui_links_row(\@list_link_buttons);
     print $hidden_add_input_fields;
     print $file_chooser_button;
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"button_enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"button_disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"button_delete_sel"}, "delete_sel_$internalfield");
+    print "<p>" . $dnsmasq::text{"with_selected"} . "</p>";
+    print &ui_submit($dnsmasq::text{"button_enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_delete_sel"}, "delete_sel_$internalfield");
     print $hidden_edit_input_fields;
     print &ui_form_end( );
     print $g;
@@ -878,7 +878,7 @@ sub do_selected_action {
         my $configfield = &internal_to_config($internalfield);
         my $action = $in{"enable_sel_$internalfield"} ? "enable" : $in{"disable_sel_$internalfield"} ? "disable" : $in{"delete_sel_$internalfield"} ? "delete" : "";
         if ($action ne "") {
-            @{$sel} || &error($text{'selected_none'});
+            @{$sel} || &error($dnsmasq::text{'selected_none'});
 
             &update_selected($configfield, $action, $sel, $dnsmconfig);
             last;
@@ -917,12 +917,12 @@ sub ui_clickable_checked_columns_row {
 
 sub show_title_with_help {
     my ($internalfield, $configfield) = @_;
-    return $text{"p_desc_$internalfield"} . &ui_help($configfield . ": " . $text{"p_man_desc_$internalfield"})
+    return $dnsmasq::text{"p_desc_$internalfield"} . &ui_help($configfield . ": " . $dnsmasq::text{"p_man_desc_$internalfield"})
 }
 
 sub show_label_with_help {
     my ($internalfield, $configfield) = @_;
-    return $text{"p_label_$internalfield"} . &ui_help($configfield . ": " . $text{"p_man_desc_$internalfield"})
+    return $dnsmasq::text{"p_label_$internalfield"} . &ui_help($configfield . ": " . $dnsmasq::text{"p_man_desc_$internalfield"})
 }
 
 sub get_max_columns {
@@ -970,7 +970,7 @@ sub icon_if_disabled {
         my $page = %dnsmconfig{$section . "_disabled_ifield_page"};
         my $tab = %dnsmconfig{$section . "_disabled_ifield_tab"};
         &load_theme_library();
-        $icon = &disabled_icon($section, $page, $tab, $text{$section . "_disabled_help"});
+        $icon = &disabled_icon($section, $page, $tab, $dnsmasq::text{$section . "_disabled_help"});
     }
     return $icon;
 }

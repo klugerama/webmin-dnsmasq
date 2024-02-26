@@ -234,15 +234,15 @@ sub start_dnsmasq {
     #     local $errorlog = $errorlogstr ? $errorlogstr->{'words'}->[0]
     #                     : "logs/error_log";
     #     if ($out =~ /\S/) {
-    #         return "$text{'start_eafter'} : <pre>$out</pre>";
+    #         return "$dnsmasq::text{'start_eafter'} : <pre>$out</pre>";
     #     }
     #     elsif ($errorlog eq 'syslog' || $errorlog =~ /^\|/) {
-    #         return $text{'start_eunknown'};
+    #         return $dnsmasq::text{'start_eunknown'};
     #     }
     #     else {
     #         $errorlog = &server_root($errorlog, $conf);
     #         $out = `tail -5 $errorlog`;
-    #         return "$text{'start_eafter'} : <pre>$out</pre>";
+    #         return "$dnsmasq::text{'start_eafter'} : <pre>$out</pre>";
     #     }
     # }
     &restart_last_restart_time();
@@ -579,21 +579,21 @@ sub apply_simple_vals {
         my $internalfield = &config_to_internal($configfield);
         if ( grep { /^$internalfield$/ } ( @{$sel} )) {
             if ( ! $item->{"val_optional"} && $in{$internalfield . "val"} eq "" ) {
-                &send_to_error( $configfield, $text{"err_valreq"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_valreq"}, $returnto, $returnlabel );
             }
             if ( $in{$internalfield . "val"} ne "" ) {
                 my $item_template = %dnsmconfigvals{"$configfield"};
                 if ( $item_template->{"valtype"} eq "int" && ($in{$internalfield . "val"} !~ /^$NUMBER$/) ) {
-                    &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_numbad"}, $returnto, $returnlabel );
                 }
                 elsif ( $item_template->{"valtype"} eq "file" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                    &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_filebad"}, $returnto, $returnlabel );
                 }
                 elsif ( $item_template->{"valtype"} eq "path" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                    &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                 }
                 elsif ( $item_template->{"valtype"} eq "dir" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                    &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                 }
             }
         }
@@ -628,20 +628,20 @@ sub check_other_vals {
                 push ( @otherfields, $internalfield . "_" . $key );
                 # if this parameter is an array, include
                 if ( $definition->{"required"} && $in{$internalfield  . "_" . $key} eq "" ) {
-                    &send_to_error( $configfield, $text{"err_valreq"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_valreq"}, $returnto, $returnlabel );
                 }
                 if ( $in{$internalfield . "_" . $key} ne "" ) {
                     if ( $definition->{"valtype"} eq "int" && ($in{$internalfield . "_" . $key} !~ /^$NUMBER$/) ) {
-                        &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_numbad"}, $returnto, $returnlabel );
                     }
                     elsif ( $definition->{"valtype"} eq "file" && ($in{$internalfield . "_" . $key} !~ /^$FILE$/) ) {
-                        &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_filebad"}, $returnto, $returnlabel );
                     }
                     elsif ( $definition->{"valtype"} eq "path" && ($in{$internalfield . "_" . $key} !~ /^$FILE$/) ) {
-                        &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                     }
                     elsif ( $definition->{"valtype"} eq "dir" && ($in{$internalfield . "_" . $key} !~ /^$FILE$/) ) {
-                        &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                     }
                 }
             }
@@ -708,8 +708,8 @@ sub get_groupnames_list {
 sub can_access {
     my ($file) = @_;
     my @f = grep { $_ ne '' } split(/\//, $file);
-    return 1 if ($access{'root'} eq '/');
-    my @a = grep { $_ ne '' } split(/\//, $access{'root'});
+    return 1 if ($dnsmasq::access{'root'} eq '/');
+    my @a = grep { $_ ne '' } split(/\//, $dnsmasq::access{'root'});
     for(my $i=0; $i<@a; $i++) {
         return 0 if ($a[$i] ne $f[$i]);
     }
@@ -791,23 +791,23 @@ sub check_for_file_errors {
     $returnto = basename($returnto);
     # check for the executable
     if (!&find_dnsmasq()) {
-        &ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
+        &ui_print_header(undef, $dnsmasq::text{'index_title'}, "", undef, 1, 1);
         print &text('index_eserver', "<tt>$config{'dnsmasq_path'}</tt>",
                 "@{[&get_webprefix()]}/config.cgi?$module_name"),"<p>\n";
         # &foreign_require("software", "software-lib.pl");
-        # $lnk = &software::missing_install_link("dnsmasq", $text{'index_dnsmasq'},
-        #         "../$module_name/", $text{'index_title'});
+        # $lnk = &software::missing_install_link("dnsmasq", $dnsmasq::text{'index_dnsmasq'},
+        #         "../$module_name/", $dnsmasq::text{'index_title'});
         # print $lnk,"<p>\n" if ($lnk);
-        &ui_print_footer("/", $text{'index'});
+        &ui_print_footer("/", $dnsmasq::text{'index'});
         exit;
     }
     elsif (!&find_config_file()) {
         # config doesn't exist!
-        &ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
+        &ui_print_header(undef, $dnsmasq::text{'index_title'}, "", undef, 1, 1);
         print "<p>\n";
         print &text('index_econf', "<tt>$config{'config_file'}</tt>",
                 "@{[&get_webprefix()]}/config.cgi?$module_name"),"<p>\n";
-        &ui_print_footer("/", $text{'index'});
+        &ui_print_footer("/", $dnsmasq::text{'index'});
         exit;
     }
     if ($in{"forced_edit"} == 1) {
@@ -823,10 +823,10 @@ sub check_for_file_errors {
             $error_check_action = "redirect";
         }
         elsif ($in{"fix_perms"}) {
-            if (!$access{"change_perms"}) {
+            if (!$dnsmasq::access{"change_perms"}) {
                 $error_check_result = "<div class=\"conf-error-block\">"
-                            . "<h3>".$text{"error"}."</h3>"
-                            . $text{"acl_change_perms_ecannot"} . "<br/><br/>"
+                            . "<h3>".$dnsmasq::text{"error"}."</h3>"
+                            . $dnsmasq::text{"acl_change_perms_ecannot"} . "<br/><br/>"
                             . "</div>";
                 $error_check_action = "warn";
             }
@@ -873,11 +873,11 @@ sub check_for_file_errors {
     elsif ( @{$dnsmconfig->{"error"}} > 0) {
         my $errorcount = @{$dnsmconfig->{"error"}};
         $error_check_result = "<div class=\"conf-error-block\">"
-                            . "<h3>".$text{"configuration_error_heading"}."</h3>"
+                            . "<h3>".$dnsmasq::text{"configuration_error_heading"}."</h3>"
                             . &text( "err_has_errors_", $errorcount ) . "<br/><br/>"
                             . "<a href=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" class=\"btn btn-lg btn-danger conf-error-button\">"
                             . "<i class=\"fa fa-fw fa-arrow-right\">&nbsp;</i>"
-                            . "<span>" . $text{"err_goto"} . "</span></a>"
+                            . "<span>" . $dnsmasq::text{"err_goto"} . "</span></a>"
                             . "</div>";
         $error_check_action = "warn";
     }

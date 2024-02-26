@@ -29,7 +29,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dhcp_range.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_range"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_range"};
 
 my $result = "";
 

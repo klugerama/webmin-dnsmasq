@@ -26,7 +26,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_title"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
@@ -34,32 +34,32 @@ if ($error_check_action eq "redirect") {
 my ($section, $page) = &get_context($0);
 my ($page_fields) = &get_page_fields($0);
 
-&ui_print_header($text{"index_dns_servers"} . &icon_if_disabled($section), $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"index_dns_servers"} . &icon_if_disabled($section), $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dns_servers.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_servers"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_servers"};
 my $apply_cgi = "dns_servers_apply.cgi";
 my $formidx = 1;
 
 my @vals = (
     {
         "internalfield" => "server",
-        "add_button_text" => $text{"_upstream_srv"},
+        "add_button_text" => $dnsmasq::text{"_upstream_srv"},
     },
     {
         "internalfield" => "rev_server",
-        "add_button_text" => $text{"_upstream_srv"},
+        "add_button_text" => $dnsmasq::text{"_upstream_srv"},
     },
 );
 
-my @tabs = (   [ 'basic', $text{'index_basic'} ],
-            # [ 'server', $text{"p_desc_server"} ],
-            # [ 'rev_server', $text{"p_desc_rev_server"} ],
+my @tabs = (   [ 'basic', $dnsmasq::text{'index_basic'} ],
+            # [ 'server', $dnsmasq::text{"p_desc_server"} ],
+            # [ 'rev_server', $dnsmasq::text{"p_desc_rev_server"} ],
         );
 foreach my $v ( @vals ) {
-    push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
+    push(@tabs, [ $v->{"internalfield"}, $dnsmasq::text{"p_desc_" . $v->{"internalfield"}} ]);
 }
 
 my $tab = $in{"tab"} || "basic";
@@ -67,9 +67,9 @@ print &ui_tabs_start(\@tabs, 'tab', $tab);
 
 print &ui_tabs_start_tab('tab', 'basic');
 
-&show_basic_fields( \%dnsmconfig, "dns_servers", $page_fields, $apply_cgi, $text{"index_dns_servers"} );
+&show_basic_fields( \%dnsmconfig, "dns_servers", $page_fields, $apply_cgi, $dnsmasq::text{"index_dns_servers"} );
 
-&show_other_fields( \%dnsmconfig, "dns_servers", $page_fields, $apply_cgi, $text{"index_dns_servers"} );
+&show_other_fields( \%dnsmconfig, "dns_servers", $page_fields, $apply_cgi, $dnsmasq::text{"index_dns_servers"} );
 
 print &ui_tabs_end_tab('tab', 'basic');
 
@@ -84,7 +84,7 @@ print &ui_tabs_end();
 
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of dns_servers.cgi ###.
 

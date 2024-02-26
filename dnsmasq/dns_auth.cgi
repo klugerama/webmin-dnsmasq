@@ -26,7 +26,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_title"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
@@ -34,20 +34,20 @@ if ($error_check_action eq "redirect") {
 my ($section, $page) = &get_context($0);
 my ($page_fields) = &get_page_fields($0);
 
-&ui_print_header($text{"index_dns_auth_settings"} . &icon_if_disabled($section),  $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"index_dns_auth_settings"} . &icon_if_disabled($section),  $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dns_auth.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_auth_settings"};
 my $apply_cgi = "dns_auth_apply.cgi";
 
-&show_basic_fields( \%dnsmconfig, "dns_auth", $page_fields, $apply_cgi, $text{"index_basic"} );
+&show_basic_fields( \%dnsmconfig, "dns_auth", $page_fields, $apply_cgi, $dnsmasq::text{"index_basic"} );
 
 &show_other_fields( \%dnsmconfig, "dns_auth", $page_fields, $apply_cgi, " " );
 
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of dns_auth.cgi ###.

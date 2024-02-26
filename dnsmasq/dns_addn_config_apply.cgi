@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_addn_config.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_addn_config"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_addn_config"};
 
 # adjust everything to what we got
 
@@ -73,19 +73,19 @@ elsif (@conf_dir_adds) {
 else {
     # $action = $in{"enable_sel_conf_file"} ? "enable" : $in{"disable_sel_conf_file"} ? "disable" : $in{"delete_sel_conf_file"} ? "delete" : "";
     # if ($action ne "") {
-    #     @sel || &error($text{'selected_none'});
+    #     @sel || &error($dnsmasq::text{'selected_none'});
     #     &update_selected("conf-file", $action, \@sel, \%$dnsmconfig);
     # }
     # else {
     #     $action = $in{"enable_sel_servers_file"} ? "enable" : $in{"disable_sel_servers_file"} ? "disable" : $in{"delete_sel_servers_file"} ? "delete" : "";
     #     if ($action ne "") {
-    #         @sel || &error($text{'selected_none'});
+    #         @sel || &error($dnsmasq::text{'selected_none'});
     #         &update_selected("servers-file", $action, \@sel, \%$dnsmconfig);
     #     }
     #     else {
     #         $action = $in{"enable_sel_conf_dir"} ? "enable" : $in{"disable_sel_conf_dir"} ? "disable" : $in{"delete_sel_conf_dir"} ? "delete" : "";
     #         if ($action ne "") {
-    #             @sel || &error($text{'selected_none'});
+    #             @sel || &error($dnsmasq::text{'selected_none'});
     #             &update_selected("conf-dir", $action, \@sel, \%$dnsmconfig);
     #         }
     #     }

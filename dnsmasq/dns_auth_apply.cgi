@@ -27,7 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "dns_auth.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_auth_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_auth_settings"};
 # check for input data errors
 
 # adjust everything to what we got

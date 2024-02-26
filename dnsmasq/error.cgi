@@ -25,14 +25,14 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-&ui_print_header($text{"configuration_errors_heading"}, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"configuration_errors_heading"}, $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 
 # output as web page
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "index.cgi?tab=dns";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_settings"};
 
 ## Insert Output code here
 
@@ -51,7 +51,7 @@ print &ui_links_row(\@list_link_buttons);
 my @error_fields = ( "configfield", "param", "file", "line", "desc" );
 my @column_headers = ( "" );
 foreach my $key ( @error_fields ) {
-    push ( @column_headers, $text{"err_" . $key} );
+    push ( @column_headers, $dnsmasq::text{"err_" . $key} );
 }
 push ( @column_headers, "" ); # for the manual edit button
 print &ui_columns_start( \@column_headers, );
@@ -62,6 +62,7 @@ foreach my $error ( @{$dnsmconfig{"error"}} ) {
     my $link_target = "";
     my $configfield = $error->{"configfield"};
     my $internalfield = &config_to_internal($configfield);
+    my $is_ignored = grep { $error->{"full"} } ( @{$config{"ignored"}} );
     my $param = $error->{"param"};
     my $fd = $dnsmconfigvals{"$configfield"};
     my $fdef = $configfield_fields{$internalfield};
@@ -79,10 +80,13 @@ foreach my $error ( @{$dnsmconfig{"error"}} ) {
         my $link = "<a href=\"" . $link_target . "\">" . $error->{$key} . "</a>";
         push ( @cols, $link );
     }
-    my $buttons = "<a href=\"manual_edit.cgi?file=" . $error->{"file"} . "&line=" . $error->{"line"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $text{"button_manual_edit"} . "</a>";
+    my $buttons = "<a href=\"manual_edit.cgi?file=" . $error->{"file"} . "&line=" . $error->{"line"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $dnsmasq::text{"button_manual_edit"} . "</a>";
     # webmin_debug_log("--------ERROR", "configfield: $configfield type: $type param: $param error_type: ". $error->{"error_type"} . " ERR_FILE_PERMS: " . ERR_FILE_PERMS());
-    if ((grep { /^$type$/ } ( @fs )) && $error->{"error_type"} == ERR_FILE_PERMS() && $access{"change_perms"}) {
-        $buttons .= "<a href=\"$returnto" . ($returnto =~ /\?/ ? "&" : "?") . "forced_edit=1&fix_perms=1&ifield=" . $internalfield . "&cfg_idx=" . $error->{"cfg_idx"} . "&param=" . $param . "&foruser=" . $error->{"foruser"} . "&forgroup=" . $error->{"forgroup"} . "&perms_failed=" . $error->{"perms_failed"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $text{"button_fix_permissions"} . "</a>";
+    if ((grep { /^$type$/ } ( @fs )) && $error->{"error_type"} == ERR_FILE_PERMS() && $dnsmasq::access{"change_perms"}) {
+        $buttons .= "<a href=\"$returnto" . ($returnto =~ /\?/ ? "&" : "?") . "forced_edit=1&fix_perms=1&ifield=" . $internalfield . "&cfg_idx=" . $error->{"cfg_idx"} . "&param=" . $param . "&foruser=" . $error->{"foruser"} . "&forgroup=" . $error->{"forgroup"} . "&perms_failed=" . $error->{"perms_failed"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $dnsmasq::text{"button_fix_permissions"} . "</a>";
+    }
+    if (!$is_ignored) {
+        $buttons .= "<a href=\"" . basename($0) . "?forced_edit=1&ignore=1&ifield=" . $internalfield . "&cfg_idx=" . $error->{"cfg_idx"} . "&param=" . $param . "&foruser=" . $error->{"foruser"} . "&forgroup=" . $error->{"forgroup"} . "&perms_failed=" . $error->{"perms_failed"} . "\" class=\"btn btn-tiny\"><i class='fa fa-fw fa-files-o -cs' style='margin-right:5px;'></i>" . $dnsmasq::text{"button_fix_permissions"} . "</a>";
     }
     push ( @cols, $buttons );
     print &ui_clickable_checked_columns_row( \@cols, undef, "sel", $count, 1 );
@@ -90,9 +94,9 @@ foreach my $error ( @{$dnsmconfig{"error"}} ) {
 }
 print &ui_columns_end();
 print &ui_links_row(\@list_link_buttons);
-print "<p>" . $text{"with_selected"} . "</p>";
-print &ui_submit($text{"button_disable_sel"}, "button_disable_sel");
-print &ui_submit($text{"button_delete_sel"}, "button_delete_sel");
+print "<p>" . $dnsmasq::text{"with_selected"} . "</p>";
+print &ui_submit($dnsmasq::text{"button_disable_sel"}, "button_disable_sel");
+print &ui_submit($dnsmasq::text{"button_delete_sel"}, "button_delete_sel");
 print &ui_form_end();
 
 print &add_js();

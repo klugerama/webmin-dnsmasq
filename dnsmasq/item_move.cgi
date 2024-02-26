@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"};
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_settings_basic"};
 
 my $internalfield = $in{"internalfield"};
 my $selected = $dnsmconfig{$internalfield}[$in{"cfg_idx"}]{"line"};

@@ -26,41 +26,41 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_title"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
 my ($section, $page) = &get_context($0);
 
-&ui_print_header($text{"index_dns_addn_config"} . &icon_if_disabled($section), $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"index_dns_addn_config"} . &icon_if_disabled($section), $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $tab = $in{"tab"} || "conf_file";
 my $returnto = $in{"returnto"} || "dns_addn_config.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_addn_config"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_addn_config"};
 my $apply_cgi = "dns_addn_config_apply.cgi";
 my $formidx = 0;
 
 my @vals = (
     {
         "internalfield" => "conf_file",
-        "add_button_text" => $text{"_file"},
+        "add_button_text" => $dnsmasq::text{"_file"},
     },
     {
         "internalfield" => "servers_file",
-        "add_button_text" => $text{"_file"},
+        "add_button_text" => $dnsmasq::text{"_file"},
     },
     {
         "internalfield" => "conf_dir",
-        "add_button_text" => $text{"_dir"},
+        "add_button_text" => $dnsmasq::text{"_dir"},
     },
 );
 
 my @tabs = ( );
 foreach my $v ( @vals ) {
-    push(@tabs, [ $v->{"internalfield"}, $text{"p_desc_" . $v->{"internalfield"}} ]);
+    push(@tabs, [ $v->{"internalfield"}, $dnsmasq::text{"p_desc_" . $v->{"internalfield"}} ]);
 }
 
 print &ui_tabs_start(\@tabs, 'tab', $tab);
@@ -75,6 +75,6 @@ print &ui_tabs_end();
 
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of dns_addn_config.cgi ###.

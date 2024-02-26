@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_settings_basic"};
 
 # adjust everything to what we got
 
@@ -120,7 +120,7 @@ elsif ($in{"dhcp_option_idx"} ne "" && $in{"dhcp_option_option"} ne "") {
 }
 else {
     my @sel = split(/\0/, $in{'sel'});
-    @sel || &error($text{'selected_none'});
+    @sel || &error($dnsmasq::text{'selected_none'});
     
     &do_selected_action( [ "dhcp_option" ], \@sel, \%$dnsmconfig );
 }

@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dhcp_tags.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_tags"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_tags"};
 
 # adjust everything to what we got
 
@@ -52,7 +52,7 @@ elsif ($in{"dhcp_vendorclass_idx"} ne "") {
 }
 else {
     my @sel = split(/\0/, $in{'sel'});
-    @sel || &error($text{'selected_none'});
+    @sel || &error($dnsmasq::text{'selected_none'});
 
     &do_selected_action( [ "dhcp_userclass", "dhcp_vendorclass" ], \@sel, \%$dnsmconfig );
 }

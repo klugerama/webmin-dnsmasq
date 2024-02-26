@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_basic.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_settings_basic"};
 
 my @sel = split(/\0/, $in{'sel'});
 my @hosts_file_adds = split(/\0/, $in{'new_addn_hosts'});

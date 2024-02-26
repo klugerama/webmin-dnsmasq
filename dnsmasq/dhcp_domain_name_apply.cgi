@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "dhcp_domain_name.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_domain_name"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_domain_name"};
 
 if ($in{'new_domain_domain'} ne "") {
     my $val = $in{"new_domain_domain"};
