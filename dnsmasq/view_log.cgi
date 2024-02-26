@@ -62,7 +62,7 @@ local $tailcmd = $config{'tail_cmd'} || "tail -n LINES";
 $tailcmd =~ s/LINES/$lines/g;
 $eflag = $gconfig{'os_type'} =~ /-linux/ ? "-E" : "";
 $dashflag = $gconfig{'os_type'} =~ /-linux/ ? "--" : "";
-$cat = "(cat ".quotemeta($file) . ($using_syslog ? " | grep -i -a $eflag $dashflag dnsmasq" : "") . ")";
+$cat = "(cat " . ($file) . ($using_syslog ? " | grep -i -a $eflag $dashflag dnsmasq" : "") . ")";
 if ($filter ne "") {
     # Are we supposed to filter anything? Then use grep.
     $got = &proc::safe_process_exec(
