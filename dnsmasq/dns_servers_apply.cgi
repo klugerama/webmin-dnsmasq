@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_servers.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_settings_basic"};
 # check for input data errors
 
 # adjust everything to what we got
@@ -63,7 +63,7 @@ elsif ($in{"server_idx"} ne "") {
     if ($in{"server_source"} ne "") {
         $newval .= "," . $in{"server_source"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $newval);
+    &save_update($item->{"file"}, $item->{"lineno"}, $newval);
 }
 elsif ($in{"new_rev_server_domain"} ne "" || $in{"new_rev_server_ip"} ne "") {
     my $newval = "";
@@ -90,7 +90,7 @@ elsif ($in{"rev_server_idx"} ne "") {
     if ($in{"rev_server_source"} ne "") {
         $newval .= "," . $in{"rev_server_source"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $newval);
+    &save_update($item->{"file"}, $item->{"lineno"}, $newval);
 }
 else {
     &do_selected_action( [ "server", "rev_server" ], \@sel, \%$dnsmconfig );

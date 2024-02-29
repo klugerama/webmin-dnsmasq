@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_basic.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_settings_basic"};
 
 my @sel = split(/\0/, $in{'sel'});
 my @hosts_file_adds = split(/\0/, $in{'new_addn_hosts'});
@@ -50,7 +50,7 @@ elsif (@hosts_file_adds) {
 elsif ($in{"addn_hosts"} ne "" && $in{"addn_hosts_idx"} ne "") {
     my $item = $dnsmconfig{"addn-hosts"}[$in{"addn_hosts_idx"}];
     my $val = "addn-hosts=" . $in{"addn_hosts"};
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 elsif (@hostsdir_adds) {
 
@@ -64,7 +64,7 @@ elsif (@hostsdir_adds) {
 elsif ($in{"hostsdir"} ne "" && $in{"hostsdir_idx"} ne "") {
     my $item = $dnsmconfig{"hostsdir"}[$in{"hostsdir_idx"}];
     my $val = "hostsdir=" . $in{"hostsdir"};
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 elsif (@resolv_file_adds) {
 
@@ -78,7 +78,7 @@ elsif (@resolv_file_adds) {
 elsif ($in{"resolv_file"} ne "" && $in{"resolv_file_idx"} ne "") {
     my $item = $dnsmconfig{"resolv-file"}[$in{"resolv_file_idx"}];
     my $val = "resolv-file=" . $in{"resolv_file"};
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     &do_selected_action( [ "addn_hosts", "hostsdir", "resolv_file" ], \@sel, \%$dnsmconfig );

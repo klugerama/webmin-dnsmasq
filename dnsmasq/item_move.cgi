@@ -28,22 +28,22 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"};
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_settings_basic"};
 
 my $internalfield = $in{"internalfield"};
-my $selected = $dnsmconfig{$internalfield}[$in{"cfg_idx"}]{"line"};
+my $selected = $dnsmconfig{$internalfield}[$in{"cfg_idx"}]{"lineno"};
 if( $in{dir} eq "up" ) {
-	$dnsmconfig{$internalfield}[$in{"cfg_idx"}]{"line"}=$dnsmconfig{$internalfield}[$in{"cfg_idx"}-1]{"line"};
-	$dnsmconfig{$internalfield}[$in{"cfg_idx"}-1]{"line"}=$selected;
+	$dnsmconfig{$internalfield}[$in{"cfg_idx"}]{"lineno"}=$dnsmconfig{$internalfield}[$in{"cfg_idx"}-1]{"lineno"};
+	$dnsmconfig{$internalfield}[$in{"cfg_idx"}-1]{"lineno"}=$selected;
 }
 else {
-	$dnsmconfig{$internalfield}[$in{"cfg_idx"}]{"line"}=$dnsmconfig{$internalfield}[$in{"cfg_idx"}+1]{"line"};
-	$dnsmconfig{$internalfield}[$in{"cfg_idx"}+1]{"line"}=$selected;
+	$dnsmconfig{$internalfield}[$in{"cfg_idx"}]{"lineno"}=$dnsmconfig{$internalfield}[$in{"cfg_idx"}+1]{"lineno"};
+	$dnsmconfig{$internalfield}[$in{"cfg_idx"}+1]{"lineno"}=$selected;
 }
 foreach my $item (@{$dnsmconfig{$internalfield}}) {
 	# $line = $item->{"full"};
-	# &update( $item->{"line"}, $line, $config_file, ($item->{"used"}?0:1) );
-    &save_update($item->{"file"}, $item->{"line"}, $item->{"full"}, ($item->{"used"}?0:1));
+	# &update( $item->{"lineno"}, $line, $config_file, ($item->{"used"}?0:1) );
+    &save_update($item->{"file"}, $item->{"lineno"}, $item->{"full"}, ($item->{"used"}?0:1));
 }
 # #
 # # write file!!

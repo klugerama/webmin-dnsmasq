@@ -26,7 +26,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_title"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
@@ -34,24 +34,24 @@ if ($error_check_action eq "redirect") {
 my ($section, $page) = &get_context($0);
 my ($page_fields) = &get_page_fields($0);
 
-&ui_print_header($text{"index_tftp_boot_pxe_settings"} . &icon_if_disabled($section), $text{"index_title"}, undef, "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"index_tftp_boot_pxe_settings"} . &icon_if_disabled($section), $dnsmasq::text{"index_title"}, undef, "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "tftp_bootp.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_boot_pxe_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_tftp_boot_pxe_settings"};
 my $apply_cgi = "tftp_bootp_apply.cgi";
 
-&show_basic_fields( \%dnsmconfig, "tftp_bootp", $page_fields, $apply_cgi, $text{"index_tftp_boot_pxe_settings"} );
+&show_basic_fields( \%dnsmconfig, "tftp_bootp", $page_fields, $apply_cgi, $dnsmasq::text{"index_tftp_boot_pxe_settings"} );
 
 &show_other_fields( \%dnsmconfig, "tftp_bootp", $page_fields, $apply_cgi, " " );
 
 print &ui_hr();
 
-&show_field_table("bootp_dynamic", $apply_cgi, $text{"_networkid"}, \%dnsmconfig, 1);
+&show_field_table("bootp_dynamic", $apply_cgi, $dnsmasq::text{"_networkid"}, \%dnsmconfig, 1);
 
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=tftp", $text{"index_tftp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=tftp", $dnsmasq::text{"index_tftp_settings"}, "index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of tftp_bootp.cgi ###.

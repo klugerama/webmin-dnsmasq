@@ -29,7 +29,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dhcp_range.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_range"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_range"};
 
 my $result = "";
 
@@ -100,7 +100,7 @@ if ($in{'new_dhcp_range_start'} ne "") {
 elsif ($in{"dhcp_range_idx"} ne "" && $in{"dhcp_range_start"} ne "") {
     my $item = $dnsmconfig{"dhcp-range"}[$in{"dhcp_range_idx"}];
     my $val = "dhcp-range=" . &eval_input_fields();
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "dhcp_domain_name.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_domain_name"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_domain_name"};
 
 if ($in{'new_domain_domain'} ne "") {
     my $val = $in{"new_domain_domain"};
@@ -49,7 +49,7 @@ elsif ($in{"domain_idx"} ne "" && $in{"domain_domain"} ne "") {
             $val .= ",local";
         }
     }
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

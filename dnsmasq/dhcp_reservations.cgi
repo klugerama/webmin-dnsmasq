@@ -24,19 +24,19 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_title"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
 my ($section, $page) = &get_context($0);
 
-&ui_print_header($text{"index_dhcp_host_reservations"} . &icon_if_disabled($section), $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"index_dhcp_host_reservations"} . &icon_if_disabled($section), $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dhcp_reservations.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_host_reservations"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_host_reservations"};
 my $apply_cgi = "dhcp_reservations_apply.cgi";
 
 my $internalfield = "dhcp_host";
@@ -55,20 +55,20 @@ sub show_reservations() {
     my $formid = $internalfield . "_form";
     my @tds = ( &get_class_tag($td_label_class), &get_class_tag($td_left_class) );
     my @column_headers = ( "",
-        $text{"enabled"},
-        $text{"p_label_val_hostname"}, 
-        $text{"p_label_val_ip_address"}, 
-        $text{"p_label_val_mac"}, 
-        $text{"p_label_val_ignore"}, 
-        $text{"p_label_val_set_tags"}, 
-        $text{"p_label_val_tag"}, 
-        $text{"p_label_val_leasetime"}, );
+        $dnsmasq::text{"enabled"},
+        $dnsmasq::text{"p_label_val_hostname"}, 
+        $dnsmasq::text{"p_label_val_ip_address"}, 
+        $dnsmasq::text{"p_label_val_mac"}, 
+        $dnsmasq::text{"p_label_val_ignore"}, 
+        $dnsmasq::text{"p_label_val_set_tags"}, 
+        $dnsmasq::text{"p_label_val_tag"}, 
+        $dnsmasq::text{"p_label_val_leasetime"}, );
     foreach my $param ( @newfields ) {
         push( @tds, &get_class_tag($td_left_class) );
     }
-    # my @list_link_buttons = &list_links( "sel", 0, "dhcp_res_apply.cgi", "dhcp-host=new,0.0.0.0", "dhcp_reservations.cgi", &text("add_", $text{"_host"}) );
+    # my @list_link_buttons = &list_links( "sel", 0, "dhcp_res_apply.cgi", "dhcp-host=new,0.0.0.0", "dhcp_reservations.cgi", &text("add_", $dnsmasq::text{"_host"}) );
     my @list_link_buttons = &list_links( "sel", 1 );
-    my ($add_button, $hidden_add_input_fields) = &add_item_button( &text("add_", $text{"_host"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button( &text("add_", $dnsmasq::text{"_host"}), $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $formid, \@newfields );
     push(@list_link_buttons, $add_button);
 
     my $count = 0;
@@ -89,10 +89,10 @@ sub show_reservations() {
         foreach my $val ( @vals ) {
             # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"} );
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"} );
             }
             else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"} );
+                ($edit_link) = &edit_item_link($val, $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"} );
             }
             push( @cols, $edit_link );
         }
@@ -101,10 +101,10 @@ sub show_reservations() {
     }
     print &ui_columns_end();
     print &ui_links_row(\@list_link_buttons);
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"button_enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"button_disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"button_delete_sel"}, "delete_sel_$internalfield");
+    print "<p>" . $dnsmasq::text{"with_selected"} . "</p>";
+    print &ui_submit($dnsmasq::text{"button_enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_delete_sel"}, "delete_sel_$internalfield");
     print $hidden_add_input_fields;
     print $hidden_edit_input_fields;
     print &ui_form_end( );
@@ -114,6 +114,6 @@ sub show_reservations() {
 
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dhcp", $dnsmasq::text{"index_dhcp_settings"}, "index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of dhcp_reservations.cgi ###.

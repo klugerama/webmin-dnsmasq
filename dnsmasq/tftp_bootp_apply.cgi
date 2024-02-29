@@ -27,7 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "tftp_bootp.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_bootp_pxe_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_tftp_bootp_pxe_settings"};
 
 my @sel = split(/\0/, $in{'sel'});
 
@@ -47,7 +47,7 @@ foreach my $configfield ( @conftftp ) {
 
 # check for input data errors
 
-# @sel || &error($text{'selected_none'});
+# @sel || &error($dnsmasq::text{'selected_none'});
 
 # check user input for obvious errors
 foreach my $configfield ( @tftp_singles ) {
@@ -55,23 +55,23 @@ foreach my $configfield ( @tftp_singles ) {
     my $internalfield = &config_to_internal($configfield);
     if ( grep { /^$configfield$/ } ( @sel )) {
         if ( ! $item->{"val_optional"} && $in{$internalfield . "val"} eq "" ) {
-            &send_to_error( $configfield, $text{"err_valreq"}, $returnto, $returnlabel );
+            &send_to_error( $configfield, $dnsmasq::text{"err_valreq"}, $returnto, $returnlabel );
         }
     }
     if ( grep { /^$configfield$/ } ( @sel )) {
         if ( $in{$internalfield . "val"} ne "" ) {
             my $item_template = %dnsmconfigvals{"$configfield"};
             if ( $item_template->{"valtype"} eq "int" && ($in{$internalfield . "val"} !~ /^$NUMBER$/) ) {
-                &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_numbad"}, $returnto, $returnlabel );
             }
             elsif ( $item_template->{"valtype"} eq "file" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_filebad"}, $returnto, $returnlabel );
             }
             elsif ( $item_template->{"valtype"} eq "path" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
             }
             elsif ( $item_template->{"valtype"} eq "dir" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
             }
         }
     }
@@ -85,7 +85,7 @@ if ($in{"submit"}) {
 
     if ($in{"dhcp_boot_def"} == 1) {
         my $item = $dnsmconfig{"dhcp-boot"};
-        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
+        &save_update($item->{"file"}, $item->{"lineno"}, undef, 1);
     }
     elsif ($in{"dhcp_boot_filename"}) { # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
         # "tag", "filename", "host", "address"
@@ -101,11 +101,11 @@ if ($in{"submit"}) {
                 $val .= "," . $in{"dhcp_boot_address"};
             }
         }
-        &save_update($item->{"file"}, $item->{"line"}, $val);
+        &save_update($item->{"file"}, $item->{"lineno"}, $val);
     }
     if ($in{"pxe_service_def"} == 1) {
         my $item = $dnsmconfig{"pxe-service"};
-        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
+        &save_update($item->{"file"}, $item->{"lineno"}, undef, 1);
     }
     elsif ($in{"pxe_service_csa"}) { # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
         # "tag", "csa", "menutext", "basename", "server"
@@ -121,11 +121,11 @@ if ($in{"submit"}) {
         if ($in{"pxe_service_server"}) {
             $val .= "," . $in{"pxe_service_server"};
         }
-        &save_update($item->{"file"}, $item->{"line"}, $val);
+        &save_update($item->{"file"}, $item->{"lineno"}, $val);
     }
     if ($in{"pxe_prompt_def"} == 1) {
         my $item = $dnsmconfig{"pxe-prompt"};
-        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
+        &save_update($item->{"file"}, $item->{"lineno"}, undef, 1);
     }
     elsif ($in{"pxe_prompt_prompt"}) { # =[tag:<tag>,]<prompt>[,<timeout>]
         # "tag", "prompt", "timeout"
@@ -138,7 +138,7 @@ if ($in{"submit"}) {
         if ($in{"pxe_prompt_timeout"}) {
             $val .= "," . $in{"pxe_prompt_timeout"};
         }
-        &save_update($item->{"file"}, $item->{"line"}, $val);
+        &save_update($item->{"file"}, $item->{"lineno"}, $val);
     }
 }
 elsif ($in{"new_bootp_dynamic_val"} ne "") {
@@ -150,7 +150,7 @@ elsif ($in{"bootp_dynamic_idx"} ne "") {
     my $item = $dnsmconfig{"bootp-dynamic"}[$in{"bootp_dynamic_idx"}];
     my $newval = "bootp-dynamic=";
     $newval .= $in{"bootp_dynamic_val"};
-    &save_update($item->{"file"}, $item->{"line"}, $newval);
+    &save_update($item->{"file"}, $item->{"lineno"}, $newval);
 }
 else {
     &do_selected_action( [ "bootp_dynamic" ], \@sel, \%$dnsmconfig );

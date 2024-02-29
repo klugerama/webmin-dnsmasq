@@ -32,6 +32,7 @@ require 'dnsmasq-ui.pl';
 $last_config_change_flag = $module_var_directory."/config-flag";
 $last_restart_time_flag = $module_var_directory."/restart-flag";
 $last_update_check_flag = $module_var_directory."/update-check-flag";
+$ignored_config_lines = $module_var_directory."/ignored-config-lines";
 
 sub config_post_save {
     my ($newconfig, $oldconfig) = @_;
@@ -234,15 +235,15 @@ sub start_dnsmasq {
     #     local $errorlog = $errorlogstr ? $errorlogstr->{'words'}->[0]
     #                     : "logs/error_log";
     #     if ($out =~ /\S/) {
-    #         return "$text{'start_eafter'} : <pre>$out</pre>";
+    #         return "$dnsmasq::text{'start_eafter'} : <pre>$out</pre>";
     #     }
     #     elsif ($errorlog eq 'syslog' || $errorlog =~ /^\|/) {
-    #         return $text{'start_eunknown'};
+    #         return $dnsmasq::text{'start_eunknown'};
     #     }
     #     else {
     #         $errorlog = &server_root($errorlog, $conf);
     #         $out = `tail -5 $errorlog`;
-    #         return "$text{'start_eafter'} : <pre>$out</pre>";
+    #         return "$dnsmasq::text{'start_eafter'} : <pre>$out</pre>";
     #     }
     # }
     &restart_last_restart_time();
@@ -316,6 +317,67 @@ sub restart_last_restart_time {
     &close_tempfile(FLAG);
 }
 
+sub get_ignored_lines {
+    # file is structured:
+    #   {filenameX}
+    #   {ignored line contentX}
+    #   {filenameY}
+    #   {ignored line contentY}
+    my $existing_ignored_lines = &read_file_lines("$ignored_config_lines", 1);
+    my $ignored_lines = &make_ignored_lines_array($existing_ignored_lines);
+    return $ignored_lines;
+}
+
+=head2 update_ignored_line(ignored_line, file, action)
+    update the config file array
+        ignored_line - text content of line
+        action       - 0 = add
+                       1 = delete the line
+
+=cut
+sub update_ignored_line {
+    my ($ignored_line, $file, $action) = @_;
+    webmin_debug_log("--------UPDATING", "$action: " . $action . " $ignored_line: ". $ignored_line);
+    my $existing_ignored_lines = &read_file_lines("$ignored_config_lines");
+    my $ignored_lines = &make_ignored_lines_array($existing_ignored_lines);
+    webmin_debug_log("--------UPDATING", " @$existing_ignored_lines: ". @$existing_ignored_lines);
+    if ($action == 1) {
+        my $lineidx = 0;
+        foreach my $existing_line ( @$ignored_lines ) {
+            last if ($existing_line->{"line"} == $ignored_line && $existing_line->{"file"} == $file);
+            $lineidx++;
+        }
+        splice(@$existing_ignored_lines, ($lineidx * 2), 2);
+    }
+    else {
+        push(@$existing_ignored_lines, $file);
+        push(@$existing_ignored_lines, $ignored_line);
+    }
+    &flush_file_lines();
+}
+
+sub make_ignored_lines_array {
+    my ($existing_ignored_lines) = @_;
+    my @ignored_lines = ();
+    my $idx = 0;
+    my %line_entry = {
+        "file" => "",
+        "line" => ""
+    };
+    foreach my $line (@{$existing_ignored_lines}) {
+        if ($idx == 0) {
+            $line_entry->{"file"} = $line;
+            $idx++;
+        }
+        else {
+            $line_entry->{"line"} = $line;
+            $idx = 0;
+            push(@ignored_lines, $line_entry);
+        }
+    }
+    return \@ignored_lines;
+}
+
 =head2 needs_config_restart()
     Returns 1 if a restart is needed for sure after a config change
 =cut
@@ -380,13 +442,13 @@ sub find_config {
             : wantarray ? () : undef;
 }
 
-=head2 save_update(file, line, val, [action])
+=head2 save_update(file, lineno, val, [action])
 =cut
 sub save_update {
-    my ($file, $line, $val) = @_;
+    my ($file, $lineno, $val) = @_;
     my $action = $_[3] ? $_[3] : 0;
     my $file_arr = &read_file_lines($file);
-    &update($line, $val, \@$file_arr, $action);
+    &update($lineno, $val, \@$file_arr, $action);
     &flush_file_lines();
     &update_last_config_change();
 }
@@ -458,7 +520,7 @@ sub update_selected {
         foreach my $selected_idx (@reversed_selected_idxes) {
             my $item = $dnsmconfig{$configfield}[$selected_idx];
             if ($item->{"file"} eq $conf_filename) {
-                &update( $item->{"line"}, undef,
+                &update( $item->{"lineno"}, undef,
                     \@$file_arr, $actioncode );
             }
         }
@@ -502,8 +564,8 @@ sub update_booleans {
                  # skip this if it:
                  # 1. wasn't selected and 
                  # 2. isn't already in the file
-                next if (( ! grep { /^$configfield$/ } ( @{$sel} ) ) && $item->{"line"} == -1);
-                &update( $item->{"line"}, $configfield,
+                next if (( ! grep { /^$configfield$/ } ( @{$sel} ) ) && $item->{"lineno"} == -1);
+                &update( $item->{"lineno"}, $configfield,
                     \@$file_arr, ( ( grep { /^$configfield$/ } ( @{$sel} ) ) ? 0 : 1 ) );
             }
         }
@@ -535,18 +597,18 @@ sub update_simple_vals {
                  # 1. wasn't selected and 
                  # 2a. isn't already in the file or
                  # 2b. is in the file but is disabled
-                next if ( !$is_selected && ($item->{"line"} == -1 || $item->{"used"} == 0));
+                next if ( !$is_selected && ($item->{"lineno"} == -1 || $item->{"used"} == 0));
                 if (!$is_selected && $item->{"used"} == 1) {
                     # if it wasn't selected but is enabled in the file, disabled this value
-                    &update( $item->{"line"}, undef,
+                    &update( $item->{"lineno"}, undef,
                         \@$file_arr, ( $is_selected ? 0 : 1 ) );
                 }
                 elsif ($item->{"val_optional"} || $in{$internalfield . "val"}) {
-                    &update( $item->{"line"}, "$configfield" . ( $in{$internalfield . "val"} eq "" ? "" : "=" . $in{$internalfield . "val"}),
+                    &update( $item->{"lineno"}, "$configfield" . ( $in{$internalfield . "val"} eq "" ? "" : "=" . $in{$internalfield . "val"}),
                         \@$file_arr, ( $is_selected ? 0 : 1 ) );
                 }
                 else {
-                    &update( $item->{"line"}, "$configfield=" . $in{$internalfield . "val"},
+                    &update( $item->{"lineno"}, "$configfield=" . $in{$internalfield . "val"},
                         \@$file_arr, ( $is_selected ? 0 : 1 ) );
                 }
             }
@@ -579,21 +641,21 @@ sub apply_simple_vals {
         my $internalfield = &config_to_internal($configfield);
         if ( grep { /^$internalfield$/ } ( @{$sel} )) {
             if ( ! $item->{"val_optional"} && $in{$internalfield . "val"} eq "" ) {
-                &send_to_error( $configfield, $text{"err_valreq"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_valreq"}, $returnto, $returnlabel );
             }
             if ( $in{$internalfield . "val"} ne "" ) {
                 my $item_template = %dnsmconfigvals{"$configfield"};
                 if ( $item_template->{"valtype"} eq "int" && ($in{$internalfield . "val"} !~ /^$NUMBER$/) ) {
-                    &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_numbad"}, $returnto, $returnlabel );
                 }
                 elsif ( $item_template->{"valtype"} eq "file" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                    &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_filebad"}, $returnto, $returnlabel );
                 }
                 elsif ( $item_template->{"valtype"} eq "path" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                    &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                 }
                 elsif ( $item_template->{"valtype"} eq "dir" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                    &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                 }
             }
         }
@@ -628,20 +690,20 @@ sub check_other_vals {
                 push ( @otherfields, $internalfield . "_" . $key );
                 # if this parameter is an array, include
                 if ( $definition->{"required"} && $in{$internalfield  . "_" . $key} eq "" ) {
-                    &send_to_error( $configfield, $text{"err_valreq"}, $returnto, $returnlabel );
+                    &send_to_error( $configfield, $dnsmasq::text{"err_valreq"}, $returnto, $returnlabel );
                 }
                 if ( $in{$internalfield . "_" . $key} ne "" ) {
                     if ( $definition->{"valtype"} eq "int" && ($in{$internalfield . "_" . $key} !~ /^$NUMBER$/) ) {
-                        &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_numbad"}, $returnto, $returnlabel );
                     }
                     elsif ( $definition->{"valtype"} eq "file" && ($in{$internalfield . "_" . $key} !~ /^$FILE$/) ) {
-                        &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_filebad"}, $returnto, $returnlabel );
                     }
                     elsif ( $definition->{"valtype"} eq "path" && ($in{$internalfield . "_" . $key} !~ /^$FILE$/) ) {
-                        &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                     }
                     elsif ( $definition->{"valtype"} eq "dir" && ($in{$internalfield . "_" . $key} !~ /^$FILE$/) ) {
-                        &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                        &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
                     }
                 }
             }
@@ -662,8 +724,8 @@ sub add_to_list {
 }
 
 sub send_to_error {
-    my ($line, $err_desc, $returnto, $returnlabel) = @_;
-    my $line = "error.cgi?line=" . &urlize($line);
+    my ($cfield, $err_desc, $returnto, $returnlabel) = @_;
+    my $line = "error.cgi?cfield=" . &urlize($cfield);
     $line .= "&type=" . &urlize($err_desc);
     $line .= "&returnto=" . $returnto;
     $line .= "&returnlabel=" . &urlize($returnlabel);
@@ -708,8 +770,8 @@ sub get_groupnames_list {
 sub can_access {
     my ($file) = @_;
     my @f = grep { $_ ne '' } split(/\//, $file);
-    return 1 if ($access{'root'} eq '/');
-    my @a = grep { $_ ne '' } split(/\//, $access{'root'});
+    return 1 if ($dnsmasq::access{'root'} eq '/');
+    my @a = grep { $_ ne '' } split(/\//, $dnsmasq::access{'root'});
     for(my $i=0; $i<@a; $i++) {
         return 0 if ($a[$i] ne $f[$i]);
     }
@@ -791,42 +853,71 @@ sub check_for_file_errors {
     $returnto = basename($returnto);
     # check for the executable
     if (!&find_dnsmasq()) {
-        &ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
+        &ui_print_header(undef, $dnsmasq::text{'index_title'}, "", undef, 1, 1);
         print &text('index_eserver', "<tt>$config{'dnsmasq_path'}</tt>",
                 "@{[&get_webprefix()]}/config.cgi?$module_name"),"<p>\n";
         # &foreign_require("software", "software-lib.pl");
-        # $lnk = &software::missing_install_link("dnsmasq", $text{'index_dnsmasq'},
-        #         "../$module_name/", $text{'index_title'});
+        # $lnk = &software::missing_install_link("dnsmasq", $dnsmasq::text{'index_dnsmasq'},
+        #         "../$module_name/", $dnsmasq::text{'index_title'});
         # print $lnk,"<p>\n" if ($lnk);
-        &ui_print_footer("/", $text{'index'});
+        &ui_print_footer("/", $dnsmasq::text{'index'});
         exit;
     }
     elsif (!&find_config_file()) {
         # config doesn't exist!
-        &ui_print_header(undef, $text{'index_title'}, "", undef, 1, 1);
+        &ui_print_header(undef, $dnsmasq::text{'index_title'}, "", undef, 1, 1);
         print "<p>\n";
         print &text('index_econf', "<tt>$config{'config_file'}</tt>",
                 "@{[&get_webprefix()]}/config.cgi?$module_name"),"<p>\n";
-        &ui_print_footer("/", $text{'index'});
+        &ui_print_footer("/", $dnsmasq::text{'index'});
         exit;
     }
     if ($in{"forced_edit"} == 1) {
+        # webmin_debug_log("--------FORCED_EDIT");
         if (defined($in{"sel"})) {
             my @sel = split(/\0/, $in{"sel"});
-            foreach my $selid ( @sel ) {
-                my $f = $in{"file_" . $selid};
-                my $l = $in{"line_" . $selid};
-                my $a = $in{"button_disable_sel"} ? 1 : ($in{"button_delete_sel"} ? 2 : 0);
-                &save_update($f, $l, undef, $a);
+            if ($in{"button_disable_sel"} || $in{"button_delete_sel"}) {
+                foreach my $selid ( @sel ) {
+                    my $f = $in{"file_" . $selid};
+                    my $l = $in{"lineno_" . $selid};
+                    my $a = $in{"button_disable_sel"} ? 1 : ($in{"button_delete_sel"} ? 2 : 0);
+                    &save_update($f, $l, undef, $a);
+                }
+            }
+            elsif ($in{"button_ignore_sel"}) {
+                foreach my $selid ( @sel ) {
+                    my $f = $in{"file_" . $selid};
+                    my $l = $in{"line_" . $selid};
+                    &update_ignored_line(&un_urlize($l), $f, 0);
+                }
+            }
+            elsif ($in{"button_unignore_sel"}) {
+                foreach my $selid ( @sel ) {
+                    my $f = $in{"ign_file_" . $selid};
+                    my $l = $in{"ign_line_" . $selid};
+                    &update_ignored_line(&un_urlize($l), $f, 1);
+                }
             }
             $error_check_result = $redirect;
             $error_check_action = "redirect";
         }
+        elsif ($in{"ignore"} == 1) {
+            # webmin_debug_log("--------IGNORE");
+            &update_ignored_line(&un_urlize($in{"full"}), $in{"file"}, 0);
+            $error_check_result = $redirect;
+            $error_check_action = "redirect";
+        }
+        elsif ($in{"unignore"} == 1) {
+            # webmin_debug_log("--------IGNORE");
+            &update_ignored_line(&un_urlize($in{"full"}), $in{"file"}, 1);
+            $error_check_result = $redirect;
+            $error_check_action = "redirect";
+        }
         elsif ($in{"fix_perms"}) {
-            if (!$access{"change_perms"}) {
+            if (!$dnsmasq::access{"change_perms"}) {
                 $error_check_result = "<div class=\"conf-error-block\">"
-                            . "<h3>".$text{"error"}."</h3>"
-                            . $text{"acl_change_perms_ecannot"} . "<br/><br/>"
+                            . "<h3>".$dnsmasq::text{"error"}."</h3>"
+                            . $dnsmasq::text{"acl_change_perms_ecannot"} . "<br/><br/>"
                             . "</div>";
                 $error_check_action = "warn";
             }
@@ -871,15 +962,36 @@ sub check_for_file_errors {
         }
     }
     elsif ( @{$dnsmconfig->{"error"}} > 0) {
-        my $errorcount = @{$dnsmconfig->{"error"}};
-        $error_check_result = "<div class=\"conf-error-block\">"
-                            . "<h3>".$text{"configuration_error_heading"}."</h3>"
-                            . &text( "err_has_errors_", $errorcount ) . "<br/><br/>"
-                            . "<a href=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" class=\"btn btn-lg btn-danger conf-error-button\">"
-                            . "<i class=\"fa fa-fw fa-arrow-right\">&nbsp;</i>"
-                            . "<span>" . $text{"err_goto"} . "</span></a>"
-                            . "</div>";
-        $error_check_action = "warn";
+        # first flush obsolete ignored lines
+        my $ignored_lines = &get_ignored_lines();
+        if (@{$ignored_lines} > 0) {
+            foreach my $ignored_line ( @{$ignored_lines} ) {
+                my $found = 0;
+                my $erridx = 0;
+                foreach my $err ( @{$dnsmconfig->{"error"}} ) {
+                    if ($ignored_line->{"line"} eq $err->{"full"} && $ignored_line->{"file"} eq $err->{"file"}) {
+                        splice(@{$dnsmconfig->{"error"}}, $erridx, 1);
+                        $found = 1;
+                        last;
+                    }
+                    $erridx++;
+                }
+                if ($found == 0) {
+                    &update_ignored_line($ignored_line->{"line"}, $ignored_line->{"file"}, 1);
+                }
+            }
+        }
+        if ( @{$dnsmconfig->{"error"}} > 0) {
+            my $errorcount = @{$dnsmconfig->{"error"}};
+            $error_check_result = "<div class=\"conf-error-block\">"
+                                . "<h3>".$dnsmasq::text{"configuration_error_heading"}."</h3>"
+                                . &text( "err_has_errors_", $errorcount ) . "<br/><br/>"
+                                . "<a href=\"error.cgi?returnto=$returnto&returnlabel=$returnlabel\" class=\"btn btn-lg btn-danger conf-error-button\">"
+                                . "<i class=\"fa fa-fw fa-arrow-right\">&nbsp;</i>"
+                                . "<span>" . $dnsmasq::text{"err_goto"} . "</span></a>"
+                                . "</div>";
+            $error_check_action = "warn";
+        }
     }
     return ($error_check_action, $error_check_result);
 }
@@ -1024,18 +1136,19 @@ sub deserialize_string {
     return $var;
 }
 
-=head2 create_error(file, line, desc, configfield, param, cfg_idx, [custom_error], [error_type], [foruser], [forgroup])
+=head2 create_error(file, lineno, desc, configfield, param, cfg_idx, [custom_error], [error_type], [foruser], [forgroup])
 =cut
 sub create_error {
-    my ($file, $line, $desc, $configfield, $param, $cfg_idx) = @_;
+    my ($file, $lineno, $desc, $configfield, $param, $cfg_idx) = @_;
     my $custom_error = $_[6] ? $_[6] : 0;
     my $error_type = $_[7] ? $_[7] : undef;
     my $foruser = $_[8] ? $_[8] : undef;
     my $forgroup = $_[9] ? $_[9] : undef;
     my $perms_failed = $_[10] ? $_[10] : undef;
+    my $full = $_[11] ? $_[11] : undef;
     return {
                 "file" => $file,
-                "line" => $line,
+                "lineno" => $lineno,
                 "desc" => $desc,
                 "configfield" => $configfield,
                 "param" => $param,
@@ -1045,6 +1158,7 @@ sub create_error {
                 "foruser" => $foruser,
                 "forgroup" => $forgroup,
                 "perms_failed" => $perms_failed,
+                "full" => $full,
            };
 }
 

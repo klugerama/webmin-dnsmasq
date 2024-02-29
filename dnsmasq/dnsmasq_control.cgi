@@ -41,9 +41,9 @@ if ($in{"do_cmd"}) {
         &error("<pre>".&html_escape($err)."</pre>") if ($err);
     }
 
-    &error_setup($text{'$cmd_err'});
+    &error_setup($dnsmasq::text{'$cmd_err'});
     my $err;
-    $access{$cmd} || &error($text{'acl_'.$cmd.'_ecannot'});
+    $dnsmasq::access{$cmd} || &error($dnsmasq::text{'acl_'.$cmd.'_ecannot'});
     given ( $cmd ) {
         when ("start") {
             $err = &start_dnsmasq();
@@ -52,8 +52,8 @@ if ($in{"do_cmd"}) {
             $err = &stop_dnsmasq();
         }
         when ("restart") {
-            $access{'stop'} || &error($text{'acl_stop_ecannot'});
-            $access{'start'} || &error($text{'acl_start_ecannot'});
+            $dnsmasq::access{'stop'} || &error($dnsmasq::text{'acl_stop_ecannot'});
+            $dnsmasq::access{'start'} || &error($dnsmasq::text{'acl_start_ecannot'});
             $err = &restart_dnsmasq();
         }
         when ("reload") {
@@ -71,12 +71,12 @@ if ($in{"do_cmd"}) {
     # &redirect($in{'returnto'});
 }
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_dns_settings"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_dns_settings"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
-&ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header(undef, $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
@@ -115,11 +115,11 @@ if ($show_buttons == 1) {
         # my $form = &ui_form_start($action . ".cgi?returnto=" . $returnto, "post");
         my $form = &ui_form_start(basename($0), "post");
         $form .= &ui_hidden("do_cmd", $action);
-        $form .= &ui_submit($text{"index_button_" . $action}, $action, $button->{$action}->{"enabled"}, undef, $button->{$action}->{"icon"}, $button->{$action}->{"btn_class_extra"});
+        $form .= &ui_submit($dnsmasq::text{"index_button_" . $action}, $action, $button->{$action}->{"enabled"}, undef, $button->{$action}->{"icon"}, $button->{$action}->{"btn_class_extra"});
         $form .= &ui_form_end();
         my @cols = ();
         push(@cols, $form);
-        push(@cols, $text{$action . "_desc"});
+        push(@cols, $dnsmasq::text{$action . "_desc"});
         print &ui_columns_row( \@cols );
     }
     print &ui_columns_end();
@@ -132,15 +132,15 @@ if ($config{"check_for_updates"} eq "1" || ($in{"manual_check_for_update"} && $i
                 : 0;
     $latest = &check_for_updated_version($force);
     if ($latest) {
-        print "<p>" . &text("update_message", &get_current_version(), "<a href=\"" . $latest . "\" target=\"_blank\">" . $text{"click_here"} . "</a>") . "</p>";
+        print "<p>" . &text("update_message", &get_current_version(), "<a href=\"" . $latest . "\" target=\"_blank\">" . $dnsmasq::text{"click_here"} . "</a>") . "</p>";
     }
     else {
         print "<p>" . &text("current_version_message", &get_current_version()) . "</p>";
     }
-    print "<p>" . $text{"gh_message"} . "</p>";
+    print "<p>" . $dnsmasq::text{"gh_message"} . "</p>";
 }
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of dnsmasq_control.cgi ###.

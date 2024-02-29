@@ -27,7 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParse();
 
 my $returnto = $in{"returnto"} || "dhcp_basic.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_settings_basic"};
 
 my $result = "";
 my @sel = split(/\0/, $in{'sel'});
@@ -54,23 +54,23 @@ foreach my $configfield ( @dhcp_singles ) {
     my $internalfield = &config_to_internal($configfield);
     if ( grep { /^$configfield$/ } ( @sel )) {
         if ( ! $item->{"val_optional"} && $in{$internalfield . "val"} eq "" ) {
-            &send_to_error( $configfield, $text{"err_valreq"}, $returnto, $returnlabel );
+            &send_to_error( $configfield, $dnsmasq::text{"err_valreq"}, $returnto, $returnlabel );
         }
     }
     if ( grep { /^$configfield$/ } ( @sel )) {
         if ( $in{$internalfield . "val"} ne "" ) {
             my $item_template = %dnsmconfigvals{"$configfield"};
             if ( $item_template->{"valtype"} eq "int" && ($in{$internalfield . "val"} !~ /^$NUMBER$/) ) {
-                &send_to_error( $configfield, $text{"err_numbad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_numbad"}, $returnto, $returnlabel );
             }
             elsif ( $item_template->{"valtype"} eq "file" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                &send_to_error( $configfield, $text{"err_filebad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_filebad"}, $returnto, $returnlabel );
             }
             elsif ( $item_template->{"valtype"} eq "path" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
             }
             elsif ( $item_template->{"valtype"} eq "dir" && ($in{$internalfield . "val"} !~ /^$FILE$/) ) {
-                &send_to_error( $configfield, $text{"err_pathbad"}, $returnto, $returnlabel );
+                &send_to_error( $configfield, $dnsmasq::text{"err_pathbad"}, $returnto, $returnlabel );
             }
         }
     }

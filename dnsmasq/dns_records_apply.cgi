@@ -29,12 +29,12 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dns_records.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_records_settings"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_records_settings"};
 
 # check for input data errors
 if( ($in{resolv_std}) && ($in{resolv_file} !~ /^$FILE$/) ) {
-	my $line = "error.cgi?line=".$text{"p_label_resolv_file"};
-	$line .= "&type=" . &urlize($text{"err_filebad"});
+	my $line = "error.cgi?line=".$dnsmasq::text{"p_label_resolv_file"};
+	$line .= "&type=" . &urlize($dnsmasq::text{"err_filebad"});
 	&redirect( $line );
 	exit;
 }
@@ -52,7 +52,7 @@ elsif ($in{"new_ipset_domain"} ne "" && $in{"new_ipset_ipset"} ne "" ) {
 elsif ($in{"ipset_idx"} ne "") {
     my $item = $dnsmconfig{"ipset"}[$in{"ipset_idx"}];
     my $val = "ipset=/" . $in{"ipset_domain"} . "/" . $in{"ipset_ipset"};
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 elsif ($in{"new_connmark_allowlist_connmark"} ne "" ) {
     my $newval = $in{"new_connmark_allowlist_connmark"};
@@ -73,7 +73,7 @@ elsif ($in{"connmark_allowlist_idx"} ne "") {
     if ($in{"connmark_allowlist_pattern"}) {
         $val .= "," . $in{"connmark_allowlist_pattern"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     &do_selected_action( [ "ipset", "connmark_allowlist" ], \@sel, \%$dnsmconfig );

@@ -26,7 +26,7 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_title"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
@@ -34,20 +34,20 @@ if ($error_check_action eq "redirect") {
 my ($section, $page) = &get_context($0);
 my ($page_fields) = &get_page_fields($0);
 
-&ui_print_header($text{"index_tftp_settings_basic"} . &icon_if_disabled($section), $text{"index_title"}, undef, "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"index_tftp_settings_basic"} . &icon_if_disabled($section), $dnsmasq::text{"index_title"}, undef, "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "tftp_basic.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_tftp_settings_basic"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_tftp_settings_basic"};
 my $apply_cgi = "tftp_basic_apply.cgi";
 
-&show_basic_fields( \%dnsmconfig, "tftp_basic", $page_fields, $apply_cgi, $text{"index_tftp_settings_basic"} );
+&show_basic_fields( \%dnsmconfig, "tftp_basic", $page_fields, $apply_cgi, $dnsmasq::text{"index_tftp_settings_basic"} );
 
 &show_other_fields( \%dnsmconfig, "tftp_basic", $page_fields, $apply_cgi, " " );
 
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=tftp", $text{"index_tftp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=tftp", $dnsmasq::text{"index_tftp_settings"}, "index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of tftp_basic.cgi ###.

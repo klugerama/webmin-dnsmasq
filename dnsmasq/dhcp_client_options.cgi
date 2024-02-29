@@ -24,22 +24,22 @@ my $config_file = &read_file_lines( $config_filename );
 
 &parse_config_file( \%dnsmconfig, \$config_file, $config_filename );
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_title"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_title"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
 my ($section, $page) = &get_context($0);
 
-&ui_print_header($text{"index_dhcp_client_options"} . &icon_if_disabled($section), $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header($dnsmasq::text{"index_dhcp_client_options"} . &icon_if_disabled($section), $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my $returnto = $in{"returnto"} || "dhcp_client_options.cgi";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_client_options"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_client_options"};
 my $apply_cgi = "dhcp_client_options_apply.cgi";
 
-# &show_field_table("dhcp_option", $apply_cgi, $text{"_dhcp_option"}, \%dnsmconfig, 1);
+# &show_field_table("dhcp_option", $apply_cgi, $dnsmasq::text{"_dhcp_option"}, \%dnsmconfig, 1);
 our $internalfield = "dhcp_option";
 my $configfield = &internal_to_config($internalfield);
 my $definition = %configfield_fields{$internalfield};
@@ -50,7 +50,7 @@ sub show_dhcp_option_list {
     my $version_excluded = ($ipver == 4 ? 6 : 4);
     my $edit_link;
     my $hidden_edit_input_fields;
-    my @column_headers = ( "", $text{"enabled"}, );
+    my @column_headers = ( "", $dnsmasq::text{"enabled"}, );
     my @newfields = ( "ipversion" );
     foreach my $param ( @{$definition->{"param_order"}} ) {
         next if ($definition->{$param}->{"ipversion"} == $version_excluded);
@@ -64,7 +64,7 @@ sub show_dhcp_option_list {
         push( @tds, &get_class_tag($td_left_class) );
     }
     my @list_link_buttons = &list_links( "sel", $formidx );
-    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $text{"_dhcp_option"}), $internalfield, $text{"p_desc_$internalfield"}, $formid, \@newfields, "ipversion=ip" . $ipver );
+    my ($add_button, $hidden_add_input_fields) = &add_item_button(&text("add_", $dnsmasq::text{"_dhcp_option"}), $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $formid, \@newfields, "ipversion=ip" . $ipver );
     push(@list_link_buttons, $add_button);
 
     my $count = -1;
@@ -92,10 +92,10 @@ sub show_dhcp_option_list {
         foreach my $val ( @vals ) {
             # first call to &edit_item_link should capture link and fields; subsequent calls (1 for each field) only need the link
             if ( ! $hidden_edit_input_fields) {
-                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, ($in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : "") . "&ipversion=ip" . $ipver);
+                ($edit_link, $hidden_edit_input_fields) = &edit_item_link($val, $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, ($in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : "") . "&ipversion=ip" . $ipver);
             }
             else {
-                ($edit_link) = &edit_item_link($val, $internalfield, $text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, ($in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : "") . "&ipversion=ip" . $ipver);
+                ($edit_link) = &edit_item_link($val, $internalfield, $dnsmasq::text{"p_desc_$internalfield"}, $count, $formid, \@editfields, $item->{"cfg_idx"}, ($in{"show_validation"} ? "show_validation=" . $in{"show_validation"} : "") . "&ipversion=ip" . $ipver);
             }
             push( @cols, $edit_link );
         }
@@ -103,17 +103,17 @@ sub show_dhcp_option_list {
     }
     print &ui_columns_end();
     print &ui_links_row(\@list_link_buttons);
-    print "<p>" . $text{"with_selected"} . "</p>";
-    print &ui_submit($text{"button_enable_sel"}, "enable_sel_$internalfield");
-    print &ui_submit($text{"button_disable_sel"}, "disable_sel_$internalfield");
-    print &ui_submit($text{"button_delete_sel"}, "delete_sel_$internalfield");
+    print "<p>" . $dnsmasq::text{"with_selected"} . "</p>";
+    print &ui_submit($dnsmasq::text{"button_enable_sel"}, "enable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_disable_sel"}, "disable_sel_$internalfield");
+    print &ui_submit($dnsmasq::text{"button_delete_sel"}, "delete_sel_$internalfield");
     print $hidden_add_input_fields;
     print $hidden_edit_input_fields;
     print &ui_form_end();
 }
 
-my @tabs = (   [ 'ip4', $text{"dhcp_ipversion4"} ],
-            [ 'ip6', $text{"dhcp_ipversion6"} ] );
+my @tabs = (   [ 'ip4', $dnsmasq::text{"dhcp_ipversion4"} ],
+            [ 'ip6', $dnsmasq::text{"dhcp_ipversion6"} ] );
 my $ipversion = $in{"ipversion"} || "ip4";
 print &ui_tabs_start(\@tabs, "ipversion", $ipversion);
 
@@ -129,6 +129,6 @@ print &ui_tabs_end();
 
 print &add_js();
 
-&ui_print_footer("index.cgi?tab=dhcp", $text{"index_dhcp_settings"}, "index.cgi?tab=dns", $text{"index_dns_settings"});
+&ui_print_footer("index.cgi?tab=dhcp", $dnsmasq::text{"index_dhcp_settings"}, "index.cgi?tab=dns", $dnsmasq::text{"index_dns_settings"});
 
 ### END of dhcp_client_options.cgi ###.

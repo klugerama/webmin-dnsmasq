@@ -27,17 +27,17 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParseMime();
 
 my $type = $in{"type"} || "config";
-my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type . "&file=" . $in{'file'} . "&line=" . $in{'line'} . "&ch=" . $in{'ch'};
-my $returnlabel = $in{"returnlabel"} || $text{"index_dns_config_edit"};
+my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type . "&file=" . $in{'file'} . "&lineno=" . $in{'lineno'} . "&ch=" . $in{'ch'};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_config_edit"};
 
 my @files = ();
 if ($type eq "config") {
     push( @files, @{ $dnsmconfig{"configfiles"} } );
-    &indexof($in{'file'}, @files) >= 0 || &error($text{'manual_econffile'});
+    &indexof($in{'file'}, @files) >= 0 || &error($dnsmasq::text{'manual_econffile'});
 }
 else {
     push( @files, @{ $dnsmconfig{"scripts"} });
-    &indexof($in{'file'}, @files) >= 0 || &error($text{'manual_escriptfile'});
+    &indexof($in{'file'}, @files) >= 0 || &error($dnsmasq::text{'manual_escriptfile'});
 }
 
 $temp = &transname();

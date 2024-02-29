@@ -17,10 +17,6 @@
 
 require 'dnsmasq-lib.pl';
 
-require 'dns.cgi';
-require 'dhcp.cgi';
-require 'tftp.cgi';
-
 ## put in ACL checks here if needed
 
 # read config file
@@ -32,19 +28,19 @@ my $config_file = &read_file_lines( $config_filename );
 # read posted data
 &ReadParse();
 
-my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $text{"index_dns_settings"}, \%dnsmconfig );
+my ($error_check_action, $error_check_result) = &check_for_file_errors( $0, $dnsmasq::text{"index_dns_settings"}, \%dnsmconfig );
 if ($error_check_action eq "redirect") {
     &redirect ( $error_check_result );
 }
 
 ## Insert Output code here
-&ui_print_header(undef, $text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
+&ui_print_header(undef, $dnsmasq::text{"index_title"}, "", "intro", 1, 0, 0, &restart_button());
 print &header_js(\%dnsmconfig);
 print $error_check_result;
 
 my @tabs = ( );
 foreach my $c ( @section ) {
-    push(@tabs, [$c, $text{"index_" . $c . "_settings"} . &icon_if_disabled($c)]);
+    push(@tabs, [$c, $dnsmasq::text{"index_" . $c . "_settings"} . &icon_if_disabled($c)]);
 }
 
 my $tab = @section[0];
@@ -54,17 +50,11 @@ if ( defined ($in{"tab"}) ) {
 
 print &ui_tabs_start(\@tabs, 'tab', $tab);
 
-print &ui_tabs_start_tab('tab', 'dns');
-show_dns_settings();
-print &ui_tabs_end_tab('tab', 'dns');
-
-print &ui_tabs_start_tab('tab', 'dhcp');
-show_dhcp_settings();
-print &ui_tabs_end_tab('tab', 'dhcp');
-
-print &ui_tabs_start_tab('tab', 'tftp');
-show_tftp_settings();
-print &ui_tabs_end_tab('tab', 'tftp');
+foreach my $c ( @section ) {
+    print &ui_tabs_start_tab('tab', $c);
+    show_main_icons_section($c);
+    print &ui_tabs_end_tab('tab', $c);
+}
 
 print &ui_tabs_end();
 

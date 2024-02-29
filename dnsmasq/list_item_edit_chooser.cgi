@@ -56,11 +56,11 @@ sub formtable_ip4 {
     $formtable .= &generate_param_rows(6);
     $formtable .= &ui_columns_end();
     if ($at_least_one_required) {
-        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $dnsmasq::text{"footnote_required_parameter"} . "</i></div>";
     }
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_4", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $dnsmasq::text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $dnsmasq::text{"button_save"}, "submit_4", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_4_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -80,11 +80,11 @@ sub formtable_ip6 {
     $formtable .= &generate_param_rows(4);
     $formtable .= &ui_columns_end();
     if ($at_least_one_required) {
-        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $dnsmasq::text{"footnote_required_parameter"} . "</i></div>";
     }
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit_6", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $dnsmasq::text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $dnsmasq::text{"button_save"}, "submit_6", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_6_input_form');\"" ) );
     $formtable .= &ui_form_end( \@form_buttons );
     return $formtable;
 }
@@ -98,7 +98,7 @@ sub generate_param_rows {
         my $paramdefinition = $fielddefinition->{$param};
         next if ($ipversionfilter && ($paramdefinition->{"ipversion"} eq "$ipversionfilter" || $paramdefinition->{"ipversion"} == $ipversionfilter));
         my $tmpl = $ipversionfilter == 4 && $paramdefinition->{"template6"} ? $paramdefinition->{"template6"} : $paramdefinition->{"template"};
-        my $label = $paramdefinition->{"label"} || $text{"p_label_" . $internalfield . "_" . $param};
+        my $label = $paramdefinition->{"label"} || $dnsmasq::text{"p_label_" . $internalfield . "_" . $param};
         my $input_guidance = "placeholder=\"$tmpl\" title=\"$tmpl\"";
         my $validation = "";
         $validation .= $paramdefinition->{"pattern"} ? " pattern='" . $paramdefinition->{"pattern"} . "'" : "";
@@ -228,8 +228,8 @@ my $title_header = "<div class=\"dnsm-modal-header\"><span class=\"dnsm-modal-ti
 if ($internalfield eq "dhcp_range" || $internalfield eq "dhcp_option") {
     my $ipversion = "modal_" . ($in{"ipversion"} || "ip4");
     print &ui_columns_start( undef, 100, undef, undef, $title_header);
-    my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_chooser.cgi");
-    $desc .= $text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr;
+    my $desc = &ui_hidden_start($dnsmasq::text{"description_expand"}, "mandesc", 0, "list_item_edit_chooser.cgi");
+    $desc .= $dnsmasq::text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr;
     $desc .= &ui_hidden_end("mandesc");
     print &ui_columns_row( [ $desc ], \@doctd );
     if ($action eq "edit") {
@@ -241,8 +241,8 @@ if ($internalfield eq "dhcp_range" || $internalfield eq "dhcp_option") {
         }
     }
     else {
-        my @tabs = ( [ 'modal_ip4', $text{"dhcp_ipversion4"} ],
-                    [ 'modal_ip6', $text{"dhcp_ipversion6"} ] );
+        my @tabs = ( [ 'modal_ip4', $dnsmasq::text{"dhcp_ipversion4"} ],
+                    [ 'modal_ip6', $dnsmasq::text{"dhcp_ipversion6"} ] );
         $tabrow .= &ui_tabs_start(\@tabs, "ipversion", $ipversion);
 
         $tabrow .= &ui_tabs_start_tab("ipversion", 'modal_ip4');
@@ -267,8 +267,8 @@ else {
         print &ui_hidden($fieldname_prefix . "idx", $cfg_idx);
     }
     print &ui_columns_start( undef, 100, undef, undef, $title_header);
-    my $desc = &ui_hidden_start($text{"description_expand"}, "mandesc", 0, "list_item_edit_chooser.cgi");
-    $desc .= $text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr;
+    my $desc = &ui_hidden_start($dnsmasq::text{"description_expand"}, "mandesc", 0, "list_item_edit_chooser.cgi");
+    $desc .= $dnsmasq::text{"p_man_desc_" . $internalfield} =~ s/&amp;/&/gr;
     $desc .= &ui_hidden_end("mandesc");
     print &ui_columns_row( [ $desc ], \@doctd );
     if ($in{"ipversion"} eq "ip6") {
@@ -282,11 +282,11 @@ else {
     }
     print &ui_table_end();
     if ($at_least_one_required) {
-        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $text{"footnote_required_parameter"} . "</i></div>";
+        $formtable .= "<div><span color='red'>*</span>&nbsp;<i>" . $dnsmasq::text{"footnote_required_parameter"} . "</i></div>";
     }
     my @form_buttons = ();
-    push( @form_buttons, &ui_button( $text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
-    push( @form_buttons, &ui_submit( $text{"button_save"}, "submit", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
+    push( @form_buttons, &ui_button( $dnsmasq::text{"button_cancel"}, "cancel", undef, "class='dnsm-modal-cancel' style='height: 33px; display:inline; float:right;' data-dismiss='modal' onclick=\"\$('#list-item-edit-modal').modal('hide'); return false;\"", "fa fa-fw fa-times-circle-o", "btn btn-default ui_reset" ) );
+    push( @form_buttons, &ui_submit( $dnsmasq::text{"button_save"}, "submit", undef, "class='dnsm-modal-submit' style='height: 33px; display:inline !important; float:right;' onclick=\"return check_".$internalfield."('".$internalfield."_input_form');\"" ) );
     print &ui_form_end( \@form_buttons );
 }
 if ($in{"show_validation"}) {

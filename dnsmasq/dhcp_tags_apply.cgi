@@ -28,7 +28,7 @@ my $config_file = &read_file_lines( $config_filename );
 
 my $tab = $in{"tab"} || "basic";
 my $returnto = $in{"returnto"} || "dhcp_tags.cgi?tab=$tab";
-my $returnlabel = $in{"returnlabel"} || $text{"index_dhcp_tags"};
+my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dhcp_tags"};
 
 # adjust everything to what we got
 
@@ -39,7 +39,7 @@ if ($in{"new_dhcp_userclass_userclass"} ne "") {
 elsif ($in{"dhcp_userclass_idx"} ne "") {
     my $item = $dnsmconfig{"dhcp-userclass"}[$in{"dhcp_userclass_idx"}];
     my $val = "dhcp-userclass=set:" . $in{"dhcp_userclass_tag"} . "," . $in{"dhcp_userclass_userclass"};
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 elsif ($in{"new_dhcp_vendorclass_vendorclass"} && $in{"new_dhcp_vendorclass_vendorclass"} ne "") {
     my $newval = "set:" . $in{"new_dhcp_vendorclass_tag"} . "," . $in{"new_dhcp_vendorclass_vendorclass"};
@@ -48,11 +48,11 @@ elsif ($in{"new_dhcp_vendorclass_vendorclass"} && $in{"new_dhcp_vendorclass_vend
 elsif ($in{"dhcp_vendorclass_idx"} ne "") {
     my $item = $dnsmconfig{"dhcp-vendorclass"}[$in{"dhcp_vendorclass_idx"}];
     my $val = "dhcp-vendorclass=set:" . $in{"dhcp_vendorclass_tag"} . "," . $in{"dhcp_vendorclass_vendorclass"};
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});
-    @sel || &error($text{'selected_none'});
+    @sel || &error($dnsmasq::text{'selected_none'});
 
     &do_selected_action( [ "dhcp_userclass", "dhcp_vendorclass" ], \@sel, \%$dnsmconfig );
 }
