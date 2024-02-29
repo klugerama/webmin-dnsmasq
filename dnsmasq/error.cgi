@@ -155,6 +155,7 @@ sub show_ignored {
 &show_errors();
 
 print &ui_hr();
+print &ui_hr();
 
 &show_ignored();
 
