@@ -65,7 +65,7 @@ elsif ($in{"server_idx"} ne "") {
     if ($in{"server_source"} ne "") {
         $newval .= "," . $in{"server_source"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $newval);
+    &save_update($item->{"file"}, $item->{"lineno"}, $newval);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

@@ -30,7 +30,7 @@ my $config_file = &read_file_lines( $config_filename );
 my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type;
 my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_config_edit"};
 my $ch = defined($in{"ch"}) ? $in{"ch"} : -1;
-my $line = defined($in{"line"}) ? $in{"line"} : -1;
+my $lineno = defined($in{"lineno"}) ? $in{"lineno"} : -1;
 my $file = $in{"file"};
 my $type = $in{"type"} || "config";
 my @files = ();
@@ -44,8 +44,8 @@ if ($type eq "config") {
     if( $dnsmconfig{"error"}) {
         $error_message .= "<h2>" . @{$dnsmconfig{"error"}} . " errors found in configuration</h2><br/><br/>";
         foreach my $e ( @{$dnsmconfig{"error"}} ) {
-            if ($line == -1) {
-                $line = $e->{"line"};
+            if ($lineno == -1) {
+                $lineno = $e->{"lineno"};
                 $file = $e->{"file"};
             }
         }
@@ -68,16 +68,16 @@ if (!$file) {
     exit;
 }
 print "<script type='text/javascript'>\n";
-if ($line != -1) {
+if ($lineno != -1) {
     print "\$(document).ready(function() {\n"
         . "  setTimeout(function() {\n"
         . "    for (var i in window) {\n"
         . "      if (i.startsWith(\"__cm_editor_\") && typeof window[i] == \"object\") {\n";
     if ($ch != -1) {
-        print "        window[i].doc.setCursor({line: " . ($line - 1) . ", ch:" . ($ch - 1) . "});\n";
+        print "        window[i].doc.setCursor({line: " . ($lineno - 1) . ", ch:" . ($ch - 1) . "});\n";
     }
     else {
-        print "        window[i].doc.setSelection({line: " . ($line - 1) . ", ch:0},{line: " . $line . ", ch:0});\n";
+        print "        window[i].doc.setSelection({line: " . ($lineno - 1) . ", ch:0},{line: " . $lineno . ", ch:0});\n";
     }
     print "      }\n"
         . "    }\n"
@@ -112,7 +112,7 @@ $found || &error($dnsmasq::text{'manual_efile'});
 print &ui_form_start("manual_edit_save.cgi", "form-data", undef, "onsubmit=\"getPosition();\"");
 print &ui_hidden("type", $type),"\n";
 print &ui_hidden("file", $file),"\n";
-print &ui_hidden("line", -1),"\n";
+print &ui_hidden("lineno", -1),"\n";
 print &ui_hidden("ch", -1),"\n";
 
 $data = &read_file_lines($file, 1);

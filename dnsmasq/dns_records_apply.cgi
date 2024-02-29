@@ -52,7 +52,7 @@ elsif ($in{"new_ipset_domain"} ne "" && $in{"new_ipset_ipset"} ne "" ) {
 elsif ($in{"ipset_idx"} ne "") {
     my $item = $dnsmconfig{"ipset"}[$in{"ipset_idx"}];
     my $val = "ipset=/" . $in{"ipset_domain"} . "/" . $in{"ipset_ipset"};
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 elsif ($in{"new_connmark_allowlist_connmark"} ne "" ) {
     my $newval = $in{"new_connmark_allowlist_connmark"};
@@ -73,7 +73,7 @@ elsif ($in{"connmark_allowlist_idx"} ne "") {
     if ($in{"connmark_allowlist_pattern"}) {
         $val .= "," . $in{"connmark_allowlist_pattern"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     &do_selected_action( [ "ipset", "connmark_allowlist" ], \@sel, \%$dnsmconfig );

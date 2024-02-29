@@ -85,7 +85,7 @@ if ($in{"submit"}) {
 
     if ($in{"dhcp_boot_def"} == 1) {
         my $item = $dnsmconfig{"dhcp-boot"};
-        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
+        &save_update($item->{"file"}, $item->{"lineno"}, undef, 1);
     }
     elsif ($in{"dhcp_boot_filename"}) { # =[tag:<tag>,]<filename>,[<servername>[,<server address>|<tftp_servername>]]
         # "tag", "filename", "host", "address"
@@ -101,11 +101,11 @@ if ($in{"submit"}) {
                 $val .= "," . $in{"dhcp_boot_address"};
             }
         }
-        &save_update($item->{"file"}, $item->{"line"}, $val);
+        &save_update($item->{"file"}, $item->{"lineno"}, $val);
     }
     if ($in{"pxe_service_def"} == 1) {
         my $item = $dnsmconfig{"pxe-service"};
-        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
+        &save_update($item->{"file"}, $item->{"lineno"}, undef, 1);
     }
     elsif ($in{"pxe_service_csa"}) { # =[tag:<tag>,]<CSA>,<menu text>[,<basename>|<bootservicetype>][,<server address>|<server_name>]
         # "tag", "csa", "menutext", "basename", "server"
@@ -121,11 +121,11 @@ if ($in{"submit"}) {
         if ($in{"pxe_service_server"}) {
             $val .= "," . $in{"pxe_service_server"};
         }
-        &save_update($item->{"file"}, $item->{"line"}, $val);
+        &save_update($item->{"file"}, $item->{"lineno"}, $val);
     }
     if ($in{"pxe_prompt_def"} == 1) {
         my $item = $dnsmconfig{"pxe-prompt"};
-        &save_update($item->{"file"}, $item->{"line"}, undef, 1);
+        &save_update($item->{"file"}, $item->{"lineno"}, undef, 1);
     }
     elsif ($in{"pxe_prompt_prompt"}) { # =[tag:<tag>,]<prompt>[,<timeout>]
         # "tag", "prompt", "timeout"
@@ -138,7 +138,7 @@ if ($in{"submit"}) {
         if ($in{"pxe_prompt_timeout"}) {
             $val .= "," . $in{"pxe_prompt_timeout"};
         }
-        &save_update($item->{"file"}, $item->{"line"}, $val);
+        &save_update($item->{"file"}, $item->{"lineno"}, $val);
     }
 }
 elsif ($in{"new_bootp_dynamic_val"} ne "") {
@@ -150,7 +150,7 @@ elsif ($in{"bootp_dynamic_idx"} ne "") {
     my $item = $dnsmconfig{"bootp-dynamic"}[$in{"bootp_dynamic_idx"}];
     my $newval = "bootp-dynamic=";
     $newval .= $in{"bootp_dynamic_val"};
-    &save_update($item->{"file"}, $item->{"line"}, $newval);
+    &save_update($item->{"file"}, $item->{"lineno"}, $newval);
 }
 else {
     &do_selected_action( [ "bootp_dynamic" ], \@sel, \%$dnsmconfig );

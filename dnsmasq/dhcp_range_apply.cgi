@@ -100,7 +100,7 @@ if ($in{'new_dhcp_range_start'} ne "") {
 elsif ($in{"dhcp_range_idx"} ne "" && $in{"dhcp_range_start"} ne "") {
     my $item = $dnsmconfig{"dhcp-range"}[$in{"dhcp_range_idx"}];
     my $val = "dhcp-range=" . &eval_input_fields();
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

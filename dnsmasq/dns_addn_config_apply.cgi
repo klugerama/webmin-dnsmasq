@@ -47,7 +47,7 @@ if ($in{"conf_dir_idx"} ne "" && ($in{"conf_dir_filter"} ne "" || $in{"conf_dir_
     elsif ($in{"conf_dir_exceptions"} ne "") {
         $val .= "," . $in{"conf_dir_exceptions"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 elsif (@conf_file_adds) {
     foreach my $conf_file_add (@conf_file_adds) {

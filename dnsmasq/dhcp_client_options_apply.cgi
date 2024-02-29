@@ -116,7 +116,7 @@ elsif ($in{"dhcp_option_idx"} ne "" && $in{"dhcp_option_option"} ne "") {
     if ($in{"dhcp_option_value"} ne "") {
         $val .= "," . $in{"dhcp_option_value"};
     }
-    &save_update($item->{"file"}, $item->{"line"}, $line . $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $line . $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

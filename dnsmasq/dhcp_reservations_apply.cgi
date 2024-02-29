@@ -80,7 +80,7 @@ if ($in{'new_dhcp_host_'} ne "") {
 elsif ($in{"dhcp_host_idx"} ne "") {
     my $item = $dnsmconfig{"dhcp-host"}[$in{"dhcp_host_idx"}];
     my $val = "dhcp-host=" . &eval_input_fields();
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

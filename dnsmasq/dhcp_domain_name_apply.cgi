@@ -49,7 +49,7 @@ elsif ($in{"domain_idx"} ne "" && $in{"domain_domain"} ne "") {
             $val .= ",local";
         }
     }
-    &save_update($item->{"file"}, $item->{"line"}, $val);
+    &save_update($item->{"file"}, $item->{"lineno"}, $val);
 }
 else {
     my @sel = split(/\0/, $in{'sel'});

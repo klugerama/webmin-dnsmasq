@@ -27,7 +27,7 @@ my $config_file = &read_file_lines( $config_filename );
 &ReadParseMime();
 
 my $type = $in{"type"} || "config";
-my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type . "&file=" . $in{'file'} . "&line=" . $in{'line'} . "&ch=" . $in{'ch'};
+my $returnto = $in{"returnto"} || "manual_edit.cgi?type=" . $type . "&file=" . $in{'file'} . "&lineno=" . $in{'lineno'} . "&ch=" . $in{'ch'};
 my $returnlabel = $in{"returnlabel"} || $dnsmasq::text{"index_dns_config_edit"};
 
 my @files = ();

@@ -3567,7 +3567,7 @@ sub parse_config_file {
         while ( ($key, $vals) = each %dnsmconfigvals ) {
             if ( ! grep { /^$key$/ } ( @confarrs ) ) {
                 $dnsmconfig_ref->{$key}{"used"} = 0;
-                $dnsmconfig_ref->{$key}{"line"} = -1;
+                $dnsmconfig_ref->{$key}{"lineno"} = -1;
                 $dnsmconfig_ref->{$key}{"file"} = $config_filename;
             }
         }
@@ -3602,7 +3602,7 @@ sub parse_config_file {
                 if ($line =~ /^[\#]*[\s]*$b[\s]*$/ ) {
                     if ($dnsmconfig_ref->{$b}->{"used"} == 0) { # only overwrite if the last value read is not used (commented)
                         $dnsmconfig_ref->{$b}->{"used"} = ($line!~/^\#/);
-                        $dnsmconfig_ref->{$b}->{"line"} = $lineno;
+                        $dnsmconfig_ref->{$b}->{"lineno"} = $lineno;
                         $dnsmconfig_ref->{$b}->{"file"} = $config_filename;
                     }
                     $found = 1;
@@ -3617,12 +3617,12 @@ sub parse_config_file {
                 $remainder = $3;
                 %temp = ( );
                 $temp{"used"} = ($line !~ /^\#/);
-                $temp{"line"} = $lineno;
+                $temp{"lineno"} = $lineno;
                 $temp{"file"} = $config_filename;
                 $temp{"full"} = $line;
                 if ( ! grep { /^$configfield$/ } ( keys %dnsmconfigvals ) ) {
                     # print "Error in line $lineno ($configfield: unknown option)! ";
-                    push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_unknown_", $configfield), $configfield, $remainder, 0));
+                    push(@{$dnsmconfig_ref->{"error"}}, &create_error($config_filename, $lineno, &text("err_unknown_", $configfield), $configfield, $remainder, 0, undef, undef, undef, undef, undef, $line));
                     next;
                 }
                 my $confvar = \%{ $dnsmconfigvals{"$configfield"} };
@@ -4784,7 +4784,7 @@ sub validate_value {
         my $fdef = $configfield_fields{$internalfield};
         # webmin_debug_log("----VALIDATE", "configfield: $configfield");
         my $config_filename = $item->{"file"};
-        my $lineno = $item->{"line"};
+        my $lineno = $item->{"lineno"};
         my $cfg_idx = $item->{"cfg_idx"};
         foreach my $param ( @{$fdef->{"param_order"}} ) {
             my $pdef = \%{ $fdef->{"$param"} };
