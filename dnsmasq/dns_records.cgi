@@ -49,6 +49,10 @@ my @vals = (
         "add_button_text" => $dnsmasq::text{"_listen"},
     },
     {
+        "internalfield" => "nftset",
+        "add_button_text" => $dnsmasq::text{"_listen"},
+    },
+    {
         "internalfield" => "connmark_allowlist",
         "add_button_text" => $dnsmasq::text{"_connmark"},
     },

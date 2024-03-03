@@ -87,7 +87,7 @@ our %dnsmconfigvals = (
     "address"                   => { "idx" => 53,  "valtype" => "var",     "section" => $section[0], "page" => "4", "tab" => "5", "arr" => 1, "mult" => "" }, # =/<domain>[/<domain>...]/[<ipaddr>]
     "ipset"                     => { "idx" => 54,  "valtype" => "var",     "section" => $section[0], "page" => "5", "tab" => "3", "arr" => 1, "mult" => "" }, # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
     "connmark-allowlist-enable" => { "idx" => 55,  "valtype" => "string",  "section" => $section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "val_optional" => 1 }, # [=<mask>]
-    "connmark-allowlist"        => { "idx" => 56,  "valtype" => "var",     "section" => $section[0], "page" => "5", "tab" => "4", "arr" => 1, "mult" => "" }, # =<connmark>[/<mask>][,<pattern>[/<pattern>...]] 
+    "connmark-allowlist"        => { "idx" => 56,  "valtype" => "var",     "section" => $section[0], "page" => "5", "tab" => "5", "arr" => 1, "mult" => "" }, # =<connmark>[/<mask>][,<pattern>[/<pattern>...]] 
     "mx-host"                   => { "idx" => 57,  "valtype" => "var",     "section" => $section[0], "page" => "5", "tab" => "2", "arr" => 0, "mult" => "" }, # =<mx name>[[,<hostname>],<preference>]
     "mx-target"                 => { "idx" => 58,  "valtype" => "string",  "section" => $section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "" }, # =<hostname>
     "selfmx"                    => { "idx" => 59,  "valtype" => "bool",    "section" => $section[0], "page" => "5", "tab" => "1", "arr" => 0, "mult" => "", "default" => 0 },
@@ -195,6 +195,7 @@ our %dnsmconfigvals = (
     "conf-file"                 => { "idx" => 161, "valtype" => "var",     "section" => $section[0], "page" => "6", "tab" => "1", "arr" => 1, "mult" => "" }, # =<file>
     "conf-dir"                  => { "idx" => 162, "valtype" => "var",     "section" => $section[0], "page" => "6", "tab" => "3", "arr" => 1, "mult" => "" }, # =<directory>[,<file-extension>......],
     "servers-file"              => { "idx" => 163, "valtype" => "var",     "section" => $section[0], "page" => "6", "tab" => "2", "arr" => 1, "mult" => "" }, # =<file>
+    "nftset"                    => { "idx" => 164, "valtype" => "var",     "section" => $section[0], "page" => "5", "tab" => "4", "arr" => 1, "mult" => "" }, # =/<domain>[/<domain>...]/<ipset>[,<ipset>...]
 );
 
 # our %dnsmnav = (
@@ -1055,6 +1056,29 @@ sub init_hashes {
                 "required" => 1,
                 "label" => $dnsmasq::text{"p_label_val_ipsets"},
                 "template" => "<" . $dnsmasq::text{"tmpl_ipset"} . ">[,<" . $dnsmasq::text{"tmpl_ipset"} . ">...]",
+                "arr" => 1,
+                "sep" => ",",
+            },
+        },
+        "nftset" => {  # =/<domain>[/<domain>...]/[(6|4)#[<family>#]<table>#<set>[,[(6|4)#[<family>#]<table>#<set>]...]
+            "param_order" => [ "domain", "nftset" ],
+            "domain" => {
+                "length" => 20,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $dnsmasq::text{"p_label_val_domains"},
+                "template" => "<" . $dnsmasq::text{"tmpl_domain"} . ">[/<" . $dnsmasq::text{"tmpl_domain"} . ">...]",
+                "arr" => 1,
+                "sep" => "/",
+            },
+            "nftset" => {
+                "length" => 25,
+                "valtype" => "string",
+                "default" => "",
+                "required" => 1,
+                "label" => $dnsmasq::text{"p_label_val_nftsets"},
+                "template" => "[" . $dnsmasq::text{"tmpl_nftset"} . ">[,<" . $dnsmasq::text{"tmpl_nftset"} . ">]...]",
                 "arr" => 1,
                 "sep" => ",",
             },
@@ -3408,7 +3432,8 @@ sub init_hashes {
                     "1" => "basic",
                     "2" => "recs",
                     "3" => "ipset",
-                    "4" => "connmark_allowlist",
+                    "4" => "nftset",
+                    "5" => "connmark_allowlist",
                 }
             },
             "6" => {
@@ -3783,6 +3808,24 @@ sub parse_config_file {
                                 while ( $ipsets && $ipsets =~ /^([0-9a-zA-Z\.\-]+)((?:,)(.*))*$/ && defined($1) ) {
                                     push( @{ $valtemp{"ipset"} }, $1 );
                                     $ipsets = $3;
+                                    last if ($current++ >= $max_iterations);
+                                }
+                            }
+                        }
+                        when ("nftset") { # =/<domain>[/<domain>...]/[(6|4)#[<family>#]<table>#<set>[,[(6|4)#[<family>#]<table>#<set>]...]
+                            if ( $remainder && $remainder =~ /^\/([a-zA-Z\_\.][0-9a-zA-Z\_\.\-\/]*)\/([#0-9a-zA-Z\,\.\-]*)$/ ) {
+                                my $domains = $1;
+                                my $nftsets = $2;
+                                $current = 0;
+                                while ($domains && $domains =~ /^([a-zA-Z\_\.][0-9a-zA-Z\_\.\-]*)((?:\/)(.*))*$/ ) {
+                                    push( @{ $valtemp{"domain"} }, $1 );
+                                    $domains = $3;
+                                    last if ($current++ >= $max_iterations);
+                                }
+                                $current = 0;
+                                while ( $nftsets && $nftsets =~ /^([\#0-9a-zA-Z\.\-]+)((?:,)(.*))*$/ && defined($1) ) {
+                                    push( @{ $valtemp{"nftset"} }, $1 );
+                                    $nftsets = $3;
                                     last if ($current++ >= $max_iterations);
                                 }
                             }
