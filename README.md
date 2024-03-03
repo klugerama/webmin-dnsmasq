@@ -61,9 +61,11 @@ Finally, you may directly edit the configuration file(s) by clicking `Edit confi
 ## Errors
 If any errors are found in the saved configuration, a box will show at the top of the page listing the details of the discovered issue. This contains the name of the option, the configuration file it is found in, and which line contains the offending error. If a required parameter is missing, or if there is something wrong with the specified value for that parameter, a short description will identify the issue.
 
-To correct the error, you have three options:
+To address the error, you have four options:
 ### 1. Fix the value
 Clicking on any text in the error row will take you to the relevant settings page for that option, and (hopefully) provide you with more information regarding how to fix the problem. For list items, the appropriate edit dialog will pop up for that item.
+
+For items that with an unrecognized parameter, clicking the text has no effect.
 #### Manual editing
 Alternatively, there is a button to edit the option in the file editor. Clicking "Manual Edit" to the right of the error will take to the file editor, and put the cursor on the relevant line.
 #### File permissions
@@ -120,9 +122,18 @@ drwxr-xr-x 5 root root  4096 Sep  5 13:25 ../
 ```
 The script requires - but does not have - `execute` permissions. Since `fred` is not the file's owner and `fred` is not a member of the `root` group, the module will add the `execute` permission for "others" (also for "user" - but not "group" - because it doesn't make sense to allow others to execute the file but not the owner).
 ### 2. Disable the option
-To disable the option and allow DNSMasq to use the default value, ensure the checkbox to the left of the error is checked and click `Disable`. More than one error-causing option at a time may be disabled by checking more than one box.
-### 3. Delete the option
-To delete the option from the configuration file and allow DNSMasq to use the default value, ensure the checkbox to the left of the error is checked and click `Delete`. More than one error-causing option at a time may be deleted by checking more than one box.
+To disable the option and allow DNSMasq to use the default value, ensure the checkbox to the left of the error is checked and click `Disable` under `With Selected:` below the error table. More than one error-causing option at a time may be disabled by checking more than one box.
+### 4. Ignore the option
+To ignore the option in the specified configuration file and allow DNSMasq to use the default value (if applicable), either click the "Ignore" button to the right of the error or ensure the checkbox to the left of the error is checked and click `Ignore` under `With Selected:` below the error table. More than one error-causing option at a time may be ignored by checking more than one box.
+
+Ignoring the error will add the contents of that line - for that configuration file only - to an internal list of ignored values. Ignored values will not be displayed as errors in the module. If the content of an ignored line is changed in the specified configuration file, it will automatically be removed from the list of ignored values.
+
+To "unignore" an ignored value, either click the "Unignore" button to the right of the value or ensure the checkbox to the left of the error is checked and click `Ignore` under `With Selected:` below the error table. This will remove the ignored value from the internal list of ignored values, and it will again be displayed as an error in the module.
+### 5. Delete the option
+To delete the option from the configuration file and allow DNSMasq to use the default value, ensure the checkbox to the left of the error is checked and click `Delete` under `With Selected:` below the error table. More than one error-causing option at a time may be deleted by checking more than one box. 
+
+> [!WARNING]
+> Deleting an option from the configuration file will delete the entire line in the file. THIS CANNOT BE UNDONE. Ensure you have adequate backups of all applicable configuration files.
 
 ## Applying changes
 Click the restart icon at the top right of the module's page to restart DNSMasq. In most cases, DNSMasq must be restarted to apply configuration changes.
